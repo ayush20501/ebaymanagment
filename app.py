@@ -19,7 +19,7 @@ from openai import OpenAI
 app = Flask(__name__, static_folder='static', template_folder='templates')
 load_dotenv()
 
-SECRET_KEY = os.getenv("SECRET_KEY")
+app.secret_key = os.getenv("SECRET_KEY")
 DB_URL = os.getenv("DB_URL")
 
 EBAY_ENV = os.getenv("EBAY_ENV", "PRODUCTION")
