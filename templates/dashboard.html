@@ -34,6 +34,17 @@
         <div id="success-message" class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"></div>
 
         <form id="listing-form" class="bg-white rounded-lg shadow p-6">
+            <!-- Autofill Button -->
+            <div class="mb-6 flex justify-between items-center">
+                <button type="button" id="autofill-btn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    Fill Sample Data
+                </button>
+                <span class="text-sm text-gray-500">Click to autofill with example values</span>
+            </div>
+
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="lg:col-span-2">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Item Description *</label>
@@ -104,6 +115,27 @@
             } catch (error) {
                 window.location.href = 'login.html';
             }
+        });
+
+        // Autofill functionality
+        document.getElementById('autofill-btn').addEventListener('click', () => {
+            document.getElementById('raw_text').value = "Sainsbury's Mackerel Fillets in Olive Oil 125g - Premium quality mackerel fillets preserved in olive oil. Perfect for sandwiches, salads, or as a healthy snack. Rich in omega-3 fatty acids and protein. Best before date clearly marked on tin.";
+            document.getElementById('price_value').value = "19.99";
+            document.getElementById('quantity').value = "3";
+            document.getElementById('condition').value = "NEW";
+            document.getElementById('images').value = "https://assets.sainsburys-groceries.co.uk/gol/1261448/1/640x640.jpg";
+            
+            // Clear any error messages
+            document.getElementById('error-message').classList.add('hidden');
+            document.getElementById('success-message').classList.add('hidden');
+            
+            // Add a subtle animation to show the form has been filled
+            const form = document.getElementById('listing-form');
+            form.style.transform = 'scale(1.01)';
+            form.style.transition = 'transform 0.2s ease';
+            setTimeout(() => {
+                form.style.transform = 'scale(1)';
+            }, 200);
         });
 
         // Logout functionality
