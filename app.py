@@ -17,24 +17,26 @@ from collections import Counter
 from openai import OpenAI
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
-app.secret_key ="super-secret-key-change-in-production"
-
 load_dotenv()
-DB_URL = "postgresql://ebaymanagementsystem_user:dNA23QSwkfz8ArItjYRJvel89YoRCpyL@dpg-d2iqd2ili9vc73b7tbfg-a.singapore-postgres.render.com/ebaymanagementsystem?sslmode=require"
-db_pool = psycopg2.pool.SimpleConnectionPool(1, 20, DB_URL)
 
-# eBay configuration
-EBAY_ENV = "PRODUCTION"
-BASE = "https://api.sandbox.ebay.com" if EBAY_ENV == "SANDBOX" else "https://api.ebay.com"
-AUTH = "https://auth.sandbox.ebay.com" if EBAY_ENV == "SANDBOX" else "https://auth.ebay.com"
-TOKEN = BASE + "/identity/v1/oauth2/token"
-API = "https://api.ebay.com"
-MARKETPLACE_ID = "EBAY_GB"
-LANG = "en-GB" if MARKETPLACE_ID == "EBAY_GB" else "en-US"
-CLIENT_ID = "Yogachan-Test01-PRD-2813fd373-5c224fb5"
-CLIENT_SECRET = "PRD-9d78966a26e5-da39-485c-9712-8d28"
-RU_NAME = "Yogachandran_RA-Yogachan-Test01-aeegb"
-OPENAI_API_KEY = "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"
+SECRET_KEY = os.getenv("SECRET_KEY")
+DB_URL = os.getenv("DB_URL")
+
+EBAY_ENV = os.getenv("EBAY_ENV", "PRODUCTION")
+BASE = os.getenv("EBAY_BASE")
+AUTH = os.getenv("EBAY_AUTH")
+TOKEN = os.getenv("EBAY_TOKEN_URL")
+API = os.getenv("EBAY_API")
+MARKETPLACE_ID = os.getenv("EBAY_MARKETPLACE_ID")
+LANG = os.getenv("EBAY_LANG")
+
+CLIENT_ID = os.getenv("EBAY_CLIENT_ID")
+CLIENT_SECRET = os.getenv("EBAY_CLIENT_SECRET")
+RU_NAME = os.getenv("EBAY_RU_NAME")
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+db_pool = psycopg2.pool.SimpleConnectionPool(1, 20, DB_URL)
 
 SCOPES = " ".join([
     "https://api.ebay.com/oauth/api_scope",
