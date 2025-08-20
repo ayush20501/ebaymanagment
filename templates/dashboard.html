@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - eBay Listing Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-xl font-bold text-gray-900">eBay Listing Manager</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span id="user-email" class="text-gray-600"></span>
+                    <button id="logout-btn" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">Create New Listing</h2>
+            <p class="text-gray-600">Fill in the details below to create your eBay listing</p>
+        </div>
+
+        <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"></div>
+        <div id="success-message" class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"></div>
+
+        <form id="listing-form" class="bg-white rounded-lg shadow p-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="lg:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Item Description *</label>
+                    <textarea id="raw_text" required rows="4" placeholder="Describe your item in detail..." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Price (£) *</label>
+                    <input type="number" id="price_value" step="0.01" min="0.01" required placeholder="0.00" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Quantity *</label>
+                    <input type="number" id="quantity" min="1" value="1" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Condition *</label>
+                    <select id="condition" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">Select condition...</option>
+                        <option value="NEW">New</option>
+                        <option value="USED">Used</option>
+                        <option value="REFURBISHED">Refurbished</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Currency *</label>
+                    <select id="currency" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="GBP" selected>GBP (£)</option>
+                    </select>
+                </div>
+                
+                <div class="lg:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Image URLs *</label>
+                    <textarea id="images" required rows="3" placeholder="Enter at least one image URL (must start with https://)" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                    <p class="text-xs text-gray-500 mt-1">Enter one HTTPS URL per line (at least one required)</p>
+                </div>
+            </div>
+            
+            <div class="mt-6">
+                <button type="submit" id="publish-btn" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                    Publish to eBay
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Check authentication on page load
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch('/auth-status');
+                const data = await response.json();
+                
+                if (!data.is_logged_in) {
+                    window.location.href = 'login.html';
+                    return;
+                } else if (!data.has_profile) {
+                    window.location.href = 'profile.html';
+                    return;
+                } else if (!data.has_ebay_auth) {
+                    window.location.href = 'ebay-auth.html';
+                    return;
+                }
+                
+                document.getElementById('user-email').textContent = data.email;
+            } catch (error) {
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Logout functionality
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            try {
+                await fetch('/logout', { method: 'POST' });
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('Logout failed:', error);
+            }
+        });
+
+        // Form submission with enhanced validation
+        document.getElementById('listing-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Additional validation for images - now compulsory
+            const imagesValue = document.getElementById('images').value.trim();
+            const validImages = imagesValue
+                .split('\n')
+                .map(url => url.trim())
+                .filter(url => url.startsWith('https://'));
+            
+            if (!imagesValue || validImages.length === 0) {
+                document.getElementById('error-message').textContent = 'At least one valid HTTPS image URL is required.';
+                document.getElementById('error-message').classList.remove('hidden');
+                document.getElementById('success-message').classList.add('hidden');
+                return;
+            }
+            
+            const formData = {
+                raw_text: document.getElementById('raw_text').value.trim(),
+                price: {
+                    value: parseFloat(document.getElementById('price_value').value),
+                    currency: document.getElementById('currency').value
+                },
+                quantity: parseInt(document.getElementById('quantity').value),
+                condition: document.getElementById('condition').value,
+                images: validImages
+            };
+            
+            const button = document.getElementById('publish-btn');
+            button.disabled = true;
+            button.innerHTML = `
+                <div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin inline-block mr-2"></div>
+                Publishing...
+            `;
+            
+            try {
+                const response = await fetch('/publish-item', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Store success data for success page
+                    localStorage.setItem('listing-success', JSON.stringify(data));
+                    window.location.href = 'success.html';
+                } else {
+                    document.getElementById('error-message').textContent = data.error || 'Failed to publish listing';
+                    document.getElementById('error-message').classList.remove('hidden');
+                    document.getElementById('success-message').classList.add('hidden');
+                }
+            } catch (error) {
+                document.getElementById('error-message').textContent = 'Network error. Please try again.';
+                document.getElementById('error-message').classList.remove('hidden');
+            }
+            
+            button.disabled = false;
+            button.textContent = 'Publish to eBay';
+        });
+    </script>
+</body>
+</html>

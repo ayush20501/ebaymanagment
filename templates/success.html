@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Success - eBay Listing Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <div class="min-h-screen flex items-center justify-center">
+        <div class="max-w-lg w-full bg-white rounded-lg shadow-md p-8">
+            <div class="text-center">
+                <!-- Success Icon -->
+                <div class="mb-6">
+                    <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                        <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                </div>
+                
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Listing Published!</h1>
+                <p class="text-gray-600 mb-8">Your item has been successfully published to eBay</p>
+                
+                <!-- Listing Details -->
+                <div id="listing-details" class="bg-gray-50 rounded-lg p-6 mb-6 text-left">
+                    <h3 class="font-semibold text-gray-900 mb-4">Listing Details:</h3>
+                    <div class="space-y-2 text-sm">
+                        <div><span class="font-medium">Title:</span> <span id="listing-title"></span></div>
+                        <div><span class="font-medium">SKU:</span> <span id="listing-sku"></span></div>
+                        <div><span class="font-medium">Category:</span> <span id="listing-category"></span></div>
+                        <div><span class="font-medium">Listing ID:</span> <span id="listing-id"></span></div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="space-y-3">
+                    <a id="view-listing-btn" href="#" target="_blank" class="block w-full bg-yellow-500 text-black py-3 px-4 rounded-lg hover:bg-yellow-600 transition-colors font-semibold">
+                        View on eBay
+                    </a>
+                    <a href="dashboard.html" class="block w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                        Create Another Listing
+                    </a>
+                    <a href="index.html" class="block w-full border border-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors font-semibold">
+                        Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('load', () => {
+            // Get listing data from localStorage
+            const listingData = JSON.parse(localStorage.getItem('listing-success') || '{}');
+            
+            if (!listingData.status) {
+                // No listing data, redirect to dashboard
+                window.location.href = 'dashboard.html';
+                return;
+            }
+            
+            // Populate listing details
+            document.getElementById('listing-title').textContent = listingData.title || 'N/A';
+            document.getElementById('listing-sku').textContent = listingData.sku || 'N/A';
+            document.getElementById('listing-category').textContent = listingData.categoryName || 'N/A';
+            document.getElementById('listing-id').textContent = listingData.listingId || 'N/A';
+            
+            // Set view listing button
+            const viewBtn = document.getElementById('view-listing-btn');
+            if (listingData.viewItemUrl) {
+                viewBtn.href = listingData.viewItemUrl;
+            } else {
+                viewBtn.style.display = 'none';
+            }
+            
+            // Clear localStorage
+            localStorage.removeItem('listing-success');
+        });
+    </script>
+</body>
+</html>

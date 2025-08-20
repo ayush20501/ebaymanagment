@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eBay Authentication - eBay Listing Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <div class="min-h-screen flex items-center justify-center">
+        <div class="max-w-md w-full bg-white rounded-lg shadow-md p-8">
+            <div class="text-center mb-8">
+                <div class="mb-4">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
+                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-900">Connect to eBay</h1>
+                <p class="text-gray-600">Authorize access to your eBay account to start listing items</p>
+            </div>
+            
+            <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"></div>
+            <div id="success-message" class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"></div>
+            
+            <div class="space-y-4">
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <h3 class="font-semibold text-blue-900 mb-2">What will happen:</h3>
+                    <ul class="text-sm text-blue-800 space-y-1">
+                        <li>• You'll be redirected to eBay's secure login</li>
+                        <li>• Log in with your eBay username and password</li>
+                        <li>• Authorize our app to manage your listings</li>
+                        <li>• You'll be brought back to complete setup</li>
+                    </ul>
+                </div>
+                
+                <button id="ebay-auth-btn" class="w-full bg-yellow-500 text-black py-3 rounded-lg hover:bg-yellow-600 transition-colors font-semibold flex items-center justify-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-3H9V7h2v6z"/>
+                    </svg>
+                    Connect to eBay
+                </button>
+                
+                <div class="text-center">
+                    <p class="text-xs text-gray-500">
+                        Your eBay credentials are handled securely by eBay. We never see your password.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication status on page load
+        window.addEventListener('load', () => {
+            fetch('/auth-status')
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.is_logged_in) {
+                        window.location.href = 'login.html';
+                    } else if (!data.has_profile) {
+                        window.location.href = 'profile.html';
+                    } else if (data.has_ebay_auth) {
+                        window.location.href = 'dashboard.html';
+                    }
+                });
+
+            // Check for eBay auth success in URL params
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('ebay_auth') === 'success') {
+                document.getElementById('success-message').textContent = 'eBay authentication successful!';
+                document.getElementById('success-message').classList.remove('hidden');
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 2000);
+            }
+        });
+
+        document.getElementById('ebay-auth-btn').addEventListener('click', async () => {
+            const button = document.getElementById('ebay-auth-btn');
+            button.disabled = true;
+            button.innerHTML = `
+                <div class="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin mr-2"></div>
+                Redirecting...
+            `;
+            
+            try {
+                // Redirect to eBay OAuth
+                window.location.href = '/ebay-login';
+            } catch (error) {
+                document.getElementById('error-message').textContent = 'Failed to connect to eBay. Please try again.';
+                document.getElementById('error-message').classList.remove('hidden');
+                button.disabled = false;
+                button.innerHTML = `
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-3H9V7h2v6z"/>
+                    </svg>
+                    Connect to eBay
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

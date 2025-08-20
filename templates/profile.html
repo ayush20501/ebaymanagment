@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Profile - eBay Listing Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <div class="min-h-screen flex items-center justify-center py-8">
+        <div class="max-w-lg w-full bg-white rounded-lg shadow-md p-8">
+            <div class="text-center mb-8">
+                <h1 class="text-2xl font-bold text-gray-900">Setup Your Profile</h1>
+                <p class="text-gray-600">Please provide your warehouse address details</p>
+            </div>
+            
+            <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"></div>
+            <div id="success-message" class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"></div>
+            
+            <form id="profile-form">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Address Line 1 *</label>
+                    <input type="text" id="address_line1" required placeholder="House number, Road name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <p class="text-xs text-gray-500 mt-1">e.g., 123 High Street</p>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">City *</label>
+                    <input type="text" id="city" required placeholder="Enter your city" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Postal Code *</label>
+                    <input type="text" id="postal_code" required placeholder="e.g., SW1A 1AA" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Country</label>
+                    <select id="country" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-100" disabled>
+                        <option value="GB" selected>United Kingdom (GB)</option>
+                    </select>
+                    <p class="text-xs text-gray-500 mt-1">Currently only UK addresses are supported</p>
+                </div>
+                
+                <button type="submit" id="profile-btn" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                    Save Profile
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Check if user is logged in
+        fetch('/auth-status')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.is_logged_in) {
+                    window.location.href = 'login.html';
+                } else if (data.has_profile) {
+                    // User already has profile, redirect based on eBay auth status
+                    if (data.has_ebay_auth) {
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        window.location.href = 'ebay-auth.html';
+                    }
+                }
+            });
+
+        document.getElementById('profile-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                address_line1: document.getElementById('address_line1').value.trim(),
+                city: document.getElementById('city').value.trim(),
+                postal_code: document.getElementById('postal_code').value.trim(),
+                country: 'GB'
+            };
+            
+            const button = document.getElementById('profile-btn');
+            button.disabled = true;
+            button.textContent = 'Saving...';
+            
+            try {
+                const response = await fetch('/profile', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('success-message').textContent = 'Profile saved successfully!';
+                    document.getElementById('success-message').classList.remove('hidden');
+                    document.getElementById('error-message').classList.add('hidden');
+                    
+                    setTimeout(() => {
+                        window.location.href = 'ebay-auth.html';
+                    }, 1500);
+                } else {
+                    document.getElementById('error-message').textContent = data.error || 'Failed to save profile';
+                    document.getElementById('error-message').classList.remove('hidden');
+                    document.getElementById('success-message').classList.add('hidden');
+                }
+            } catch (error) {
+                document.getElementById('error-message').textContent = 'Network error. Please try again.';
+                document.getElementById('error-message').classList.remove('hidden');
+            }
+            
+            button.disabled = false;
+            button.textContent = 'Save Profile';
+        });
+    </script>
+</body>
+</html>
