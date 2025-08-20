@@ -5,3 +5,4 @@ requests
 werkzeug
 jsonschema
 openai
+gunicorn
