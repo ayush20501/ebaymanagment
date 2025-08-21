@@ -701,7 +701,25 @@ def get_required_and_recommended_aspects(tree_id: str, category_id: str):
         "raw": aspects,
     }
 
-# Keep all existing route handlers up to auth_status...
+@app.route("/")
+def index():
+    return send_from_directory(app.template_folder, 'index.html')
+
+@app.route("/signup.html")
+def signup_page():
+    return send_from_directory(app.template_folder, 'signup.html')
+
+@app.route("/login.html")
+def login_page():
+    return send_from_directory(app.template_folder, 'login.html')
+
+@app.route("/profile.html")
+def profile_page():
+    return send_from_directory(app.template_folder, 'profile.html')
+
+@app.route("/ebay-auth.html")
+def ebay_auth_page():
+    return send_from_directory(app.template_folder, 'ebay-auth.html')
 
 @app.route("/dashboard.html")
 def dashboard_page():
