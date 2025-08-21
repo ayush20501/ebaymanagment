@@ -363,6 +363,41 @@ def init_db():
 
 init_db()
 
+def init_user_listings_table():
+    conn = db_pool.getconn()
+    try:
+        with conn.cursor() as c:
+            c.execute("""
+                CREATE TABLE IF NOT EXISTS user_listings (
+                    id SERIAL PRIMARY KEY,
+                    user_id INTEGER NOT NULL,
+                    listing_id TEXT NOT NULL,
+                    offer_id TEXT,
+                    sku TEXT,
+                    title TEXT NOT NULL,
+                    price_value DECIMAL(10,2),
+                    price_currency TEXT DEFAULT 'GBP',
+                    quantity INTEGER,
+                    condition TEXT,
+                    category_id TEXT,
+                    category_name TEXT,
+                    marketplace_id TEXT,
+                    view_url TEXT,
+                    status TEXT DEFAULT 'ACTIVE',
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (user_id) REFERENCES users(id),
+                    UNIQUE(user_id, listing_id)
+                )
+            """)
+            conn.commit()
+    except psycopg2.Error as e:
+        print(f"Database error: {e}")
+        raise
+    finally:
+        db_pool.putconn(conn)
+
+init_user_listings_table()
+
 def _b64_basic():
     return "Basic " + base64.b64encode(f"{CLIENT_ID}:{CLIENT_SECRET}".encode()).decode()
 
@@ -480,6 +515,80 @@ def update_listing_count():
         with conn.cursor() as c:
             c.execute("UPDATE listing_counts SET total_count = total_count + 1, updated_at = CURRENT_TIMESTAMP WHERE id = 1")
             conn.commit()
+    finally:
+        close_db_connection(conn)
+
+def save_user_listing(user_id, listing_data):
+    """Save user listing to database"""
+    if not is_user_active(user_id):
+        return False
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as c:
+            c.execute("""
+                INSERT INTO user_listings
+                (user_id, listing_id, offer_id, sku, title, price_value, price_currency,
+                 quantity, condition, category_id, category_name, marketplace_id, view_url)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                ON CONFLICT (user_id, listing_id) DO UPDATE
+                SET title = EXCLUDED.title,
+                    price_value = EXCLUDED.price_value,
+                    quantity = EXCLUDED.quantity,
+                    view_url = EXCLUDED.view_url
+            """, (
+                user_id, listing_data['listing_id'], listing_data.get('offer_id'),
+                listing_data.get('sku'), listing_data['title'], 
+                listing_data.get('price_value'), listing_data.get('price_currency', 'GBP'),
+                listing_data.get('quantity'), listing_data.get('condition'),
+                listing_data.get('category_id'), listing_data.get('category_name'),
+                listing_data.get('marketplace_id'), listing_data.get('view_url')
+            ))
+            conn.commit()
+            return True
+    except psycopg2.Error as e:
+        print(f"Error saving user listing: {e}")
+        conn.rollback()
+        return False
+    finally:
+        close_db_connection(conn)
+
+def get_user_listings(user_id, limit=50, offset=0):
+    """Get user's listings with pagination"""
+    if not is_user_active(user_id):
+        return []
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as c:
+            c.execute("""
+                SELECT listing_id, offer_id, sku, title, price_value, price_currency,
+                       quantity, condition, category_name, view_url, status, created_at
+                FROM user_listings 
+                WHERE user_id = %s 
+                ORDER BY created_at DESC 
+                LIMIT %s OFFSET %s
+            """, (user_id, limit, offset))
+            rows = c.fetchall()
+            
+            listings = []
+            for row in rows:
+                listings.append({
+                    'listing_id': row[0],
+                    'offer_id': row[1],
+                    'sku': row[2],
+                    'title': row[3],
+                    'price_value': float(row[4]) if row[4] else 0,
+                    'price_currency': row[5],
+                    'quantity': row[6],
+                    'condition': row[7],
+                    'category_name': row[8],
+                    'view_url': row[9],
+                    'status': row[10],
+                    'created_at': row[11].isoformat() if row[11] else None
+                })
+            return listings
+    except psycopg2.Error as e:
+        print(f"Error fetching user listings: {e}")
+        return []
     finally:
         close_db_connection(conn)
 
@@ -1174,6 +1283,22 @@ OUTPUT RULES:
         view_url = f"https://www.ebay.co.uk/itm/{listing_id}" if marketplaceId == "EBAY_GB" else None
         
         update_listing_count()
+
+        listing_data = {
+            'listing_id': listing_id,
+            'offer_id': offer_id,
+            'sku': sku,
+            'title': title,
+            'price_value': price['value'],
+            'price_currency': price['currency'],
+            'quantity': quantity,
+            'condition': condition,
+            'category_id': cat_id,
+            'category_name': cat_name,
+            'marketplace_id': marketplaceId,
+            'view_url': view_url
+        }
+        save_user_listing(session["user_id"], listing_data)
         
         result = {
             "status": "published",
@@ -1232,6 +1357,43 @@ def get_total_listings_route():
     total = get_total_listings()
     return jsonify({"total_listings": total})
 
+@app.route("/user-stats")
+def get_user_stats():
+    if "user_id" not in session:
+        return jsonify({"error": "Please log in first"}), 401
+    if not is_user_active(session["user_id"]):
+        return jsonify({"error": "Account is inactive"}), 403
+
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as c:
+            # Get listing count for user
+            c.execute("SELECT COUNT(*) FROM user_listings WHERE user_id = %s", (session["user_id"],))
+            listing_count = c.fetchone()[0]
+            
+            # Get total value of listings
+            c.execute("""
+                SELECT SUM(price_value * quantity) as total_value,
+                       COUNT(CASE WHEN status = 'ACTIVE' THEN 1 END) as active_count
+                FROM user_listings 
+                WHERE user_id = %s
+            """, (session["user_id"],))
+            stats_row = c.fetchone()
+            
+            total_value = float(stats_row[0]) if stats_row[0] else 0
+            active_count = stats_row[1] if stats_row[1] else 0
+            
+            return jsonify({
+                "total_listings": listing_count,
+                "active_listings": active_count,
+                "total_inventory_value": total_value,
+                "email": session.get("email")
+            })
+    except psycopg2.Error as e:
+        return jsonify({"error": "Failed to fetch stats"}), 500
+    finally:
+        close_db_connection(conn)
+        
 @app.route("/my-listings")
 def get_my_listings():
     if "user_id" not in session:
@@ -1239,7 +1401,17 @@ def get_my_listings():
     if not is_user_active(session["user_id"]):
         return jsonify({"error": "Account is inactive"}), 403
 
-    return jsonify({"listings": []})
+    page = request.args.get('page', 1, type=int)
+    limit = 20
+    offset = (page - 1) * limit
+    
+    listings = get_user_listings(session["user_id"], limit, offset)
+    
+    return jsonify({
+        "listings": listings,
+        "page": page,
+        "has_more": len(listings) == limit
+    })
 
 @app.errorhandler(404)
 def not_found(error):
