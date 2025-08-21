@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - eBay Listing Manager</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="min-h-screen bg-gray-50">
+    <!-- Navigation -->
     <!-- Navigation -->
     <nav class="bg-white shadow">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -15,8 +18,17 @@
                     <h1 class="text-xl font-bold text-gray-900">eBay Listing Manager</h1>
                 </div>
                 <div class="flex items-center space-x-4">
+                    <button id="profile-btn"
+                        class="flex items-center space-x-2 text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                        <span>Profile</span>
+                    </button>
                     <span id="user-email" class="text-gray-600"></span>
-                    <button id="logout-btn" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors">
+                    <button id="logout-btn"
+                        class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors">
                         Logout
                     </button>
                 </div>
@@ -24,21 +36,99 @@
         </div>
     </nav>
 
+    <div id="profile-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-2/3 lg:w-1/2 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium text-gray-900">My Profile</h3>
+                    <button id="close-profile" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Profile Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <div class="text-2xl font-bold text-blue-600" id="total-listings-stat">-</div>
+                        <div class="text-sm text-gray-600">Total Listings</div>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <div class="text-2xl font-bold text-green-600" id="active-listings-stat">-</div>
+                        <div class="text-sm text-gray-600">Active Listings</div>
+                    </div>
+                    <div class="bg-purple-50 p-4 rounded-lg">
+                        <div class="text-2xl font-bold text-purple-600" id="inventory-value-stat">£-</div>
+                        <div class="text-sm text-gray-600">Inventory Value</div>
+                    </div>
+                </div>
+
+                <!-- Account Info -->
+                <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                    <h4 class="font-medium text-gray-900 mb-2">Account Information</h4>
+                    <p class="text-sm text-gray-600">Email: <span id="profile-email" class="font-medium"></span></p>
+                </div>
+
+                <!-- Recent Listings -->
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="font-medium text-gray-900">Recent Listings</h4>
+                        <button id="view-all-listings" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            View All
+                        </button>
+                    </div>
+                    <div id="recent-listings" class="space-y-2 max-h-60 overflow-y-auto">
+                        <div class="text-center text-gray-500 py-4">
+                            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto mb-2">
+                            </div>
+                            Loading listings...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- All Listings View (Hidden by default) -->
+                <div id="all-listings-view" class="hidden">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="font-medium text-gray-900">All Listings</h4>
+                        <button id="back-to-recent" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            ← Back to Recent
+                        </button>
+                    </div>
+                    <div id="all-listings" class="space-y-2 max-h-60 overflow-y-auto">
+                        <!-- Listings will be loaded here -->
+                    </div>
+                    <div class="mt-3 flex justify-center">
+                        <button id="load-more-listings"
+                            class="hidden bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm">
+                            Load More
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="max-w-4xl mx-auto px-4 py-8">
         <div class="mb-8">
             <h2 class="text-2xl font-bold text-gray-900 mb-2">Create New Listing</h2>
             <p class="text-gray-600">Fill in the details below to create your AI-powered eBay listing</p>
         </div>
 
-        <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"></div>
-        <div id="success-message" class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"></div>
+        <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        </div>
+        <div id="success-message"
+            class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"></div>
 
         <form id="listing-form" class="bg-white rounded-lg shadow p-6">
             <!-- Autofill Button -->
             <div class="mb-6 flex justify-between items-center">
-                <button type="button" id="autofill-btn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center">
+                <button type="button" id="autofill-btn"
+                    class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                     </svg>
                     Fill Sample Data
                 </button>
@@ -48,38 +138,46 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="lg:col-span-2">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Item Description *</label>
-                    <textarea id="raw_text" required rows="4" placeholder="Describe your item in detail..." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
-                    <p class="text-xs text-gray-500 mt-1">AI will analyze this to extract keywords, generate title, and fill product specifications</p>
+                    <textarea id="raw_text" required rows="4" placeholder="Describe your item in detail..."
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                    <p class="text-xs text-gray-500 mt-1">AI will analyze this to extract keywords, generate title, and
+                        fill product specifications</p>
                 </div>
-                
+
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Price (£) *</label>
-                    <input type="number" id="price_value" step="0.01" min="0.01" required placeholder="0.00" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <input type="number" id="price_value" step="0.01" min="0.01" required placeholder="0.00"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 </div>
-                
+
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Quantity *</label>
-                    <input type="number" id="quantity" min="1" value="1" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <input type="number" id="quantity" min="1" value="1" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                 </div>
-                
+
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Condition *</label>
-                    <select id="condition" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <select id="condition" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         <option value="">Select condition...</option>
                         <option value="NEW">New</option>
                     </select>
                 </div>
-                
+
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Currency *</label>
-                    <select id="currency" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <select id="currency" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         <option value="GBP" selected>GBP (£)</option>
                     </select>
                 </div>
-                
+
                 <div class="lg:col-span-2">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Image URLs *</label>
-                    <textarea id="images" required rows="3" placeholder="Enter at least one image URL (must start with https://)" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                    <textarea id="images" required rows="3"
+                        placeholder="Enter at least one image URL (must start with https://)"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
                     <p class="text-xs text-gray-500 mt-1">Enter one HTTPS URL per line (at least one required)</p>
                 </div>
 
@@ -88,11 +186,13 @@
                     <label class="block text-sm font-medium text-gray-700 mb-3">AI Enhancement Options</label>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <label class="flex items-center">
-                            <input type="checkbox" id="use_html_description" checked class="h-4 w-4 text-blue-600 rounded">
+                            <input type="checkbox" id="use_html_description" checked
+                                class="h-4 w-4 text-blue-600 rounded">
                             <span class="ml-2 text-sm text-gray-700">Generate HTML description</span>
                         </label>
                         <label class="flex items-center">
-                            <input type="checkbox" id="use_simple_prompt_description" checked class="h-4 w-4 text-blue-600 rounded">
+                            <input type="checkbox" id="use_simple_prompt_description" checked
+                                class="h-4 w-4 text-blue-600 rounded">
                             <span class="ml-2 text-sm text-gray-700">AI-powered description</span>
                         </label>
                         <label class="flex items-center">
@@ -102,9 +202,10 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="mt-6">
-                <button type="submit" id="publish-btn" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed">
+                <button type="submit" id="publish-btn"
+                    class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed">
                     Publish to eBay
                 </button>
             </div>
@@ -121,7 +222,8 @@
             </div>
             <div class="mt-3">
                 <div class="bg-white rounded-full h-2">
-                    <div id="ai-progress" class="bg-blue-600 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    <div id="ai-progress" class="bg-blue-600 h-2 rounded-full transition-all duration-500"
+                        style="width: 0%"></div>
                 </div>
             </div>
         </div>
@@ -144,7 +246,8 @@
                 </div>
                 <div>
                     <h4 class="font-medium text-gray-700 mb-2">Generated Description</h4>
-                    <div id="debug-description" class="bg-white p-3 rounded border text-sm text-gray-600 max-h-40 overflow-y-auto"></div>
+                    <div id="debug-description"
+                        class="bg-white p-3 rounded border text-sm text-gray-600 max-h-40 overflow-y-auto"></div>
                 </div>
             </div>
         </div>
@@ -156,7 +259,7 @@
             try {
                 const response = await fetch('/auth-status');
                 const data = await response.json();
-                
+
                 if (!data.is_logged_in) {
                     window.location.href = 'login.html';
                     return;
@@ -167,7 +270,7 @@
                     window.location.href = 'ebay-auth.html';
                     return;
                 }
-                
+
                 document.getElementById('user-email').textContent = data.email;
             } catch (error) {
                 window.location.href = 'login.html';
@@ -202,12 +305,12 @@
             document.getElementById('quantity').value = "3";
             document.getElementById('condition').value = "NEW";
             document.getElementById('images').value = "https://assets.sainsburys-groceries.co.uk/gol/1261448/1/640x640.jpg";
-            
+
             // Clear any error messages
             document.getElementById('error-message').classList.add('hidden');
             document.getElementById('success-message').classList.add('hidden');
             document.getElementById('debug-panel').classList.add('hidden');
-            
+
             // Add a subtle animation to show the form has been filled
             const form = document.getElementById('listing-form');
             form.style.transform = 'scale(1.01)';
@@ -230,21 +333,21 @@
         // Enhanced form submission with AI status tracking
         document.getElementById('listing-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             // Additional validation for images - now compulsory
             const imagesValue = document.getElementById('images').value.trim();
             const validImages = imagesValue
                 .split('\n')
                 .map(url => url.trim())
                 .filter(url => url.startsWith('https://'));
-            
+
             if (!imagesValue || validImages.length === 0) {
                 document.getElementById('error-message').textContent = 'At least one valid HTTPS image URL is required.';
                 document.getElementById('error-message').classList.remove('hidden');
                 document.getElementById('success-message').classList.add('hidden');
                 return;
             }
-            
+
             const formData = {
                 raw_text: document.getElementById('raw_text').value.trim(),
                 price: {
@@ -258,26 +361,26 @@
                 use_simple_prompt_description: document.getElementById('use_simple_prompt_description').checked,
                 include_debug: document.getElementById('include_debug').checked
             };
-            
+
             const button = document.getElementById('publish-btn');
             button.disabled = true;
             button.textContent = 'Processing...';
-            
+
             // Hide previous messages and debug panel
             document.getElementById('error-message').classList.add('hidden');
             document.getElementById('success-message').classList.add('hidden');
             document.getElementById('debug-panel').classList.add('hidden');
-            
+
             // Start AI processing animation
             showAIStatus('🤖 Analyzing your product description...', 10);
-            
+
             try {
                 // Simulate AI processing steps for better UX
                 setTimeout(() => updateAIProgress('🔍 Extracting keywords and metadata...', 25), 500);
                 setTimeout(() => updateAIProgress('📂 Finding optimal eBay category...', 50), 1500);
                 setTimeout(() => updateAIProgress('📋 Filling product specifications...', 75), 2500);
                 setTimeout(() => updateAIProgress('✍️ Generating marketing description...', 90), 3500);
-                
+
                 const response = await fetch('/publish-item', {
                     method: 'POST',
                     headers: {
@@ -285,17 +388,17 @@
                     },
                     body: JSON.stringify(formData),
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (response.ok) {
                     updateAIProgress('✅ Publishing to eBay...', 100);
-                    
+
                     // Show debug information if requested
                     if (formData.include_debug && data.debug) {
                         showDebugInfo(data.debug);
                     }
-                    
+
                     setTimeout(() => {
                         hideAIStatus();
                         // Store success data for success page
@@ -312,7 +415,7 @@
                 document.getElementById('error-message').textContent = 'Network error. Please try again.';
                 document.getElementById('error-message').classList.remove('hidden');
             }
-            
+
             // Re-enable button and restore text
             button.disabled = false;
             button.textContent = 'Publish to eBay';
@@ -321,7 +424,7 @@
         // Show debug information
         function showDebugInfo(debug) {
             document.getElementById('debug-panel').classList.remove('hidden');
-            
+
             // Keywords
             if (debug.step1_extract_keywords) {
                 const keywords = debug.step1_extract_keywords;
@@ -331,7 +434,7 @@
                     <strong>Brand:</strong> ${keywords.brand || 'N/A'}
                 `;
             }
-            
+
             // Category
             if (debug.step2_category) {
                 const category = debug.step2_category;
@@ -341,7 +444,7 @@
                     <strong>ID:</strong> ${category.categoryId || 'N/A'}
                 `;
             }
-            
+
             // Aspects
             if (debug.step3_aspects) {
                 const aspects = debug.step3_aspects;
@@ -353,7 +456,7 @@
                     <strong>Filled:</strong><br>${filledAspects || 'None'}
                 `;
             }
-            
+
             // Description
             if (debug.description) {
                 const desc = debug.description;
@@ -364,6 +467,150 @@
                 `;
             }
         }
+
+        let currentListingsPage = 1;
+        let hasMoreListings = false;
+
+        document.getElementById('profile-btn').addEventListener('click', async () => {
+            document.getElementById('profile-modal').classList.remove('hidden');
+            await loadProfileData();
+        });
+
+        document.getElementById('close-profile').addEventListener('click', () => {
+            document.getElementById('profile-modal').classList.add('hidden');
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('profile-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'profile-modal') {
+                document.getElementById('profile-modal').classList.add('hidden');
+            }
+        });
+
+        async function loadProfileData() {
+            try {
+                // Load user stats
+                const statsResponse = await fetch('/user-stats');
+                const statsData = await statsResponse.json();
+
+                if (statsResponse.ok) {
+                    document.getElementById('total-listings-stat').textContent = statsData.total_listings;
+                    document.getElementById('active-listings-stat').textContent = statsData.active_listings;
+                    document.getElementById('inventory-value-stat').textContent = `£${statsData.total_inventory_value.toFixed(2)}`;
+                    document.getElementById('profile-email').textContent = statsData.email;
+                }
+
+                // Load recent listings
+                await loadRecentListings();
+            } catch (error) {
+                console.error('Error loading profile data:', error);
+            }
+        }
+
+        async function loadRecentListings() {
+            try {
+                const response = await fetch('/my-listings?page=1');
+                const data = await response.json();
+
+                const container = document.getElementById('recent-listings');
+
+                if (response.ok && data.listings.length > 0) {
+                    container.innerHTML = data.listings.slice(0, 5).map(listing => `
+                        <div class="flex items-center justify-between p-3 bg-white border rounded-lg">
+                            <div class="flex-1">
+                                <h5 class="font-medium text-gray-900 text-sm">${listing.title}</h5>
+                                <p class="text-xs text-gray-500">
+                                    ${listing.category_name || 'Unknown Category'} • 
+                                    £${listing.price_value} • 
+                                    Qty: ${listing.quantity}
+                                </p>
+                            </div>
+                            ${listing.view_url ? `
+                                <a href="${listing.view_url}" target="_blank" class="text-blue-600 hover:text-blue-800 text-xs font-medium">
+                                    View →
+                                </a>
+                            ` : ''}
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = '<div class="text-center text-gray-500 py-4">No listings found</div>';
+                }
+            } catch (error) {
+                document.getElementById('recent-listings').innerHTML =
+                    '<div class="text-center text-red-500 py-4">Error loading listings</div>';
+            }
+        }
+
+        document.getElementById('view-all-listings').addEventListener('click', async () => {
+            document.getElementById('recent-listings').closest('div').classList.add('hidden');
+            document.getElementById('all-listings-view').classList.remove('hidden');
+            await loadAllListings();
+        });
+
+        document.getElementById('back-to-recent').addEventListener('click', () => {
+            document.getElementById('all-listings-view').classList.add('hidden');
+            document.getElementById('recent-listings').closest('div').classList.remove('hidden');
+        });
+
+        async function loadAllListings(page = 1) {
+            try {
+                const response = await fetch(`/my-listings?page=${page}`);
+                const data = await response.json();
+
+                const container = document.getElementById('all-listings');
+
+                if (response.ok) {
+                    if (page === 1) {
+                        container.innerHTML = '';
+                    }
+
+                    if (data.listings.length > 0) {
+                        container.innerHTML += data.listings.map(listing => `
+                            <div class="flex items-center justify-between p-3 bg-white border rounded-lg">
+                                <div class="flex-1">
+                                    <h5 class="font-medium text-gray-900 text-sm">${listing.title}</h5>
+                                    <p class="text-xs text-gray-500">
+                                        ${listing.category_name || 'Unknown Category'} • 
+                                        £${listing.price_value} • 
+                                        Qty: ${listing.quantity} •
+                                        ${new Date(listing.created_at).toLocaleDateString()}
+                                    </p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="px-2 py-1 text-xs rounded-full ${listing.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                                        ${listing.status}
+                                    </span>
+                                    ${listing.view_url ? `
+                                        <a href="${listing.view_url}" target="_blank" class="text-blue-600 hover:text-blue-800 text-xs font-medium">
+                                            View →
+                                        </a>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        `).join('');
+                    } else if (page === 1) {
+                        container.innerHTML = '<div class="text-center text-gray-500 py-4">No listings found</div>';
+                    }
+
+                    hasMoreListings = data.has_more;
+                    currentListingsPage = page;
+
+                    const loadMoreBtn = document.getElementById('load-more-listings');
+                    if (hasMoreListings) {
+                        loadMoreBtn.classList.remove('hidden');
+                    } else {
+                        loadMoreBtn.classList.add('hidden');
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading listings:', error);
+            }
+        }
+
+        document.getElementById('load-more-listings').addEventListener('click', () => {
+            loadAllListings(currentListingsPage + 1);
+        });
     </script>
 </body>
+
 </html>
