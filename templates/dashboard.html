@@ -9,8 +9,6 @@
 </head>
 
 <body class="min-h-screen bg-gray-50">
-    <!-- Navigation -->
-    <!-- Navigation -->
     <nav class="bg-white shadow">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
@@ -49,7 +47,6 @@
                     </button>
                 </div>
 
-                <!-- Profile Stats -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                     <div class="bg-blue-50 p-4 rounded-lg">
                         <div class="text-2xl font-bold text-blue-600" id="total-listings-stat">-</div>
@@ -65,13 +62,68 @@
                     </div>
                 </div>
 
-                <!-- Account Info -->
                 <div class="bg-gray-50 p-4 rounded-lg mb-6">
                     <h4 class="font-medium text-gray-900 mb-2">Account Information</h4>
                     <p class="text-sm text-gray-600">Email: <span id="profile-email" class="font-medium"></span></p>
                 </div>
 
-                <!-- Recent Listings -->
+                <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="font-medium text-gray-900">Address Information</h4>
+                        <button id="edit-address-btn" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            Edit
+                        </button>
+                    </div>
+
+                    <div id="address-display">
+                        <div class="text-sm text-gray-600 space-y-1">
+                            <p id="display-address-line1">-</p>
+                            <p><span id="display-city">-</span>, <span id="display-postal-code">-</span></p>
+                            <p id="display-country">-</p>
+                        </div>
+                    </div>
+
+                    <div id="address-edit-form" class="hidden">
+                        <form id="address-form" class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Address Line 1 *</label>
+                                <input type="text" id="edit-address-line1" required
+                                    class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">City *</label>
+                                    <input type="text" id="edit-city" required
+                                        class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">Postal Code *</label>
+                                    <input type="text" id="edit-postal-code" required
+                                        class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Country</label>
+                                <select id="edit-country" disabled
+                                    class="w-full px-2 py-1 text-sm border border-gray-300 rounded bg-gray-100">
+                                    <option value="GB">United Kingdom</option>
+                                </select>
+                            </div>
+                            <div class="flex space-x-2 pt-2">
+                                <button type="submit"
+                                    class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 disabled:bg-gray-400">
+                                    Save Changes
+                                </button>
+                                <button type="button" id="cancel-address-edit"
+                                    class="bg-gray-300 text-gray-700 px-3 py-1 rounded text-sm hover:bg-gray-400">
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                        <div id="address-update-message" class="hidden mt-2 text-sm"></div>
+                    </div>
+                </div>
+
                 <div>
                     <div class="flex items-center justify-between mb-3">
                         <h4 class="font-medium text-gray-900">Recent Listings</h4>
@@ -88,7 +140,6 @@
                     </div>
                 </div>
 
-                <!-- All Listings View (Hidden by default) -->
                 <div id="all-listings-view" class="hidden">
                     <div class="flex items-center justify-between mb-3">
                         <h4 class="font-medium text-gray-900">All Listings</h4>
@@ -97,7 +148,6 @@
                         </button>
                     </div>
                     <div id="all-listings" class="space-y-2 max-h-60 overflow-y-auto">
-                        <!-- Listings will be loaded here -->
                     </div>
                     <div class="mt-3 flex justify-center">
                         <button id="load-more-listings"
@@ -122,7 +172,6 @@
             class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"></div>
 
         <form id="listing-form" class="bg-white rounded-lg shadow p-6">
-            <!-- Autofill Button -->
             <div class="mb-6 flex justify-between items-center">
                 <button type="button" id="autofill-btn"
                     class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center">
@@ -181,7 +230,6 @@
                     <p class="text-xs text-gray-500 mt-1">Enter one HTTPS URL per line (at least one required)</p>
                 </div>
 
-                <!-- AI Options -->
                 <div class="lg:col-span-2">
                     <label class="block text-sm font-medium text-gray-700 mb-3">AI Enhancement Options</label>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -211,7 +259,6 @@
             </div>
         </form>
 
-        <!-- AI Processing Status - Moved below form -->
         <div id="ai-status" class="hidden bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6">
             <div class="flex items-center">
                 <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mr-3"></div>
@@ -228,7 +275,6 @@
             </div>
         </div>
 
-        <!-- Debug Information Panel -->
         <div id="debug-panel" class="hidden mt-6 bg-gray-50 border border-gray-200 rounded-lg p-4">
             <h3 class="text-lg font-semibold text-gray-900 mb-4">Debug Information</h3>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -254,7 +300,10 @@
     </div>
 
     <script>
-        // Check authentication on page load
+        let currentUserProfile = null;
+        let currentListingsPage = 1;
+        let hasMoreListings = false;
+
         window.addEventListener('load', async () => {
             try {
                 const response = await fetch('/auth-status');
@@ -277,7 +326,6 @@
             }
         });
 
-        // AI Status Management
         const aiStatusEl = document.getElementById('ai-status');
         const aiStatusTextEl = document.getElementById('ai-status-text');
         const aiProgressEl = document.getElementById('ai-progress');
@@ -298,7 +346,6 @@
             aiProgressEl.style.width = `${progress}%`;
         }
 
-        // Autofill functionality
         document.getElementById('autofill-btn').addEventListener('click', () => {
             document.getElementById('raw_text').value = "Sainsbury's Mackerel Fillets in Olive Oil 125g - Premium quality mackerel fillets preserved in olive oil. Perfect for sandwiches, salads, or as a healthy snack. Rich in omega-3 fatty acids and protein. Best before date clearly marked on tin.";
             document.getElementById('price_value').value = "19.99";
@@ -306,12 +353,10 @@
             document.getElementById('condition').value = "NEW";
             document.getElementById('images').value = "https://assets.sainsburys-groceries.co.uk/gol/1261448/1/640x640.jpg";
 
-            // Clear any error messages
             document.getElementById('error-message').classList.add('hidden');
             document.getElementById('success-message').classList.add('hidden');
             document.getElementById('debug-panel').classList.add('hidden');
 
-            // Add a subtle animation to show the form has been filled
             const form = document.getElementById('listing-form');
             form.style.transform = 'scale(1.01)';
             form.style.transition = 'transform 0.2s ease';
@@ -320,7 +365,6 @@
             }, 200);
         });
 
-        // Logout functionality
         document.getElementById('logout-btn').addEventListener('click', async () => {
             try {
                 await fetch('/logout', { method: 'POST' });
@@ -330,147 +374,6 @@
             }
         });
 
-        // Enhanced form submission with AI status tracking
-        document.getElementById('listing-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            // Additional validation for images - now compulsory
-            const imagesValue = document.getElementById('images').value.trim();
-            const validImages = imagesValue
-                .split('\n')
-                .map(url => url.trim())
-                .filter(url => url.startsWith('https://'));
-
-            if (!imagesValue || validImages.length === 0) {
-                document.getElementById('error-message').textContent = 'At least one valid HTTPS image URL is required.';
-                document.getElementById('error-message').classList.remove('hidden');
-                document.getElementById('success-message').classList.add('hidden');
-                return;
-            }
-
-            const formData = {
-                raw_text: document.getElementById('raw_text').value.trim(),
-                price: {
-                    value: parseFloat(document.getElementById('price_value').value),
-                    currency: document.getElementById('currency').value
-                },
-                quantity: parseInt(document.getElementById('quantity').value),
-                condition: document.getElementById('condition').value,
-                images: validImages,
-                use_html_description: document.getElementById('use_html_description').checked,
-                use_simple_prompt_description: document.getElementById('use_simple_prompt_description').checked,
-                include_debug: document.getElementById('include_debug').checked
-            };
-
-            const button = document.getElementById('publish-btn');
-            button.disabled = true;
-            button.textContent = 'Processing...';
-
-            // Hide previous messages and debug panel
-            document.getElementById('error-message').classList.add('hidden');
-            document.getElementById('success-message').classList.add('hidden');
-            document.getElementById('debug-panel').classList.add('hidden');
-
-            // Start AI processing animation
-            showAIStatus('🤖 Analyzing your product description...', 10);
-
-            try {
-                // Simulate AI processing steps for better UX
-                setTimeout(() => updateAIProgress('🔍 Extracting keywords and metadata...', 25), 500);
-                setTimeout(() => updateAIProgress('📂 Finding optimal eBay category...', 50), 1500);
-                setTimeout(() => updateAIProgress('📋 Filling product specifications...', 75), 2500);
-                setTimeout(() => updateAIProgress('✍️ Generating marketing description...', 90), 3500);
-
-                const response = await fetch('/publish-item', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData),
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    updateAIProgress('✅ Publishing to eBay...', 100);
-
-                    // Show debug information if requested
-                    if (formData.include_debug && data.debug) {
-                        showDebugInfo(data.debug);
-                    }
-
-                    setTimeout(() => {
-                        hideAIStatus();
-                        // Store success data for success page
-                        localStorage.setItem('listing-success', JSON.stringify(data));
-                        window.location.href = 'success.html';
-                    }, 1000);
-                } else {
-                    hideAIStatus();
-                    document.getElementById('error-message').textContent = data.error || 'Failed to publish listing';
-                    document.getElementById('error-message').classList.remove('hidden');
-                }
-            } catch (error) {
-                hideAIStatus();
-                document.getElementById('error-message').textContent = 'Network error. Please try again.';
-                document.getElementById('error-message').classList.remove('hidden');
-            }
-
-            // Re-enable button and restore text
-            button.disabled = false;
-            button.textContent = 'Publish to eBay';
-        });
-
-        // Show debug information
-        function showDebugInfo(debug) {
-            document.getElementById('debug-panel').classList.remove('hidden');
-
-            // Keywords
-            if (debug.step1_extract_keywords) {
-                const keywords = debug.step1_extract_keywords;
-                document.getElementById('debug-keywords').innerHTML = `
-                    <strong>Title:</strong> ${keywords.normalized_title || 'N/A'}<br>
-                    <strong>Category Keywords:</strong> ${(keywords.category_keywords || []).join(', ') || 'N/A'}<br>
-                    <strong>Brand:</strong> ${keywords.brand || 'N/A'}
-                `;
-            }
-
-            // Category
-            if (debug.step2_category) {
-                const category = debug.step2_category;
-                document.getElementById('debug-category').innerHTML = `
-                    <strong>Query:</strong> ${category.queryUsed || 'N/A'}<br>
-                    <strong>Category:</strong> ${category.categoryName || 'N/A'}<br>
-                    <strong>ID:</strong> ${category.categoryId || 'N/A'}
-                `;
-            }
-
-            // Aspects
-            if (debug.step3_aspects) {
-                const aspects = debug.step3_aspects;
-                const filledAspects = Object.entries(aspects.filled || {})
-                    .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
-                    .join('<br>');
-                document.getElementById('debug-aspects').innerHTML = `
-                    <strong>Required:</strong> ${(aspects.requiredAspects || []).join(', ') || 'None'}<br>
-                    <strong>Filled:</strong><br>${filledAspects || 'None'}
-                `;
-            }
-
-            // Description
-            if (debug.description) {
-                const desc = debug.description;
-                document.getElementById('debug-description').innerHTML = `
-                    <strong>HTML Mode:</strong> ${desc.used_html ? 'Yes' : 'No'}<br>
-                    <strong>Preview:</strong><br>
-                    <div class="mt-2 p-2 bg-gray-100 rounded text-xs">${desc.text.substring(0, 200)}...</div>
-                `;
-            }
-        }
-
-        let currentListingsPage = 1;
-        let hasMoreListings = false;
-
         document.getElementById('profile-btn').addEventListener('click', async () => {
             document.getElementById('profile-modal').classList.remove('hidden');
             await loadProfileData();
@@ -478,18 +381,18 @@
 
         document.getElementById('close-profile').addEventListener('click', () => {
             document.getElementById('profile-modal').classList.add('hidden');
+            resetAddressForm();
         });
 
-        // Close modal when clicking outside
         document.getElementById('profile-modal').addEventListener('click', (e) => {
             if (e.target.id === 'profile-modal') {
                 document.getElementById('profile-modal').classList.add('hidden');
+                resetAddressForm();
             }
         });
 
         async function loadProfileData() {
             try {
-                // Load user stats
                 const statsResponse = await fetch('/user-stats');
                 const statsData = await statsResponse.json();
 
@@ -500,11 +403,123 @@
                     document.getElementById('profile-email').textContent = statsData.email;
                 }
 
-                // Load recent listings
+                await loadUserProfile();
                 await loadRecentListings();
             } catch (error) {
                 console.error('Error loading profile data:', error);
             }
+        }
+
+        async function loadUserProfile() {
+            try {
+                const response = await fetch('/profile');
+                const data = await response.json();
+
+                if (response.ok && data.profile) {
+                    currentUserProfile = data.profile;
+                    displayAddress(data.profile);
+                } else {
+                    displayAddress(null);
+                }
+            } catch (error) {
+                console.error('Error loading user profile:', error);
+                displayAddress(null);
+            }
+        }
+
+        function displayAddress(profile) {
+            if (profile) {
+                document.getElementById('display-address-line1').textContent = profile.address_line1;
+                document.getElementById('display-city').textContent = profile.city;
+                document.getElementById('display-postal-code').textContent = profile.postal_code;
+                document.getElementById('display-country').textContent = profile.country === 'GB' ? 'United Kingdom' : profile.country;
+            } else {
+                document.getElementById('display-address-line1').textContent = 'No address set';
+                document.getElementById('display-city').textContent = '-';
+                document.getElementById('display-postal-code').textContent = '-';
+                document.getElementById('display-country').textContent = '-';
+            }
+        }
+
+        document.getElementById('edit-address-btn').addEventListener('click', () => {
+            showAddressEditForm();
+        });
+
+        document.getElementById('cancel-address-edit').addEventListener('click', () => {
+            resetAddressForm();
+        });
+
+        function showAddressEditForm() {
+            if (currentUserProfile) {
+                document.getElementById('edit-address-line1').value = currentUserProfile.address_line1 || '';
+                document.getElementById('edit-city').value = currentUserProfile.city || '';
+                document.getElementById('edit-postal-code').value = currentUserProfile.postal_code || '';
+                document.getElementById('edit-country').value = currentUserProfile.country || 'GB';
+            }
+
+            document.getElementById('address-display').classList.add('hidden');
+            document.getElementById('address-edit-form').classList.remove('hidden');
+            document.getElementById('edit-address-btn').classList.add('hidden');
+        }
+
+        function resetAddressForm() {
+            document.getElementById('address-edit-form').classList.add('hidden');
+            document.getElementById('address-display').classList.remove('hidden');
+            document.getElementById('edit-address-btn').classList.remove('hidden');
+
+            const messageEl = document.getElementById('address-update-message');
+            messageEl.classList.add('hidden');
+            messageEl.textContent = '';
+        }
+
+        document.getElementById('address-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = {
+                address_line1: document.getElementById('edit-address-line1').value.trim(),
+                city: document.getElementById('edit-city').value.trim(),
+                postal_code: document.getElementById('edit-postal-code').value.trim().toUpperCase(),
+                country: document.getElementById('edit-country').value
+            };
+
+            if (!formData.address_line1 || !formData.city || !formData.postal_code) {
+                showAddressMessage('Please fill in all required fields.', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/profile', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showAddressMessage('Address updated successfully!', 'success');
+
+                    currentUserProfile = { ...currentUserProfile, ...formData };
+                    displayAddress(currentUserProfile);
+
+                    setTimeout(() => {
+                        resetAddressForm();
+                    }, 1500);
+                } else {
+                    showAddressMessage(data.error || 'Failed to update address.', 'error');
+                }
+            } catch (error) {
+                showAddressMessage('Network error. Please try again.', 'error');
+            }
+        });
+
+        function showAddressMessage(message, type) {
+            const messageEl = document.getElementById('address-update-message');
+            messageEl.textContent = message;
+            messageEl.className = `mt-2 text-sm ${type === 'success' ? 'text-green-600' : 'text-red-600'}`;
+            messageEl.classList.remove('hidden');
         }
 
         async function loadRecentListings() {
@@ -610,6 +625,131 @@
         document.getElementById('load-more-listings').addEventListener('click', () => {
             loadAllListings(currentListingsPage + 1);
         });
+
+        document.getElementById('listing-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const imagesValue = document.getElementById('images').value.trim();
+            const validImages = imagesValue
+                .split('\n')
+                .map(url => url.trim())
+                .filter(url => url.startsWith('https://'));
+
+            if (!imagesValue || validImages.length === 0) {
+                document.getElementById('error-message').textContent = 'At least one valid HTTPS image URL is required.';
+                document.getElementById('error-message').classList.remove('hidden');
+                document.getElementById('success-message').classList.add('hidden');
+                return;
+            }
+
+            const formData = {
+                raw_text: document.getElementById('raw_text').value.trim(),
+                price: {
+                    value: parseFloat(document.getElementById('price_value').value),
+                    currency: document.getElementById('currency').value
+                },
+                quantity: parseInt(document.getElementById('quantity').value),
+                condition: document.getElementById('condition').value,
+                images: validImages,
+                use_html_description: document.getElementById('use_html_description').checked,
+                use_simple_prompt_description: document.getElementById('use_simple_prompt_description').checked,
+                include_debug: document.getElementById('include_debug').checked
+            };
+
+            const button = document.getElementById('publish-btn');
+            button.disabled = true;
+            button.textContent = 'Processing...';
+
+            document.getElementById('error-message').classList.add('hidden');
+            document.getElementById('success-message').classList.add('hidden');
+            document.getElementById('debug-panel').classList.add('hidden');
+
+            showAIStatus('🤖 Analyzing your product description...', 10);
+
+            try {
+                setTimeout(() => updateAIProgress('🔍 Extracting keywords and metadata...', 25), 500);
+                setTimeout(() => updateAIProgress('📂 Finding optimal eBay category...', 50), 1500);
+                setTimeout(() => updateAIProgress('📋 Filling product specifications...', 75), 2500);
+                setTimeout(() => updateAIProgress('✍️ Generating marketing description...', 90), 3500);
+
+                const response = await fetch('/publish-item', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    updateAIProgress('✅ Publishing to eBay...', 100);
+
+                    if (formData.include_debug && data.debug) {
+                        showDebugInfo(data.debug);
+                    }
+
+                    setTimeout(() => {
+                        hideAIStatus();
+                        localStorage.setItem('listing-success', JSON.stringify(data));
+                        window.location.href = 'success.html';
+                    }, 1000);
+                } else {
+                    hideAIStatus();
+                    document.getElementById('error-message').textContent = data.error || 'Failed to publish listing';
+                    document.getElementById('error-message').classList.remove('hidden');
+                }
+            } catch (error) {
+                hideAIStatus();
+                document.getElementById('error-message').textContent = 'Network error. Please try again.';
+                document.getElementById('error-message').classList.remove('hidden');
+            }
+
+            button.disabled = false;
+            button.textContent = 'Publish to eBay';
+        });
+
+        function showDebugInfo(debug) {
+            document.getElementById('debug-panel').classList.remove('hidden');
+
+            if (debug.step1_extract_keywords) {
+                const keywords = debug.step1_extract_keywords;
+                document.getElementById('debug-keywords').innerHTML = `
+                    <strong>Title:</strong> ${keywords.normalized_title || 'N/A'}<br>
+                    <strong>Category Keywords:</strong> ${(keywords.category_keywords || []).join(', ') || 'N/A'}<br>
+                    <strong>Brand:</strong> ${keywords.brand || 'N/A'}
+                `;
+            }
+
+            if (debug.step2_category) {
+                const category = debug.step2_category;
+                document.getElementById('debug-category').innerHTML = `
+                    <strong>Query:</strong> ${category.queryUsed || 'N/A'}<br>
+                    <strong>Category:</strong> ${category.categoryName || 'N/A'}<br>
+                    <strong>ID:</strong> ${category.categoryId || 'N/A'}
+                `;
+            }
+
+            if (debug.step3_aspects) {
+                const aspects = debug.step3_aspects;
+                const filledAspects = Object.entries(aspects.filled || {})
+                    .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
+                    .join('<br>');
+                document.getElementById('debug-aspects').innerHTML = `
+                    <strong>Required:</strong> ${(aspects.requiredAspects || []).join(', ') || 'None'}<br>
+                    <strong>Filled:</strong><br>${filledAspects || 'None'}
+                `;
+            }
+
+            if (debug.description) {
+                const desc = debug.description;
+                document.getElementById('debug-description').innerHTML = `
+                    <strong>HTML Mode:</strong> ${desc.used_html ? 'Yes' : 'No'}<br>
+                    <strong>Preview:</strong><br>
+                    <div class="mt-2 p-2 bg-gray-100 rounded text-xs">${desc.text.substring(0, 200)}...</div>
+                `;
+            }
+        }
     </script>
 </body>
 
