@@ -603,6 +603,44 @@ def auth_status():
         "access_exp_in": max(0, int(tokens["exp"] - _now())) if tokens["access"] else 0
     })
 
+
+def parse_ebay_error(response_text):
+    """Parse eBay API error response and return user-friendly message"""
+    try:
+        error_data = json.loads(response_text)
+        
+        # Handle different error response formats
+        if 'errors' in error_data:
+            errors = error_data['errors']
+            if errors and len(errors) > 0:
+                first_error = errors[0]
+                error_id = first_error.get('errorId')
+                message = first_error.get('message', '')
+                
+                # Handle specific error cases
+                if error_id == 25002:  # Duplicate listing error
+                    # Extract item title and listing ID from the message
+                    if 'identical items' in message.lower():
+                        return "This item already exists in your eBay listings. eBay doesn't allow identical items from the same seller. Please update the quantity of your existing listing instead of creating a new one."
+                elif error_id == 25001:  # Category error
+                    return "There was an issue with the product category. Please try with a different product description."
+                elif error_id == 25003:  # Policy error
+                    return "There's an issue with your eBay selling policies. Please check your eBay account settings."
+                elif 'listing policies' in message.lower():
+                    return "Your eBay account is missing required selling policies. Please set up payment, return, and shipping policies in your eBay account."
+                elif 'inventory item' in message.lower():
+                    return "Failed to create the product listing. Please check your product details and try again."
+                else:
+                    # Return the original message if it's user-friendly
+                    return message
+        
+        # Fallback to original response if parsing fails
+        return f"eBay API error: {response_text}"
+        
+    except (json.JSONDecodeError, KeyError, TypeError):
+        return f"Unknown eBay error: {response_text}"
+
+
 @app.route("/publish-item", methods=["POST"])
 def publish_item():
     if "user_id" not in session:
@@ -623,11 +661,13 @@ def publish_item():
         validate(instance=body, schema=LISTING_SCHEMA)
     except Exception as e:
         return jsonify({"error": "Invalid input", "details": str(e)}), 400
+    
     raw_text = _clean_text(body.get("raw_text"), limit=8000)
     images = _https_only(body.get("images"))
     price = body.get("price")
     quantity = int(body.get("quantity", 1))
     condition = (body.get("condition") or "NEW").upper()
+    
     try:
         marketplace_id = MARKETPLACE_ID
         tree_id = get_category_tree_id()
@@ -647,6 +687,7 @@ def publish_item():
         sku = _gen_sku()
         title = smart_titlecase(raw_text[:80])
 
+        # Create inventory item
         inv_url = f"{BASE}/sell/inventory/v1/inventory_item/{sku}"
         inv_payload = {
             "product": {
@@ -660,13 +701,20 @@ def publish_item():
         }
         r = requests.put(inv_url, headers=headers, json=inv_payload, timeout=30)
         if r.status_code not in (200, 201, 204):
-            return jsonify({"error": "Failed to create inventory item", "details": r.text}), 500
+            error_msg = parse_ebay_error(r.text)
+            return jsonify({"error": error_msg}), 400
 
-        fulfillment_policy_id = get_first_policy_id("fulfillment", access, marketplace_id)
-        payment_policy_id = get_first_policy_id("payment", access, marketplace_id)
-        return_policy_id = get_first_policy_id("return", access, marketplace_id)
+        # Get policies
+        try:
+            fulfillment_policy_id = get_first_policy_id("fulfillment", access, marketplace_id)
+            payment_policy_id = get_first_policy_id("payment", access, marketplace_id)
+            return_policy_id = get_first_policy_id("return", access, marketplace_id)
+        except RuntimeError as e:
+            return jsonify({"error": f"Missing eBay policies: {str(e)}. Please set up your selling policies in your eBay account."}), 400
+        
         merchant_location_key = get_or_create_location(access, marketplace_id, profile)
 
+        # Create offer
         offer_payload = {
             "sku": sku,
             "marketplaceId": marketplace_id,
@@ -685,18 +733,23 @@ def publish_item():
         offer_url = f"{BASE}/sell/inventory/v1/offer"
         r = requests.post(offer_url, headers=headers, json=offer_payload, timeout=30)
         if r.status_code not in (200, 201):
-            return jsonify({"error": "Failed to create offer", "details": r.text}), 500
+            error_msg = parse_ebay_error(r.text)
+            return jsonify({"error": error_msg}), 400
 
         offer_id = r.json().get("offerId")
+        
+        # Publish listing
         pub_url = f"{BASE}/sell/inventory/v1/offer/{offer_id}/publish"
         r = requests.post(pub_url, headers=headers, timeout=30)
         if r.status_code not in (200, 201):
-            return jsonify({"error": "Failed to publish listing", "details": r.text}), 500
+            error_msg = parse_ebay_error(r.text)
+            return jsonify({"error": error_msg}), 400
 
         pub = r.json()
         listing_id = pub.get("listingId")
         view_url = f"https://www.ebay.co.uk/itm/{listing_id}" if marketplace_id == "EBAY_GB" else None
         update_listing_count()
+        
         return jsonify({
             "status": "published",
             "offerId": offer_id,
@@ -707,8 +760,12 @@ def publish_item():
             "categoryName": cat_name
         })
 
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": f"Network error while communicating with eBay: {str(e)}"}), 500
+    except RuntimeError as e:
+        return jsonify({"error": str(e)}), 400
     except Exception as e:
-        return jsonify({"error": "Publishing failed", "details": str(e)}), 500
+        return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
 
 @app.route("/total-listings")
 def get_total_listings_route():
