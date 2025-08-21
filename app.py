@@ -621,7 +621,7 @@ def parse_ebay_error(response_text):
                 if error_id == 25002:  # Duplicate listing error
                     # Extract item title and listing ID from the message
                     if 'identical items' in message.lower():
-                        return "This item already exists in your eBay listings. eBay doesn't allow identical items from the same seller. Please update the quantity of your existing listing instead of creating a new one."
+                        return "This item already exists in your eBay listings. eBay doesn't allow identical items from the same seller."
                 elif error_id == 25001:  # Category error
                     return "There was an issue with the product category. Please try with a different product description."
                 elif error_id == 25003:  # Policy error
