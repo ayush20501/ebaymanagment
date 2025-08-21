@@ -27,11 +27,27 @@
     <div class="max-w-4xl mx-auto px-4 py-8">
         <div class="mb-8">
             <h2 class="text-2xl font-bold text-gray-900 mb-2">Create New Listing</h2>
-            <p class="text-gray-600">Fill in the details below to create your eBay listing</p>
+            <p class="text-gray-600">Fill in the details below to create your AI-powered eBay listing</p>
         </div>
 
         <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"></div>
         <div id="success-message" class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"></div>
+
+        <!-- AI Processing Status -->
+        <div id="ai-status" class="hidden bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <div class="flex items-center">
+                <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mr-3"></div>
+                <div>
+                    <h3 class="text-sm font-medium text-blue-900">AI Processing Your Listing</h3>
+                    <p id="ai-status-text" class="text-sm text-blue-700">Analyzing your product description...</p>
+                </div>
+            </div>
+            <div class="mt-3">
+                <div class="bg-white rounded-full h-2">
+                    <div id="ai-progress" class="bg-blue-600 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
 
         <form id="listing-form" class="bg-white rounded-lg shadow p-6">
             <!-- Autofill Button -->
@@ -49,6 +65,7 @@
                 <div class="lg:col-span-2">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Item Description *</label>
                     <textarea id="raw_text" required rows="4" placeholder="Describe your item in detail..." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                    <p class="text-xs text-gray-500 mt-1">AI will analyze this to extract keywords, generate title, and fill product specifications</p>
                 </div>
                 
                 <div>
@@ -83,14 +100,56 @@
                     <textarea id="images" required rows="3" placeholder="Enter at least one image URL (must start with https://)" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
                     <p class="text-xs text-gray-500 mt-1">Enter one HTTPS URL per line (at least one required)</p>
                 </div>
+
+                <!-- AI Options -->
+                <div class="lg:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-3">AI Enhancement Options</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="use_html_description" checked class="h-4 w-4 text-blue-600 rounded">
+                            <span class="ml-2 text-sm text-gray-700">Generate HTML description</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="use_simple_prompt_description" checked class="h-4 w-4 text-blue-600 rounded">
+                            <span class="ml-2 text-sm text-gray-700">AI-powered description</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="include_debug" class="h-4 w-4 text-blue-600 rounded">
+                            <span class="ml-2 text-sm text-gray-700">Show debug info</span>
+                        </label>
+                    </div>
+                </div>
             </div>
             
             <div class="mt-6">
                 <button type="submit" id="publish-btn" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
-                    Publish to eBay
+                    🤖 AI-Publish to eBay
                 </button>
             </div>
         </form>
+
+        <!-- Debug Information Panel -->
+        <div id="debug-panel" class="hidden mt-6 bg-gray-50 border border-gray-200 rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Debug Information</h3>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="font-medium text-gray-700 mb-2">AI Keyword Extraction</h4>
+                    <div id="debug-keywords" class="bg-white p-3 rounded border text-sm text-gray-600"></div>
+                </div>
+                <div>
+                    <h4 class="font-medium text-gray-700 mb-2">Category Detection</h4>
+                    <div id="debug-category" class="bg-white p-3 rounded border text-sm text-gray-600"></div>
+                </div>
+                <div>
+                    <h4 class="font-medium text-gray-700 mb-2">Product Aspects</h4>
+                    <div id="debug-aspects" class="bg-white p-3 rounded border text-sm text-gray-600"></div>
+                </div>
+                <div>
+                    <h4 class="font-medium text-gray-700 mb-2">Generated Description</h4>
+                    <div id="debug-description" class="bg-white p-3 rounded border text-sm text-gray-600 max-h-40 overflow-y-auto"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -117,6 +176,27 @@
             }
         });
 
+        // AI Status Management
+        const aiStatusEl = document.getElementById('ai-status');
+        const aiStatusTextEl = document.getElementById('ai-status-text');
+        const aiProgressEl = document.getElementById('ai-progress');
+
+        function showAIStatus(message, progress = 0) {
+            aiStatusEl.classList.remove('hidden');
+            aiStatusTextEl.textContent = message;
+            aiProgressEl.style.width = `${progress}%`;
+        }
+
+        function hideAIStatus() {
+            aiStatusEl.classList.add('hidden');
+            aiProgressEl.style.width = '0%';
+        }
+
+        function updateAIProgress(message, progress) {
+            aiStatusTextEl.textContent = message;
+            aiProgressEl.style.width = `${progress}%`;
+        }
+
         // Autofill functionality
         document.getElementById('autofill-btn').addEventListener('click', () => {
             document.getElementById('raw_text').value = "Sainsbury's Mackerel Fillets in Olive Oil 125g - Premium quality mackerel fillets preserved in olive oil. Perfect for sandwiches, salads, or as a healthy snack. Rich in omega-3 fatty acids and protein. Best before date clearly marked on tin.";
@@ -128,6 +208,7 @@
             // Clear any error messages
             document.getElementById('error-message').classList.add('hidden');
             document.getElementById('success-message').classList.add('hidden');
+            document.getElementById('debug-panel').classList.add('hidden');
             
             // Add a subtle animation to show the form has been filled
             const form = document.getElementById('listing-form');
@@ -148,7 +229,7 @@
             }
         });
 
-        // Form submission with enhanced validation
+        // Enhanced form submission with AI status tracking
         document.getElementById('listing-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -174,17 +255,30 @@
                 },
                 quantity: parseInt(document.getElementById('quantity').value),
                 condition: document.getElementById('condition').value,
-                images: validImages
+                images: validImages,
+                use_html_description: document.getElementById('use_html_description').checked,
+                use_simple_prompt_description: document.getElementById('use_simple_prompt_description').checked,
+                include_debug: document.getElementById('include_debug').checked
             };
             
             const button = document.getElementById('publish-btn');
             button.disabled = true;
-            button.innerHTML = `
-                <div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin inline-block mr-2"></div>
-                Publishing...
-            `;
+            
+            // Hide previous messages and debug panel
+            document.getElementById('error-message').classList.add('hidden');
+            document.getElementById('success-message').classList.add('hidden');
+            document.getElementById('debug-panel').classList.add('hidden');
+            
+            // Start AI processing animation
+            showAIStatus('🤖 Analyzing your product description...', 10);
             
             try {
+                // Simulate AI processing steps for better UX
+                setTimeout(() => updateAIProgress('🔍 Extracting keywords and metadata...', 25), 500);
+                setTimeout(() => updateAIProgress('📂 Finding optimal eBay category...', 50), 1500);
+                setTimeout(() => updateAIProgress('📋 Filling product specifications...', 75), 2500);
+                setTimeout(() => updateAIProgress('✍️ Generating marketing description...', 90), 3500);
+                
                 const response = await fetch('/publish-item', {
                     method: 'POST',
                     headers: {
@@ -196,22 +290,79 @@
                 const data = await response.json();
                 
                 if (response.ok) {
-                    // Store success data for success page
-                    localStorage.setItem('listing-success', JSON.stringify(data));
-                    window.location.href = 'success.html';
+                    updateAIProgress('✅ Publishing to eBay...', 100);
+                    
+                    // Show debug information if requested
+                    if (formData.include_debug && data.debug) {
+                        showDebugInfo(data.debug);
+                    }
+                    
+                    setTimeout(() => {
+                        hideAIStatus();
+                        // Store success data for success page
+                        localStorage.setItem('listing-success', JSON.stringify(data));
+                        window.location.href = 'success.html';
+                    }, 1000);
                 } else {
+                    hideAIStatus();
                     document.getElementById('error-message').textContent = data.error || 'Failed to publish listing';
                     document.getElementById('error-message').classList.remove('hidden');
-                    document.getElementById('success-message').classList.add('hidden');
                 }
             } catch (error) {
+                hideAIStatus();
                 document.getElementById('error-message').textContent = 'Network error. Please try again.';
                 document.getElementById('error-message').classList.remove('hidden');
             }
             
             button.disabled = false;
-            button.textContent = 'Publish to eBay';
         });
+
+        // Show debug information
+        function showDebugInfo(debug) {
+            document.getElementById('debug-panel').classList.remove('hidden');
+            
+            // Keywords
+            if (debug.step1_extract_keywords) {
+                const keywords = debug.step1_extract_keywords;
+                document.getElementById('debug-keywords').innerHTML = `
+                    <strong>Title:</strong> ${keywords.normalized_title || 'N/A'}<br>
+                    <strong>Category Keywords:</strong> ${(keywords.category_keywords || []).join(', ') || 'N/A'}<br>
+                    <strong>Brand:</strong> ${keywords.brand || 'N/A'}
+                `;
+            }
+            
+            // Category
+            if (debug.step2_category) {
+                const category = debug.step2_category;
+                document.getElementById('debug-category').innerHTML = `
+                    <strong>Query:</strong> ${category.queryUsed || 'N/A'}<br>
+                    <strong>Category:</strong> ${category.categoryName || 'N/A'}<br>
+                    <strong>ID:</strong> ${category.categoryId || 'N/A'}
+                `;
+            }
+            
+            // Aspects
+            if (debug.step3_aspects) {
+                const aspects = debug.step3_aspects;
+                const filledAspects = Object.entries(aspects.filled || {})
+                    .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
+                    .join('<br>');
+                document.getElementById('debug-aspects').innerHTML = `
+                    <strong>Required:</strong> ${(aspects.requiredAspects || []).join(', ') || 'None'}<br>
+                    <strong>Filled:</strong><br>${filledAspects || 'None'}
+                `;
+            }
+            
+            // Description
+            if (debug.description) {
+                const desc = debug.description;
+                document.getElementById('debug-description').innerHTML = `
+                    <strong>HTML Mode:</strong> ${desc.used_html ? 'Yes' : 'No'}<br>
+                    <strong>Preview:</strong><br>
+                    <div class="mt-2 p-2 bg-gray-100 rounded text-xs">${desc.text.substring(0, 200)}...</div>
+                `;
+            }
+        }
     </script>
 </body>
 </html>
