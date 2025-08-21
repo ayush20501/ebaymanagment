@@ -24,7 +24,6 @@
                         </svg>
                         <span>Profile</span>
                     </button>
-                    <span id="user-email" class="text-gray-600"></span>
                     <button id="logout-btn"
                         class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors">
                         Logout
@@ -320,7 +319,6 @@
                     return;
                 }
 
-                document.getElementById('user-email').textContent = data.email;
             } catch (error) {
                 window.location.href = 'login.html';
             }
