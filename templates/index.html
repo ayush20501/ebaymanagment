@@ -3,26 +3,445 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>eBay Listing Manager</title>
+    <title>ListFast.ai - Create eBay Listings Instantly with AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .hero-gradient {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 8s ease-in-out infinite;
+        }
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        .listing-mockup {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transform: perspective(1000px) rotateY(-10deg) rotateX(5deg);
+        }
+        .pulse-animation {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .8; }
+        }
+        .hover-lift {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .hover-lift:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.2);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal.show {
+            display: flex;
+            opacity: 1;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin: auto;
+            max-width: 400px;
+            width: 90%;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        .modal.show .modal-content {
+            transform: scale(1);
+        }
+        .input-field {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .success-message {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        .error-message {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+    </style>
 </head>
-<body class="min-h-screen bg-gray-50">
-    <div class="min-h-screen flex items-center justify-center">
-        <div class="max-w-md w-full bg-white rounded-lg shadow-md p-8">
-            <div class="text-center">
-                <h1 class="text-3xl font-bold text-gray-900 mb-2">eBay Listing Manager</h1>
-                <p class="text-gray-600 mb-8">Create and manage your eBay listings easily</p>
-                
-                <div class="space-y-4">
-                    <a href="login.html" class="block w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors text-center font-semibold">
-                        Sign In
-                    </a>
-                    <a href="signup.html" class="block w-full border border-blue-600 text-blue-600 py-3 px-4 rounded-lg hover:bg-blue-50 transition-colors text-center font-semibold">
-                        Sign Up
-                    </a>
+<body class="bg-white">
+    <!-- Header -->
+    <header class="px-6 py-4 md:px-12 lg:px-24">
+        <div class="flex justify-between items-center">
+            <div class="text-2xl font-bold text-gray-900">
+                ListFast.ai
+            </div>
+            <div class="flex space-x-4">
+                <button onclick="showLoginModal()" class="text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors">
+                    Login
+                </button>
+                <button onclick="showSignupModal()" class="bg-gray-900 text-white px-6 py-2 rounded-lg font-medium hover:bg-gray-800 transition-colors hover-lift">
+                    Sign Up
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="px-6 py-12 md:px-12 lg:px-24">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+                <!-- Left Content -->
+                <div class="space-y-8">
+                    <div class="space-y-6">
+                        <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
+                            Create eBay Listings
+                            <span class="hero-gradient bg-clip-text text-transparent">
+                                Instantly with AI
+                            </span>
+                        </h1>
+                        
+                        <p class="text-xl md:text-2xl text-gray-600 leading-relaxed">
+                            Supports eBay's latest SEO
+                        </p>
+                        
+                        <button onclick="showSignupModal()" class="bg-blue-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-blue-700 transition-all hover-lift pulse-animation">
+                            Get Started
+                        </button>
+                    </div>
+                    
+                    <div class="pt-8">
+                        <p class="text-gray-700 text-lg">
+                            Already <span class="font-bold text-gray-900">12,483 listings</span> created<br>
+                            with ListFast.ai
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Right Content - Listing Mockup -->
+                <div class="flex justify-center lg:justify-end">
+                    <div class="listing-mockup bg-white rounded-2xl p-8 border border-gray-200 max-w-md w-full">
+                        <!-- Monitor Frame -->
+                        <div class="bg-gray-100 rounded-lg p-6">
+                            <!-- Listing Content -->
+                            <div class="space-y-4">
+                                <!-- Image Placeholder -->
+                                <div class="bg-gray-200 rounded-lg h-32 flex items-center justify-center">
+                                    <div class="w-16 h-12 border-2 border-gray-400 rounded flex items-center justify-center">
+                                        <div class="w-8 h-6 bg-gray-400 rounded-full relative">
+                                            <div class="absolute top-1 left-2 w-2 h-2 bg-white rounded-full"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Text Lines -->
+                                <div class="space-y-3">
+                                    <div class="flex space-x-3">
+                                        <div class="bg-gray-300 h-3 rounded flex-1"></div>
+                                        <div class="bg-gray-300 h-3 rounded w-20"></div>
+                                    </div>
+                                    <div class="bg-gray-300 h-3 rounded w-3/4"></div>
+                                    <div class="flex space-x-3">
+                                        <div class="bg-gray-300 h-3 rounded flex-1"></div>
+                                        <div class="bg-gray-300 h-3 rounded w-16"></div>
+                                    </div>
+                                    <div class="bg-gray-300 h-3 rounded w-1/2"></div>
+                                </div>
+                                
+                                <!-- List Button -->
+                                <div class="flex justify-end pt-2">
+                                    <div class="bg-gray-900 text-white px-4 py-2 rounded text-sm font-medium">
+                                        List
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Monitor Stand -->
+                        <div class="flex justify-center mt-4">
+                            <div class="w-20 h-1 bg-gray-300 rounded-full"></div>
+                        </div>
+                        <div class="flex justify-center mt-1">
+                            <div class="w-32 h-2 bg-gray-200 rounded-full"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+    </main>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">Welcome Back</h2>
+                <button onclick="closeModal('loginModal')" class="text-gray-400 hover:text-gray-600 text-2xl">×</button>
+            </div>
+            
+            <div id="loginSuccess" class="success-message">
+                🎉 Login successful! Welcome back to ListFast.ai
+            </div>
+            
+            <div id="loginError" class="error-message"></div>
+            
+            <form onsubmit="handleLogin(event)">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input type="email" required class="input-field" placeholder="Enter your email">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                        <input type="password" required class="input-field" placeholder="Enter your password">
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                        Sign In
+                    </button>
+                </div>
+            </form>
+            
+            <div class="text-center mt-4">
+                <p class="text-gray-600">Don't have an account? 
+                    <button onclick="switchToSignup()" class="text-blue-600 hover:text-blue-700 font-medium">Sign up</button>
+                </p>
+            </div>
+        </div>
     </div>
+
+    <!-- Signup Modal -->
+    <div id="signupModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">Get Started</h2>
+                <button onclick="closeModal('signupModal')" class="text-gray-400 hover:text-gray-600 text-2xl">×</button>
+            </div>
+            
+            <div id="signupSuccess" class="success-message">
+                🎉 Account created successfully! Welcome to ListFast.ai
+            </div>
+            
+            <div id="signupError" class="error-message"></div>
+            
+            <form onsubmit="handleSignup(event)">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input type="email" required class="input-field" placeholder="Enter your email">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                        <input type="password" required class="input-field" placeholder="Create a password">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+                        <input type="password" required class="input-field" placeholder="Confirm your password">
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                        Create Account
+                    </button>
+                </div>
+            </form>
+            
+            <div class="text-center mt-4">
+                <p class="text-gray-600">Already have an account? 
+                    <button onclick="switchToLogin()" class="text-blue-600 hover:text-blue-700 font-medium">Sign in</button>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showLoginModal() {
+            document.getElementById('loginModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function showSignupModal() {
+            document.getElementById('signupModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+            document.body.style.overflow = 'auto';
+            // Hide all messages when closing
+            document.getElementById('loginSuccess').style.display = 'none';
+            document.getElementById('loginError').style.display = 'none';
+            document.getElementById('signupSuccess').style.display = 'none';
+            document.getElementById('signupError').style.display = 'none';
+        }
+
+        function switchToSignup() {
+            closeModal('loginModal');
+            setTimeout(() => showSignupModal(), 200);
+        }
+
+        function switchToLogin() {
+            closeModal('signupModal');
+            setTimeout(() => showLoginModal(), 200);
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const email = form.querySelector('input[type="email"]').value;
+            const password = form.querySelector('input[type="password"]').value;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            
+            // Hide any previous messages
+            document.getElementById('loginSuccess').style.display = 'none';
+            document.getElementById('loginError').style.display = 'none';
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Signing in...';
+            
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }),
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Show success message
+                    document.getElementById('loginSuccess').style.display = 'block';
+                    
+                    // Check user status after login
+                    const statusResponse = await fetch('/auth-status');
+                    const statusData = await statusResponse.json();
+                    
+                    setTimeout(() => {
+                        if (!statusData.has_profile) {
+                            window.location.href = 'profile.html';
+                        } else if (!statusData.has_ebay_auth) {
+                            window.location.href = 'ebay-auth.html';
+                        } else {
+                            window.location.href = 'dashboard.html';
+                        }
+                    }, 1500);
+                } else {
+                    document.getElementById('loginError').textContent = data.error || 'Login failed';
+                    document.getElementById('loginError').style.display = 'block';
+                }
+            } catch (error) {
+                document.getElementById('loginError').textContent = 'Network error. Please try again.';
+                document.getElementById('loginError').style.display = 'block';
+            }
+            
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Sign In';
+        }
+
+        async function handleSignup(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const email = form.querySelector('input[type="email"]').value;
+            const password = form.querySelector('input[type="password"]').value;
+            const confirmPassword = form.querySelectorAll('input[type="password"]')[1].value;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            
+            // Hide any previous messages
+            document.getElementById('signupSuccess').style.display = 'none';
+            document.getElementById('signupError').style.display = 'none';
+            
+            if (password !== confirmPassword) {
+                document.getElementById('signupError').textContent = 'Passwords do not match!';
+                document.getElementById('signupError').style.display = 'block';
+                return;
+            }
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating...';
+            
+            try {
+                const response = await fetch('/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }),
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('signupSuccess').style.display = 'block';
+                    
+                    setTimeout(() => {
+                        window.location.href = 'profile.html';
+                    }, 1500);
+                } else {
+                    document.getElementById('signupError').textContent = data.error || 'Registration failed';
+                    document.getElementById('signupError').style.display = 'block';
+                }
+            } catch (error) {
+                document.getElementById('signupError').textContent = 'Network error. Please try again.';
+                document.getElementById('signupError').style.display = 'block';
+            }
+            
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Create Account';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const loginModal = document.getElementById('loginModal');
+            const signupModal = document.getElementById('signupModal');
+            
+            if (event.target === loginModal) {
+                closeModal('loginModal');
+            }
+            if (event.target === signupModal) {
+                closeModal('signupModal');
+            }
+        }
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal('loginModal');
+                closeModal('signupModal');
+            }
+        });
+    </script>
 </body>
 </html>
