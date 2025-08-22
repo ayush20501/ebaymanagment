@@ -4,28 +4,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - eBay Listing Manager</title>
+    <title>Dashboard - ListFast.ai</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .hero-gradient {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 8s ease-in-out infinite;
+        }
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        .hover-lift {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .hover-lift:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .card-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .success-gradient {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        .modal-backdrop {
+            backdrop-filter: blur(8px);
+        }
+        .input-field {
+            transition: all 0.3s ease;
+            border: 2px solid #e5e7eb;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+        .pulse-animation {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .8; }
+        }
+    </style>
 </head>
 
 <body class="min-h-screen bg-gray-50">
-    <nav class="bg-white shadow">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
+    <!-- Header -->
+    <nav class="bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
+            <div class="flex justify-between h-20">
                 <div class="flex items-center">
-                    <h1 class="text-xl font-bold text-gray-900">eBay Listing Manager</h1>
+                    <h1 class="text-2xl font-bold text-gray-900">ListFast.ai</h1>
+                    <div class="ml-8 text-sm text-gray-500">
+                        Dashboard
+                    </div>
                 </div>
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-6">
                     <button id="profile-btn"
-                        class="flex items-center space-x-2 text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md transition-colors">
+                        class="flex items-center space-x-2 text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg transition-colors hover-lift">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                         </svg>
-                        <span>Profile</span>
+                        <span class="font-medium">Profile</span>
                     </button>
+                    <span id="user-email" class="text-gray-600 text-sm"></span>
                     <button id="logout-btn"
-                        class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors">
+                        class="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors font-medium hover-lift">
                         Logout
                     </button>
                 </div>
@@ -33,266 +85,341 @@
         </div>
     </nav>
 
-    <div id="profile-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-2/3 lg:w-1/2 shadow-lg rounded-md bg-white">
+    <!-- Profile Modal -->
+    <div id="profile-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 modal-backdrop overflow-y-auto h-full w-full z-50">
+        <div class="relative top-8 mx-auto p-6 border w-11/12 md:w-4/5 lg:w-3/4 xl:w-2/3 shadow-2xl rounded-2xl bg-white max-w-4xl">
             <div class="mt-3">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-medium text-gray-900">My Profile</h3>
-                    <button id="close-profile" class="text-gray-400 hover:text-gray-600">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-900">My Profile</h3>
+                        <p class="text-gray-600 mt-1">Manage your account and listings</p>
+                    </div>
+                    <button id="close-profile" class="text-gray-400 hover:text-gray-600 hover-lift">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
                     </button>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <div class="bg-blue-50 p-4 rounded-lg">
-                        <div class="text-2xl font-bold text-blue-600" id="total-listings-stat">-</div>
-                        <div class="text-sm text-gray-600">Total Listings</div>
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-gradient-to-br from-blue-500 to-blue-600 p-6 rounded-2xl text-white hover-lift">
+                        <div class="text-3xl font-bold" id="total-listings-stat">-</div>
+                        <div class="text-blue-100 text-sm font-medium">Total Listings</div>
                     </div>
-                    <div class="bg-green-50 p-4 rounded-lg">
-                        <div class="text-2xl font-bold text-green-600" id="active-listings-stat">-</div>
-                        <div class="text-sm text-gray-600">Active Listings</div>
+                    <div class="bg-gradient-to-br from-green-500 to-green-600 p-6 rounded-2xl text-white hover-lift">
+                        <div class="text-3xl font-bold" id="active-listings-stat">-</div>
+                        <div class="text-green-100 text-sm font-medium">Active Listings</div>
                     </div>
-                    <div class="bg-purple-50 p-4 rounded-lg">
-                        <div class="text-2xl font-bold text-purple-600" id="inventory-value-stat">£-</div>
-                        <div class="text-sm text-gray-600">Inventory Value</div>
+                    <div class="bg-gradient-to-br from-purple-500 to-purple-600 p-6 rounded-2xl text-white hover-lift">
+                        <div class="text-3xl font-bold" id="inventory-value-stat">£-</div>
+                        <div class="text-purple-100 text-sm font-medium">Inventory Value</div>
                     </div>
                 </div>
 
-                <div class="bg-gray-50 p-4 rounded-lg mb-6">
-                    <h4 class="font-medium text-gray-900 mb-2">Account Information</h4>
-                    <p class="text-sm text-gray-600">Email: <span id="profile-email" class="font-medium"></span></p>
-                </div>
+                <div class="grid lg:grid-cols-2 gap-8">
+                    <!-- Left Column -->
+                    <div class="space-y-6">
+                        <!-- Account Info -->
+                        <div class="bg-gray-50 p-6 rounded-2xl">
+                            <h4 class="font-semibold text-gray-900 mb-4">Account Information</h4>
+                            <p class="text-gray-600">Email: <span id="profile-email" class="font-medium text-gray-900"></span></p>
+                        </div>
 
-                <div class="bg-gray-50 p-4 rounded-lg mb-6">
-                    <div class="flex items-center justify-between mb-3">
-                        <h4 class="font-medium text-gray-900">Address Information</h4>
-                        <button id="edit-address-btn" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                            Edit
-                        </button>
-                    </div>
+                        <!-- Address Info -->
+                        <div class="bg-gray-50 p-6 rounded-2xl">
+                            <div class="flex items-center justify-between mb-4">
+                                <h4 class="font-semibold text-gray-900">Warehouse Address</h4>
+                                <button id="edit-address-btn" class="text-blue-600 hover:text-blue-800 font-medium hover-lift">
+                                    Edit Address
+                                </button>
+                            </div>
 
-                    <div id="address-display">
-                        <div class="text-sm text-gray-600 space-y-1">
-                            <p id="display-address-line1">-</p>
-                            <p><span id="display-city">-</span>, <span id="display-postal-code">-</span></p>
-                            <p id="display-country">-</p>
+                            <div id="address-display">
+                                <div class="text-gray-600 space-y-1">
+                                    <p id="display-address-line1" class="font-medium text-gray-900">-</p>
+                                    <p><span id="display-city">-</span>, <span id="display-postal-code">-</span></p>
+                                    <p id="display-country">-</p>
+                                </div>
+                            </div>
+
+                            <div id="address-edit-form" class="hidden">
+                                <form id="address-form" class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Address Line 1 *</label>
+                                        <input type="text" id="edit-address-line1" required
+                                            class="input-field w-full px-4 py-3 rounded-lg">
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">City *</label>
+                                            <input type="text" id="edit-city" required
+                                                class="input-field w-full px-4 py-3 rounded-lg">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Postal Code *</label>
+                                            <input type="text" id="edit-postal-code" required
+                                                class="input-field w-full px-4 py-3 rounded-lg">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Country</label>
+                                        <select id="edit-country" disabled
+                                            class="input-field w-full px-4 py-3 rounded-lg bg-gray-100">
+                                            <option value="GB">United Kingdom</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex space-x-3 pt-2">
+                                        <button type="submit"
+                                            class="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-400 hover-lift">
+                                            Save Changes
+                                        </button>
+                                        <button type="button" id="cancel-address-edit"
+                                            class="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 hover-lift">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </form>
+                                <div id="address-update-message" class="hidden mt-4 text-sm"></div>
+                            </div>
                         </div>
                     </div>
 
-                    <div id="address-edit-form" class="hidden">
-                        <form id="address-form" class="space-y-3">
-                            <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Address Line 1 *</label>
-                                <input type="text" id="edit-address-line1" required
-                                    class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent">
-                            </div>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-700 mb-1">City *</label>
-                                    <input type="text" id="edit-city" required
-                                        class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-700 mb-1">Postal Code *</label>
-                                    <input type="text" id="edit-postal-code" required
-                                        class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Country</label>
-                                <select id="edit-country" disabled
-                                    class="w-full px-2 py-1 text-sm border border-gray-300 rounded bg-gray-100">
-                                    <option value="GB">United Kingdom</option>
-                                </select>
-                            </div>
-                            <div class="flex space-x-2 pt-2">
-                                <button type="submit"
-                                    class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 disabled:bg-gray-400">
-                                    Save Changes
-                                </button>
-                                <button type="button" id="cancel-address-edit"
-                                    class="bg-gray-300 text-gray-700 px-3 py-1 rounded text-sm hover:bg-gray-400">
-                                    Cancel
+                    <!-- Right Column - Listings -->
+                    <div>
+                        <div class="bg-gray-50 p-6 rounded-2xl">
+                            <div class="flex items-center justify-between mb-4">
+                                <h4 class="font-semibold text-gray-900">Recent Listings</h4>
+                                <button id="view-all-listings" class="text-blue-600 hover:text-blue-800 font-medium hover-lift">
+                                    View All →
                                 </button>
                             </div>
-                        </form>
-                        <div id="address-update-message" class="hidden mt-2 text-sm"></div>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="flex items-center justify-between mb-3">
-                        <h4 class="font-medium text-gray-900">Recent Listings</h4>
-                        <button id="view-all-listings" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                            View All
-                        </button>
-                    </div>
-                    <div id="recent-listings" class="space-y-2 max-h-60 overflow-y-auto">
-                        <div class="text-center text-gray-500 py-4">
-                            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto mb-2">
+                            <div id="recent-listings" class="space-y-3 max-h-80 overflow-y-auto">
+                                <div class="text-center text-gray-500 py-8">
+                                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3">
+                                    </div>
+                                    Loading listings...
+                                </div>
                             </div>
-                            Loading listings...
                         </div>
-                    </div>
-                </div>
 
-                <div id="all-listings-view" class="hidden">
-                    <div class="flex items-center justify-between mb-3">
-                        <h4 class="font-medium text-gray-900">All Listings</h4>
-                        <button id="back-to-recent" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                            ← Back to Recent
-                        </button>
-                    </div>
-                    <div id="all-listings" class="space-y-2 max-h-60 overflow-y-auto">
-                    </div>
-                    <div class="mt-3 flex justify-center">
-                        <button id="load-more-listings"
-                            class="hidden bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm">
-                            Load More
-                        </button>
+                        <div id="all-listings-view" class="hidden bg-gray-50 p-6 rounded-2xl">
+                            <div class="flex items-center justify-between mb-4">
+                                <h4 class="font-semibold text-gray-900">All Listings</h4>
+                                <button id="back-to-recent" class="text-blue-600 hover:text-blue-800 font-medium hover-lift">
+                                    ← Back to Recent
+                                </button>
+                            </div>
+                            <div id="all-listings" class="space-y-3 max-h-80 overflow-y-auto"></div>
+                            <div class="mt-4 flex justify-center">
+                                <button id="load-more-listings"
+                                    class="hidden bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-medium hover-lift">
+                                    Load More
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="max-w-4xl mx-auto px-4 py-8">
-        <div class="mb-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-2">Create New Listing</h2>
-            <p class="text-gray-600">Fill in the details below to create your AI-powered eBay listing</p>
-        </div>
-
-        <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-        </div>
-        <div id="success-message"
-            class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"></div>
-
-        <form id="listing-form" class="bg-white rounded-lg shadow p-6">
-            <div class="mb-6 flex justify-between items-center">
-                <button type="button" id="autofill-btn"
-                    class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                    </svg>
-                    Fill Sample Data
-                </button>
-                <span class="text-sm text-gray-500">Click to autofill with example values</span>
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-6 lg:px-12 py-12">
+        <!-- Header Section -->
+        <div class="mb-12">
+            <div class="max-w-4xl">
+                <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                    Create New
+                    <span class="hero-gradient bg-clip-text text-transparent">
+                        Listing
+                    </span>
+                </h2>
+                <p class="text-xl text-gray-600 leading-relaxed">
+                    Describe your product and let our AI create the perfect eBay listing with optimized titles, descriptions, and categories.
+                </p>
             </div>
+        </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="lg:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Item Description *</label>
-                    <textarea id="raw_text" required rows="4" placeholder="Describe your item in detail..."
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
-                    <p class="text-xs text-gray-500 mt-1">AI will analyze this to extract keywords, generate title, and
-                        fill product specifications</p>
-                </div>
+        <!-- Messages -->
+        <div id="error-message" class="hidden bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-xl mb-8 font-medium">
+        </div>
+        <div id="success-message" class="hidden bg-green-50 border border-green-200 text-green-800 px-6 py-4 rounded-xl mb-8 font-medium"></div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Price (£) *</label>
-                    <input type="number" id="price_value" step="0.01" min="0.01" required placeholder="0.00"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Quantity *</label>
-                    <input type="number" id="quantity" min="1" value="1" required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Condition *</label>
-                    <select id="condition" required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <option value="">Select condition...</option>
-                        <option value="NEW">New</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Currency *</label>
-                    <select id="currency" required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <option value="GBP" selected>GBP (£)</option>
-                    </select>
-                </div>
-
-                <div class="lg:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Image URLs *</label>
-                    <textarea id="images" required rows="3"
-                        placeholder="Enter at least one image URL (must start with https://)"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
-                    <p class="text-xs text-gray-500 mt-1">Enter one HTTPS URL per line (at least one required)</p>
-                </div>
-
-                <div class="lg:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-3">AI Enhancement Options</label>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <label class="flex items-center">
-                            <input type="checkbox" id="use_html_description" checked
-                                class="h-4 w-4 text-blue-600 rounded">
-                            <span class="ml-2 text-sm text-gray-700">Generate HTML description</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" id="use_simple_prompt_description" checked
-                                class="h-4 w-4 text-blue-600 rounded">
-                            <span class="ml-2 text-sm text-gray-700">AI-powered description</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" id="include_debug" class="h-4 w-4 text-blue-600 rounded">
-                            <span class="ml-2 text-sm text-gray-700">Show debug info</span>
-                        </label>
+        <!-- Main Form -->
+        <div class="grid lg:grid-cols-3 gap-12">
+            <!-- Form Section -->
+            <div class="lg:col-span-2">
+                <form id="listing-form" class="bg-white rounded-2xl shadow-lg p-8">
+                    <!-- Quick Fill Button -->
+                    <div class="mb-8 flex justify-between items-center p-4 bg-green-50 border border-green-200 rounded-xl">
+                        <button type="button" id="autofill-btn"
+                            class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center hover-lift">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                            Fill Sample Data
+                        </button>
+                        <span class="text-sm text-green-700 font-medium">Click to see how it works with example data</span>
                     </div>
+
+                    <!-- Form Fields -->
+                    <div class="space-y-8">
+                        <div>
+                            <label class="block text-lg font-semibold text-gray-900 mb-3">Product Description *</label>
+                            <textarea id="raw_text" required rows="5" placeholder="Describe your product in detail - include brand, model, features, condition details, etc."
+                                class="input-field w-full px-4 py-4 rounded-xl text-base resize-none"></textarea>
+                            <p class="text-sm text-gray-500 mt-3">💡 The more detail you provide, the better our AI can optimize your listing for search and sales</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-lg font-semibold text-gray-900 mb-3">Price (£) *</label>
+                                <input type="number" id="price_value" step="0.01" min="0.01" required placeholder="0.00"
+                                    class="input-field w-full px-4 py-4 rounded-xl text-base">
+                            </div>
+
+                            <div>
+                                <label class="block text-lg font-semibold text-gray-900 mb-3">Quantity *</label>
+                                <input type="number" id="quantity" min="1" value="1" required
+                                    class="input-field w-full px-4 py-4 rounded-xl text-base">
+                            </div>
+
+                            <div>
+                                <label class="block text-lg font-semibold text-gray-900 mb-3">Condition *</label>
+                                <select id="condition" required
+                                    class="input-field w-full px-4 py-4 rounded-xl text-base">
+                                    <option value="">Select condition...</option>
+                                    <option value="NEW">New</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-lg font-semibold text-gray-900 mb-3">Currency *</label>
+                                <select id="currency" required
+                                    class="input-field w-full px-4 py-4 rounded-xl text-base">
+                                    <option value="GBP" selected>GBP (£)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-lg font-semibold text-gray-900 mb-3">Product Images *</label>
+                            <textarea id="images" required rows="4"
+                                placeholder="https://example.com/image1.jpg&#10;https://example.com/image2.jpg&#10;https://example.com/image3.jpg"
+                                class="input-field w-full px-4 py-4 rounded-xl text-base resize-none"></textarea>
+                            <p class="text-sm text-gray-500 mt-3">📸 Enter one HTTPS image URL per line. High-quality images improve sales significantly!</p>
+                        </div>
+
+                        <!-- AI Options -->
+                        <div class="bg-blue-50 p-6 rounded-xl">
+                            <label class="block text-lg font-semibold text-gray-900 mb-4">AI Enhancement Options</label>
+                            <div class="space-y-3">
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="use_html_description" checked
+                                        class="h-5 w-5 text-blue-600 rounded mr-3">
+                                    <span class="text-gray-700 font-medium">Generate HTML-formatted description</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="use_simple_prompt_description" checked
+                                        class="h-5 w-5 text-blue-600 rounded mr-3">
+                                    <span class="text-gray-700 font-medium">Create AI-powered marketing copy</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="include_debug"
+                                        class="h-5 w-5 text-blue-600 rounded mr-3">
+                                    <span class="text-gray-700 font-medium">Show technical details (for debugging)</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="pt-4">
+                            <button type="submit" id="publish-btn"
+                                class="w-full bg-blue-600 text-white py-4 px-8 rounded-xl text-lg font-semibold hover:bg-blue-700 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed hover-lift pulse-animation">
+                                Publish to eBay
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Info Panel -->
+            <div class="space-y-6">
+                <div class="bg-gradient-to-br from-blue-500 to-purple-600 text-white p-6 rounded-2xl">
+                    <h3 class="text-xl font-bold mb-4">✨ AI-Powered Listing</h3>
+                    <ul class="space-y-3 text-blue-100">
+                        <li>• Automatic keyword extraction</li>
+                        <li>• SEO-optimized titles</li>
+                        <li>• Perfect category detection</li>
+                        <li>• Professional descriptions</li>
+                        <li>• eBay best practices</li>
+                    </ul>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">📈 Tips for Better Sales</h3>
+                    <ul class="space-y-3 text-sm text-gray-600">
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-2">✓</span>
+                            Use high-quality, well-lit photos
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-2">✓</span>
+                            Include brand names and model numbers
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-2">✓</span>
+                            Mention any defects or wear honestly
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-2">✓</span>
+                            Research competitive pricing
+                        </li>
+                    </ul>
                 </div>
             </div>
+        </div>
 
-            <div class="mt-6">
-                <button type="submit" id="publish-btn"
-                    class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed">
-                    Publish to eBay
-                </button>
-            </div>
-        </form>
-
-        <div id="ai-status" class="hidden bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6">
+        <!-- AI Status -->
+        <div id="ai-status" class="hidden bg-blue-50 border-2 border-blue-200 rounded-2xl p-6 mt-8">
             <div class="flex items-center">
-                <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mr-3"></div>
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-4"></div>
                 <div>
-                    <h3 class="text-sm font-medium text-blue-900">AI Processing Your Listing</h3>
-                    <p id="ai-status-text" class="text-sm text-blue-700">Analyzing your product description...</p>
+                    <h3 class="text-lg font-semibold text-blue-900">AI Processing Your Listing</h3>
+                    <p id="ai-status-text" class="text-blue-700 mt-1">Analyzing your product description...</p>
                 </div>
             </div>
-            <div class="mt-3">
-                <div class="bg-white rounded-full h-2">
-                    <div id="ai-progress" class="bg-blue-600 h-2 rounded-full transition-all duration-500"
+            <div class="mt-6">
+                <div class="bg-white rounded-full h-3">
+                    <div id="ai-progress" class="bg-blue-600 h-3 rounded-full transition-all duration-500"
                         style="width: 0%"></div>
                 </div>
             </div>
         </div>
 
-        <div id="debug-panel" class="hidden mt-6 bg-gray-50 border border-gray-200 rounded-lg p-4">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Debug Information</h3>
+        <!-- Debug Panel -->
+        <div id="debug-panel" class="hidden mt-8 bg-gray-900 text-white rounded-2xl p-6">
+            <h3 class="text-xl font-bold mb-6">🔧 Technical Debug Information</h3>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div>
-                    <h4 class="font-medium text-gray-700 mb-2">AI Keyword Extraction</h4>
-                    <div id="debug-keywords" class="bg-white p-3 rounded border text-sm text-gray-600"></div>
+                    <h4 class="font-semibold text-gray-300 mb-3">AI Keyword Extraction</h4>
+                    <div id="debug-keywords" class="bg-gray-800 p-4 rounded-lg text-sm text-gray-300"></div>
                 </div>
                 <div>
-                    <h4 class="font-medium text-gray-700 mb-2">Category Detection</h4>
-                    <div id="debug-category" class="bg-white p-3 rounded border text-sm text-gray-600"></div>
+                    <h4 class="font-semibold text-gray-300 mb-3">Category Detection</h4>
+                    <div id="debug-category" class="bg-gray-800 p-4 rounded-lg text-sm text-gray-300"></div>
                 </div>
                 <div>
-                    <h4 class="font-medium text-gray-700 mb-2">Product Aspects</h4>
-                    <div id="debug-aspects" class="bg-white p-3 rounded border text-sm text-gray-600"></div>
+                    <h4 class="font-semibold text-gray-300 mb-3">Product Aspects</h4>
+                    <div id="debug-aspects" class="bg-gray-800 p-4 rounded-lg text-sm text-gray-300"></div>
                 </div>
                 <div>
-                    <h4 class="font-medium text-gray-700 mb-2">Generated Description</h4>
+                    <h4 class="font-semibold text-gray-300 mb-3">Generated Description</h4>
                     <div id="debug-description"
-                        class="bg-white p-3 rounded border text-sm text-gray-600 max-h-40 overflow-y-auto"></div>
+                        class="bg-gray-800 p-4 rounded-lg text-sm text-gray-300 max-h-40 overflow-y-auto"></div>
                 </div>
             </div>
         </div>
@@ -319,6 +446,7 @@
                     return;
                 }
 
+                document.getElementById('user-email').textContent = data.email;
             } catch (error) {
                 window.location.href = 'login.html';
             }
@@ -516,7 +644,7 @@
         function showAddressMessage(message, type) {
             const messageEl = document.getElementById('address-update-message');
             messageEl.textContent = message;
-            messageEl.className = `mt-2 text-sm ${type === 'success' ? 'text-green-600' : 'text-red-600'}`;
+            messageEl.className = `mt-4 text-sm ${type === 'success' ? 'text-green-600' : 'text-red-600'}`;
             messageEl.classList.remove('hidden');
         }
 
@@ -529,28 +657,28 @@
 
                 if (response.ok && data.listings.length > 0) {
                     container.innerHTML = data.listings.slice(0, 5).map(listing => `
-                        <div class="flex items-center justify-between p-3 bg-white border rounded-lg">
+                        <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl hover-lift">
                             <div class="flex-1">
                                 <h5 class="font-medium text-gray-900 text-sm">${listing.title}</h5>
-                                <p class="text-xs text-gray-500">
+                                <p class="text-xs text-gray-500 mt-1">
                                     ${listing.category_name || 'Unknown Category'} • 
                                     £${listing.price_value} • 
                                     Qty: ${listing.quantity}
                                 </p>
                             </div>
                             ${listing.view_url ? `
-                                <a href="${listing.view_url}" target="_blank" class="text-blue-600 hover:text-blue-800 text-xs font-medium">
+                                <a href="${listing.view_url}" target="_blank" class="text-blue-600 hover:text-blue-800 text-xs font-medium hover-lift">
                                     View →
                                 </a>
                             ` : ''}
                         </div>
                     `).join('');
                 } else {
-                    container.innerHTML = '<div class="text-center text-gray-500 py-4">No listings found</div>';
+                    container.innerHTML = '<div class="text-center text-gray-500 py-8">No listings found</div>';
                 }
             } catch (error) {
                 document.getElementById('recent-listings').innerHTML =
-                    '<div class="text-center text-red-500 py-4">Error loading listings</div>';
+                    '<div class="text-center text-red-500 py-8">Error loading listings</div>';
             }
         }
 
@@ -579,22 +707,22 @@
 
                     if (data.listings.length > 0) {
                         container.innerHTML += data.listings.map(listing => `
-                            <div class="flex items-center justify-between p-3 bg-white border rounded-lg">
+                            <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl hover-lift">
                                 <div class="flex-1">
                                     <h5 class="font-medium text-gray-900 text-sm">${listing.title}</h5>
-                                    <p class="text-xs text-gray-500">
+                                    <p class="text-xs text-gray-500 mt-1">
                                         ${listing.category_name || 'Unknown Category'} • 
                                         £${listing.price_value} • 
                                         Qty: ${listing.quantity} •
                                         ${new Date(listing.created_at).toLocaleDateString()}
                                     </p>
                                 </div>
-                                <div class="flex items-center space-x-2">
-                                    <span class="px-2 py-1 text-xs rounded-full ${listing.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                                <div class="flex items-center space-x-3">
+                                    <span class="px-3 py-1 text-xs rounded-full font-medium ${listing.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
                                         ${listing.status}
                                     </span>
                                     ${listing.view_url ? `
-                                        <a href="${listing.view_url}" target="_blank" class="text-blue-600 hover:text-blue-800 text-xs font-medium">
+                                        <a href="${listing.view_url}" target="_blank" class="text-blue-600 hover:text-blue-800 text-xs font-medium hover-lift">
                                             View →
                                         </a>
                                     ` : ''}
@@ -602,7 +730,7 @@
                             </div>
                         `).join('');
                     } else if (page === 1) {
-                        container.innerHTML = '<div class="text-center text-gray-500 py-4">No listings found</div>';
+                        container.innerHTML = '<div class="text-center text-gray-500 py-8">No listings found</div>';
                     }
 
                     hasMoreListings = data.has_more;
@@ -744,7 +872,7 @@
                 document.getElementById('debug-description').innerHTML = `
                     <strong>HTML Mode:</strong> ${desc.used_html ? 'Yes' : 'No'}<br>
                     <strong>Preview:</strong><br>
-                    <div class="mt-2 p-2 bg-gray-100 rounded text-xs">${desc.text.substring(0, 200)}...</div>
+                    <div class="mt-2 p-2 bg-gray-700 rounded text-xs">${desc.text.substring(0, 200)}...</div>
                 `;
             }
         }
