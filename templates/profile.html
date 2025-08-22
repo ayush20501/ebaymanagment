@@ -3,51 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Profile - eBay Listing Manager</title>
+    <title>Setup Your Profile - ListFast.ai</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .hero-gradient {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 8s ease-in-out infinite;
+        }
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        .input-field {
+            transition: all 0.3s ease;
+            border: 2px solid #e5e7eb;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+        .success-message {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+        .error-message {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+        }
+        .hover-lift {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .hover-lift:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .progress-bar {
+            width: 50%;
+            transition: width 0.5s ease;
+        }
+    </style>
 </head>
-<body class="min-h-screen bg-gray-50">
-    <div class="min-h-screen flex items-center justify-center py-8">
-        <div class="max-w-lg w-full bg-white rounded-lg shadow-md p-8">
-            <div class="text-center mb-8">
-                <h1 class="text-2xl font-bold text-gray-900">Setup Your Profile</h1>
-                <p class="text-gray-600">Please provide your warehouse address details</p>
+<body class="bg-white min-h-screen">
+    <!-- Header -->
+    <header class="px-6 py-4 md:px-12 lg:px-24">
+        <div class="flex justify-between items-center">
+            <div class="text-2xl font-bold text-gray-900">
+                ListFast.ai
             </div>
-            
-            <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"></div>
-            <div id="success-message" class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"></div>
-            
-            <form id="profile-form">
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Address Line 1 *</label>
-                    <input type="text" id="address_line1" required placeholder="House number, Road name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <p class="text-xs text-gray-500 mt-1">e.g., 123 High Street</p>
+            <div class="flex items-center space-x-3 text-gray-600">
+                <div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
+                    2
                 </div>
-                
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">City *</label>
-                    <input type="text" id="city" required placeholder="Enter your city" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                </div>
-                
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Postal Code *</label>
-                    <input type="text" id="postal_code" required placeholder="e.g., SW1A 1AA" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                </div>
-                
-                <div class="mb-6">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Country</label>
-                    <select id="country" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-100" disabled>
-                        <option value="GB" selected>United Kingdom (GB)</option>
-                    </select>
-                    <p class="text-xs text-gray-500 mt-1">Currently only UK addresses are supported</p>
-                </div>
-                
-                <button type="submit" id="profile-btn" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
-                    Save Profile
-                </button>
-            </form>
+                <span class="text-sm font-medium">Profile Setup</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Progress Bar -->
+    <div class="px-6 md:px-12 lg:px-24 mb-12">
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-gray-200 rounded-full h-2">
+                <div class="progress-bar bg-blue-600 rounded-full h-2"></div>
+            </div>
+            <div class="flex justify-between text-sm mt-3 text-gray-600">
+                <span class="font-medium text-green-600">✓ Account Created</span>
+                <span class="font-semibold text-gray-900">Profile Setup</span>
+                <span>eBay Authentication</span>
+            </div>
         </div>
     </div>
+
+    <!-- Main Content -->
+    <main class="px-6 pb-12 md:px-12 lg:px-24">
+        <div class="max-w-4xl mx-auto">
+            <div class="grid lg:grid-cols-2 gap-16 items-start">
+                <!-- Left Content -->
+                <div class="space-y-8">
+                    <div class="space-y-6">
+                        <h1 class="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
+                            Setup Your
+                            <span class="hero-gradient bg-clip-text text-transparent">
+                                Profile
+                            </span>
+                        </h1>
+                        
+                        <p class="text-xl text-gray-600 leading-relaxed">
+                            We need your warehouse address to calculate accurate shipping costs and optimize your eBay listings for local search.
+                        </p>
+                        
+                        <div class="bg-blue-50 border border-blue-200 rounded-xl p-6">
+                            <div class="flex items-start">
+                                <div class="text-blue-500 mr-4 mt-1">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-blue-900 font-semibold mb-2">Why do we need this?</p>
+                                    <ul class="text-blue-800 text-sm space-y-1">
+                                        <li>• Calculate accurate shipping costs</li>
+                                        <li>• Optimize listings for local buyers</li>
+                                        <li>• Set appropriate delivery timeframes</li>
+                                        <li>• Improve your eBay SEO ranking</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Content - Form -->
+                <div class="bg-white rounded-2xl border border-gray-200 p-8 shadow-lg">
+                    <!-- Messages -->
+                    <div id="error-message" class="hidden error-message px-4 py-3 rounded-lg mb-6 text-sm"></div>
+                    <div id="success-message" class="hidden success-message px-4 py-3 rounded-lg mb-6 text-sm font-medium"></div>
+                    
+                    <!-- Form -->
+                    <form id="profile-form" class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-3">
+                                Street Address *
+                            </label>
+                            <input 
+                                type="text" 
+                                id="address_line1" 
+                                required 
+                                placeholder="e.g., 123 High Street, Unit 4B"
+                                class="input-field w-full px-4 py-3 rounded-lg text-base"
+                            >
+                            <p class="text-xs text-gray-500 mt-2">Include house number, street name, and unit/apartment if applicable</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-3">
+                                    City *
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="city" 
+                                    required 
+                                    placeholder="London"
+                                    class="input-field w-full px-4 py-3 rounded-lg text-base"
+                                >
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-3">
+                                    Postal Code *
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="postal_code" 
+                                    required 
+                                    placeholder="SW1A 1AA"
+                                    pattern="^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$"
+                                    class="input-field w-full px-4 py-3 rounded-lg text-base uppercase"
+                                >
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-3">
+                                Country
+                            </label>
+                            <select 
+                                id="country" 
+                                class="input-field w-full px-4 py-3 rounded-lg text-base bg-gray-50 cursor-not-allowed"
+                                disabled
+                            >
+                                <option value="GB" selected>🇬🇧 United Kingdom (GB)</option>
+                            </select>
+                            <p class="text-xs text-gray-500 mt-2">Currently only UK addresses are supported</p>
+                        </div>
+                        
+                        <div class="pt-4">
+                            <button 
+                                type="submit" 
+                                id="profile-btn" 
+                                class="w-full bg-blue-600 text-white py-4 px-6 rounded-xl text-lg font-semibold hover:bg-blue-700 transition-all hover-lift"
+                            >
+                                Save Profile & Continue
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <!-- Security Note -->
+                    <div class="mt-8 bg-gray-50 rounded-lg p-6">
+                        <div class="flex items-start">
+                            <div class="text-green-600 mr-3 mt-0.5">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-900 text-sm mb-1">Your Data is Secure</h3>
+                                <p class="text-sm text-gray-600">
+                                    Your address is encrypted and only used for shipping calculations. We never share your personal information.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
 
     <script>
         // Check if user is logged in
@@ -64,21 +231,48 @@
                         window.location.href = 'ebay-auth.html';
                     }
                 }
+            })
+            .catch(error => {
+                console.error('Auth check failed:', error);
             });
 
+        // Auto-format postal code
+        document.getElementById('postal_code').addEventListener('input', function(e) {
+            let value = e.target.value.toUpperCase().replace(/\s/g, '');
+            if (value.length > 3) {
+                value = value.substring(0, value.length - 3) + ' ' + value.substring(value.length - 3);
+            }
+            e.target.value = value;
+        });
+
+        // Form validation and submission
         document.getElementById('profile-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const formData = {
                 address_line1: document.getElementById('address_line1').value.trim(),
                 city: document.getElementById('city').value.trim(),
-                postal_code: document.getElementById('postal_code').value.trim(),
+                postal_code: document.getElementById('postal_code').value.trim().toUpperCase(),
                 country: 'GB'
             };
             
+            // Validate required fields
+            if (!formData.address_line1 || !formData.city || !formData.postal_code) {
+                showError('Please fill in all required fields.');
+                return;
+            }
+            
+            // Validate UK postal code format
+            const ukPostalRegex = /^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/;
+            if (!ukPostalRegex.test(formData.postal_code)) {
+                showError('Please enter a valid UK postal code (e.g., SW1A 1AA)');
+                return;
+            }
+            
             const button = document.getElementById('profile-btn');
+            
             button.disabled = true;
-            button.textContent = 'Saving...';
+            button.textContent = 'Saving Profile...';
             
             try {
                 const response = await fetch('/profile', {
@@ -92,26 +286,42 @@
                 const data = await response.json();
                 
                 if (response.ok) {
-                    document.getElementById('success-message').textContent = 'Profile saved successfully!';
-                    document.getElementById('success-message').classList.remove('hidden');
-                    document.getElementById('error-message').classList.add('hidden');
+                    showSuccess('Profile saved successfully! Redirecting to eBay authentication...');
+                    
+                    // Update progress bar
+                    document.querySelector('.progress-bar').style.width = '100%';
                     
                     setTimeout(() => {
                         window.location.href = 'ebay-auth.html';
                     }, 1500);
                 } else {
-                    document.getElementById('error-message').textContent = data.error || 'Failed to save profile';
-                    document.getElementById('error-message').classList.remove('hidden');
-                    document.getElementById('success-message').classList.add('hidden');
+                    showError(data.error || 'Failed to save profile. Please try again.');
                 }
             } catch (error) {
-                document.getElementById('error-message').textContent = 'Network error. Please try again.';
-                document.getElementById('error-message').classList.remove('hidden');
+                showError('Network error. Please check your connection and try again.');
             }
             
             button.disabled = false;
-            button.textContent = 'Save Profile';
+            button.textContent = 'Save Profile & Continue';
         });
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            const successDiv = document.getElementById('success-message');
+            
+            errorDiv.textContent = message;
+            errorDiv.classList.remove('hidden');
+            successDiv.classList.add('hidden');
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('success-message');
+            const errorDiv = document.getElementById('error-message');
+            
+            successDiv.textContent = message;
+            successDiv.classList.remove('hidden');
+            errorDiv.classList.add('hidden');
+        }
     </script>
 </body>
 </html>
