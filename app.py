@@ -814,13 +814,13 @@ def get_required_and_recommended_aspects(tree_id: str, category_id: str):
 def index():
     return send_from_directory(app.template_folder, 'index.html')
 
-@app.route("/signup.html")
-def signup_page():
-    return send_from_directory(app.template_folder, 'signup.html')
+# @app.route("/signup.html")
+# def signup_page():
+#     return send_from_directory(app.template_folder, 'signup.html')
 
-@app.route("/login.html")
-def login_page():
-    return send_from_directory(app.template_folder, 'login.html')
+# @app.route("/login.html")
+# def login_page():
+#     return send_from_directory(app.template_folder, 'login.html')
 
 @app.route("/profile.html")
 def profile_page():
