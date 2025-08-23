@@ -414,11 +414,15 @@
                             </div>
                         </div>
 
-                        <!-- Submit Button -->
-                        <div class="pt-4">
+                        <!-- Submit Buttons -->
+                        <div class="pt-4 flex space-x-4">
+                            <button type="button" id="preview-btn"
+                                class="flex-1 bg-blue-600 text-white py-4 px-8 rounded-xl text-lg font-semibold hover:bg-blue-700 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed hover-lift pulse-animation">
+                                Preview, Edit & Publish
+                            </button>
                             <button type="submit" id="publish-btn"
-                                class="w-full bg-blue-600 text-white py-4 px-8 rounded-xl text-lg font-semibold hover:bg-blue-700 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed hover-lift pulse-animation">
-                                Preview Listing
+                                class="flex-1 bg-green-600 text-white py-4 px-8 rounded-xl text-lg font-semibold hover:bg-green-700 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed hover-lift pulse-animation">
+                                Publish to eBay
                             </button>
                         </div>
                     </div>
@@ -842,6 +846,58 @@
             loadAllListings(currentListingsPage + 1);
         });
 
+        async function submitToPublish(formData, button) {
+            button.disabled = true;
+            button.textContent = 'Publishing...';
+
+            document.getElementById('error-message').classList.add('hidden');
+            document.getElementById('success-message').classList.add('hidden');
+            document.getElementById('debug-panel').classList.add('hidden');
+
+            showAIStatus('🤖 Analyzing your product description...', 10);
+            setTimeout(() => updateAIProgress('🔍 Extracting keywords and metadata...', 25), 500);
+            setTimeout(() => updateAIProgress('📂 Finding optimal eBay category...', 50), 1500);
+            setTimeout(() => updateAIProgress('📋 Filling product specifications...', 75), 2500);
+            setTimeout(() => updateAIProgress('✍️ Generating marketing description...', 90), 3500);
+
+            try {
+                const response = await fetch('/publish-item', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    updateAIProgress('✅ Published to eBay!', 100);
+
+                    if (formData.include_debug && data.debug) {
+                        showDebugInfo(data.debug);
+                    }
+
+                    setTimeout(() => {
+                        hideAIStatus();
+                        localStorage.setItem('listing-success', JSON.stringify(data));
+                        window.location.href = 'success.html';
+                    }, 1000);
+                } else {
+                    hideAIStatus();
+                    document.getElementById('error-message').textContent = data.error || 'Failed to publish listing';
+                    document.getElementById('error-message').classList.remove('hidden');
+                }
+            } catch (error) {
+                hideAIStatus();
+                document.getElementById('error-message').textContent = 'Network error. Please try again.';
+                document.getElementById('error-message').classList.remove('hidden');
+            }
+
+            button.disabled = false;
+            button.textContent = 'Publish to eBay';
+        }
+
         document.getElementById('listing-form').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -873,6 +929,38 @@
             };
 
             const button = document.getElementById('publish-btn');
+            await submitToPublish(formDataPreview, button);
+        });
+
+        document.getElementById('preview-btn').addEventListener('click', async () => {
+            const imagesValue = document.getElementById('images').value.trim();
+            const validImages = imagesValue
+                .split('\n')
+                .map(url => url.trim())
+                .filter(url => url.startsWith('https://'));
+
+            if (!imagesValue || validImages.length === 0) {
+                document.getElementById('error-message').textContent = 'At least one valid HTTPS image URL is required.';
+                document.getElementById('error-message').classList.remove('hidden');
+                document.getElementById('success-message').classList.add('hidden');
+                return;
+            }
+
+            formDataPreview = {
+                raw_text: document.getElementById('raw_text').value.trim(),
+                price: {
+                    value: parseFloat(document.getElementById('price_value').value),
+                    currency: document.getElementById('currency').value
+                },
+                quantity: parseInt(document.getElementById('quantity').value),
+                condition: document.getElementById('condition').value,
+                images: validImages,
+                use_html_description: document.getElementById('use_html_description').checked,
+                use_simple_prompt_description: document.getElementById('use_simple_prompt_description').checked,
+                include_debug: document.getElementById('include_debug').checked
+            };
+
+            const button = document.getElementById('preview-btn');
             button.disabled = true;
             button.textContent = 'Processing...';
 
@@ -908,7 +996,7 @@
             }
 
             button.disabled = false;
-            button.textContent = 'Preview Listing';
+            button.textContent = 'Preview, Edit & Publish';
         });
 
         document.getElementById('confirm-submit-btn').addEventListener('click', async () => {
@@ -917,49 +1005,7 @@
             button.textContent = 'Publishing...';
 
             document.getElementById('preview-modal').classList.add('hidden');
-            showAIStatus('🤖 Publishing to eBay...', 10);
-
-            try {
-                setTimeout(() => updateAIProgress('🔍 Finalizing metadata...', 25), 500);
-                setTimeout(() => updateAIProgress('📂 Confirming category...', 50), 1500);
-                setTimeout(() => updateAIProgress('📋 Verifying aspects...', 75), 2500);
-                setTimeout(() => updateAIProgress('✍️ Submitting listing...', 90), 3500);
-
-                const response = await fetch('/publish-item', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formDataPreview),
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    updateAIProgress('✅ Published to eBay!', 100);
-
-                    if (formDataPreview.include_debug && data.debug) {
-                        showDebugInfo(data.debug);
-                    }
-
-                    setTimeout(() => {
-                        hideAIStatus();
-                        localStorage.setItem('listing-success', JSON.stringify(data));
-                        window.location.href = 'success.html';
-                    }, 1000);
-                } else {
-                    hideAIStatus();
-                    document.getElementById('error-message').textContent = data.error || 'Failed to publish listing';
-                    document.getElementById('error-message').classList.remove('hidden');
-                }
-            } catch (error) {
-                hideAIStatus();
-                document.getElementById('error-message').textContent = 'Network error. Please try again.';
-                document.getElementById('error-message').classList.remove('hidden');
-            }
-
-            button.disabled = false;
-            button.textContent = 'Publish to eBay';
+            await submitToPublish(formDataPreview, button);
         });
 
         document.getElementById('preview-edit-publish-btn').addEventListener('click', async () => {
