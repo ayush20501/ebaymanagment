@@ -878,6 +878,12 @@ def success_page():
 
 @app.route("/admin-portal.html")
 def admin_portal_page():
+    uid = session.get("user_id")
+    if not uid:
+        return redirect("/login.html")
+    if not is_admin_user(uid):
+        return jsonify({"error": "Admin access required"}), 403
+
     return send_from_directory(app.template_folder, 'admin-portal.html')
 
 @app.route("/debug-admin")
