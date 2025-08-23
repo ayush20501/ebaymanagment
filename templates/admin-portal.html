@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - ListFast.ai</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .hero-gradient {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 8s ease-in-out infinite;
+        }
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.2);
+        }
+        .sidebar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .nav-item {
+            transition: all 0.3s ease;
+        }
+        .nav-item:hover {
+            transform: translateX(5px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-left: 4px solid white;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
+        }
+        .loading-spinner {
+            display: none;
+        }
+        .loading-spinner.show {
+            display: flex;
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .pulse-animation {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .8; }
+        }
+        .table-custom {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="sidebar w-64 flex-shrink-0 shadow-2xl">
+            <div class="p-6">
+                <div class="text-white mb-8">
+                    <h2 class="text-2xl font-bold hero-gradient bg-clip-text text-transparent">ListFast.ai</h2>
+                    <p class="text-sm opacity-80 mt-1">Admin Portal</p>
+                </div>
+                
+                <nav class="space-y-2">
+                    <a href="#" onclick="showDashboard()" class="nav-item active flex items-center space-x-3 text-white px-4 py-3 rounded-lg transition-all duration-300">
+                        <i class="fas fa-tachometer-alt w-5"></i>
+                        <span class="font-medium">Dashboard</span>
+                    </a>
+                    <a href="#" onclick="showUsers()" class="nav-item flex items-center space-x-3 text-white px-4 py-3 rounded-lg transition-all duration-300 opacity-80 hover:opacity-100">
+                        <i class="fas fa-users w-5"></i>
+                        <span class="font-medium">Users</span>
+                    </a>
+                    <a href="#" onclick="showListings()" class="nav-item flex items-center space-x-3 text-white px-4 py-3 rounded-lg transition-all duration-300 opacity-80 hover:opacity-100">
+                        <i class="fas fa-list w-5"></i>
+                        <span class="font-medium">All Listings</span>
+                    </a>
+                    <div class="pt-6 mt-6 border-t border-white border-opacity-20">
+                        <a href="#" onclick="logout()" class="nav-item flex items-center space-x-3 text-white px-4 py-3 rounded-lg transition-all duration-300 opacity-80 hover:opacity-100">
+                            <i class="fas fa-sign-out-alt w-5"></i>
+                            <span class="font-medium">Logout</span>
+                        </a>
+                    </div>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <div class="p-8">
+                <!-- Dashboard Section -->
+                <div id="dashboard-section">
+                    <!-- Header -->
+                    <div class="mb-8">
+                        <h1 class="text-4xl font-bold text-gray-900 mb-2">
+                            <i class="fas fa-tachometer-alt mr-3 hero-gradient bg-clip-text text-transparent"></i>
+                            Dashboard
+                        </h1>
+                        <p class="text-xl text-gray-600">Welcome back, Admin! Here's what's happening.</p>
+                    </div>
+
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="bg-white p-6 rounded-2xl shadow-lg card-hover">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-600 mb-2">Total Users</p>
+                                    <p class="text-3xl font-bold text-gray-900" id="total-users">-</p>
+                                </div>
+                                <div class="text-4xl text-gray-400">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white p-6 rounded-2xl shadow-lg card-hover">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-600 mb-2">Active Users</p>
+                                    <p class="text-3xl font-bold text-gray-900" id="active-users">-</p>
+                                </div>
+                                <div class="text-4xl text-gray-400">
+                                    <i class="fas fa-user-check"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white p-6 rounded-2xl shadow-lg card-hover">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-600 mb-2">Total Listings</p>
+                                    <p class="text-3xl font-bold text-gray-900" id="total-listings">-</p>
+                                </div>
+                                <div class="text-4xl text-gray-400">
+                                    <i class="fas fa-list"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card text-white p-6 rounded-2xl shadow-lg card-hover">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm opacity-90 mb-2">Total Value</p>
+                                    <p class="text-3xl font-bold" id="total-value">£-</p>
+                                </div>
+                                <div class="text-4xl opacity-80">
+                                    <i class="fas fa-pound-sign"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white p-8 rounded-2xl shadow-lg card-hover">
+                            <div class="flex items-center mb-6">
+                                <i class="fas fa-chart-line text-2xl hero-gradient bg-clip-text text-transparent mr-3"></i>
+                                <h3 class="text-xl font-bold text-gray-900">Recent Activity</h3>
+                            </div>
+                            <div class="grid grid-cols-2 gap-6">
+                                <div class="text-center">
+                                    <p class="text-3xl font-bold text-gray-900 mb-2" id="recent-registrations">-</p>
+                                    <p class="text-gray-600">New Users (7 days)</p>
+                                </div>
+                                <div class="text-center">
+                                    <p class="text-3xl font-bold text-gray-900 mb-2" id="recent-listings">-</p>
+                                    <p class="text-gray-600">New Listings (7 days)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users Section -->
+                <div id="users-section" style="display: none;">
+                    <div class="flex justify-between items-center mb-8">
+                        <h1 class="text-4xl font-bold text-gray-900">
+                            <i class="fas fa-users mr-3 hero-gradient bg-clip-text text-transparent"></i>
+                            User Management
+                        </h1>
+                        <button onclick="loadUsers()" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-all card-hover pulse-animation">
+                            <i class="fas fa-sync-alt mr-2"></i>Refresh
+                        </button>
+                    </div>
+
+                    <!-- Loading Spinner -->
+                    <div id="users-loading" class="loading-spinner justify-center items-center py-20">
+                        <div class="text-center">
+                            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                            <p class="mt-4 text-gray-600 text-lg">Loading users...</p>
+                        </div>
+                    </div>
+
+                    <!-- Users Table -->
+                    <div id="users-table-container" class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="gradient-bg text-white">
+                                    <tr>
+                                        <th class="px-6 py-4 text-left font-semibold">ID</th>
+                                        <th class="px-6 py-4 text-left font-semibold">Email</th>
+                                        <th class="px-6 py-4 text-left font-semibold">Status</th>
+                                        <th class="px-6 py-4 text-left font-semibold">Listings</th>
+                                        <th class="px-6 py-4 text-left font-semibold">Joined</th>
+                                        <th class="px-6 py-4 text-left font-semibold">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-table-body" class="divide-y divide-gray-200">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Listings Section -->
+                <div id="listings-section" style="display: none;">
+                    <div class="flex justify-between items-center mb-8">
+                        <h1 class="text-4xl font-bold text-gray-900">
+                            <i class="fas fa-list mr-3 hero-gradient bg-clip-text text-transparent"></i>
+                            All Listings
+                        </h1>
+                        <button onclick="loadListings()" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-all card-hover pulse-animation">
+                            <i class="fas fa-sync-alt mr-2"></i>Refresh
+                        </button>
+                    </div>
+
+                    <!-- Loading Spinner -->
+                    <div id="listings-loading" class="loading-spinner justify-center items-center py-20">
+                        <div class="text-center">
+                            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                            <p class="mt-4 text-gray-600 text-lg">Loading listings...</p>
+                        </div>
+                    </div>
+
+                    <!-- Listings Table -->
+                    <div id="listings-table-container" class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="gradient-bg text-white">
+                                    <tr>
+                                        <th class="px-6 py-4 text-left font-semibold">Listing ID</th>
+                                        <th class="px-6 py-4 text-left font-semibold">Title</th>
+                                        <th class="px-6 py-4 text-left font-semibold">Price</th>
+                                        <th class="px-6 py-4 text-left font-semibold">Quantity</th>
+                                        <th class="px-6 py-4 text-left font-semibold">Status</th>
+                                        <th class="px-6 py-4 text-left font-semibold">User</th>
+                                        <th class="px-6 py-4 text-left font-semibold">Created</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="listings-table-body" class="divide-y divide-gray-200">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Navigation functions
+        function showDashboard() {
+            document.getElementById('dashboard-section').style.display = 'block';
+            document.getElementById('users-section').style.display = 'none';
+            document.getElementById('listings-section').style.display = 'none';
+            
+            // Update active nav
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            event.target.closest('.nav-item').classList.add('active');
+            
+            loadStats();
+        }
+
+        function showUsers() {
+            document.getElementById('dashboard-section').style.display = 'none';
+            document.getElementById('users-section').style.display = 'block';
+            document.getElementById('listings-section').style.display = 'none';
+            
+            // Update active nav
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            event.target.closest('.nav-item').classList.add('active');
+            
+            loadUsers();
+        }
+
+        function showListings() {
+            document.getElementById('dashboard-section').style.display = 'none';
+            document.getElementById('users-section').style.display = 'none';
+            document.getElementById('listings-section').style.display = 'block';
+            
+            // Update active nav
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            event.target.closest('.nav-item').classList.add('active');
+            
+            loadListings();
+        }
+
+        // API functions
+        async function loadStats() {
+            try {
+                const response = await fetch('/admin/stats');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('total-users').textContent = data.total_users;
+                    document.getElementById('active-users').textContent = data.active_users;
+                    document.getElementById('total-listings').textContent = data.total_listings;
+                    document.getElementById('total-value').textContent = `£${data.total_value.toFixed(2)}`;
+                    document.getElementById('recent-registrations').textContent = data.recent_registrations;
+                    document.getElementById('recent-listings').textContent = data.recent_listings;
+                } else {
+                    console.error('Failed to load stats:', data.error);
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        async function loadUsers() {
+            const loading = document.getElementById('users-loading');
+            const container = document.getElementById('users-table-container');
+            const tbody = document.getElementById('users-table-body');
+            
+            loading.classList.add('show');
+            container.style.display = 'none';
+            
+            try {
+                const response = await fetch('/admin/users');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    tbody.innerHTML = '';
+                    data.users.forEach(user => {
+                        const row = document.createElement('tr');
+                        row.className = 'hover:bg-gray-50 transition-colors';
+                        row.innerHTML = `
+                            <td class="px-6 py-4 text-gray-900 font-medium">${user.id}</td>
+                            <td class="px-6 py-4 text-gray-900">${user.email}</td>
+                            <td class="px-6 py-4">
+                                <span class="px-3 py-1 rounded-full text-sm font-medium ${user.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                    ${user.is_active ? 'Active' : 'Inactive'}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-900">${user.listing_count}</td>
+                            <td class="px-6 py-4 text-gray-600">${new Date(user.created_at).toLocaleDateString()}</td>
+                            <td class="px-6 py-4">
+                                <button class="px-4 py-2 rounded-lg text-sm font-medium transition-all ${user.is_active ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-green-100 text-green-700 hover:bg-green-200'}" 
+                                        onclick="toggleUserStatus(${user.id}, ${user.is_active})">
+                                    ${user.is_active ? 'Deactivate' : 'Activate'}
+                                </button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                } else {
+                    console.error('Failed to load users:', data.error);
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+            } finally {
+                loading.classList.remove('show');
+                container.style.display = 'block';
+            }
+        }
+
+        async function toggleUserStatus(userId, currentStatus) {
+            try {
+                const response = await fetch(`/admin/users/${userId}/toggle-status`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert(data.message);
+                    loadUsers(); // Refresh the table
+                    loadStats(); // Refresh stats
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error toggling user status:', error);
+                alert('Error updating user status');
+            }
+        }
+
+        async function loadListings() {
+            const loading = document.getElementById('listings-loading');
+            const container = document.getElementById('listings-table-container');
+            const tbody = document.getElementById('listings-table-body');
+            
+            loading.classList.add('show');
+            container.style.display = 'none';
+            
+            try {
+                const response = await fetch('/admin/listings');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    tbody.innerHTML = '';
+                    data.listings.forEach(listing => {
+                        const row = document.createElement('tr');
+                        row.className = 'hover:bg-gray-50 transition-colors';
+                        row.innerHTML = `
+                            <td class="px-6 py-4 text-gray-900 font-medium">${listing.listing_id}</td>
+                            <td class="px-6 py-4 text-gray-900">${listing.title}</td>
+                            <td class="px-6 py-4 text-gray-900 font-medium">£${listing.price_value.toFixed(2)} ${listing.price_currency}</td>
+                            <td class="px-6 py-4 text-gray-900">${listing.quantity}</td>
+                            <td class="px-6 py-4">
+                                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">${listing.status}</span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-600">${listing.user_email}</td>
+                            <td class="px-6 py-4 text-gray-600">${new Date(listing.created_at).toLocaleDateString()}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                } else {
+                    console.error('Failed to load listings:', data.error);
+                }
+            } catch (error) {
+                console.error('Error loading listings:', error);
+            } finally {
+                loading.classList.remove('show');
+                container.style.display = 'block';
+            }
+        }
+
+        async function logout() {
+            try {
+                const response = await fetch('/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                console.error('Error logging out:', error);
+            }
+        }
+
+        // Load dashboard on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStats();
+        });
+    </script>
+</body>
+</html>
