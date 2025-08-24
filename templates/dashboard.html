@@ -226,7 +226,6 @@
     </div>
 
     <!-- Preview Modal -->
-<!-- Preview Modal -->
 <div id="preview-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 modal-backdrop overflow-y-auto h-full w-full z-50">
     <div class="relative top-8 mx-auto p-6 border w-11/12 md:w-4/5 lg:w-3/4 xl:w-2/3 shadow-2xl rounded-2xl bg-white max-w-4xl">
         <div class="mt-3">
@@ -270,36 +269,20 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-lg font-semibold text-gray-900 mb-3">Price</label>
-                        <div class="flex space-x-2">
-                            <select id="preview-currency"
-                                class="input-field w-1/3 px-4 py-4 rounded-xl text-base">
-                                <option value="GBP">GBP (£)</option>
-                                <option value="USD">USD ($)</option>
-                                <option value="EUR">EUR (€)</option>
-                            </select>
-                            <input type="number" id="preview-price" min="0" step="0.01"
-                                class="input-field w-2/3 px-4 py-4 rounded-xl text-base">
-                        </div>
-                        <p class="text-sm text-gray-500 mt-2">Enter the price and select currency</p>
+                        <p id="preview-price-currency" class="text-base text-gray-900"></p>
+                        <p class="text-sm text-gray-500 mt-2">Price and currency (non-editable)</p>
                     </div>
-
                     <div>
                         <label class="block text-lg font-semibold text-gray-900 mb-3">Quantity</label>
-                        <input type="number" id="preview-quantity" min="1"
-                            class="input-field w-full px-4 py-4 rounded-xl text-base">
-                        <p class="text-sm text-gray-500 mt-2">Number of items available</p>
+                        <p id="preview-quantity" class="text-base text-gray-900"></p>
+                        <p class="text-sm text-gray-500 mt-2">Number of items available (non-editable)</p>
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-lg font-semibold text-gray-900 mb-3">Condition</label>
-                    <select id="preview-condition"
-                        class="input-field w-full px-4 py-4 rounded-xl text-base">
-                        <option value="NEW">New</option>
-                        <option value="USED">Used</option>
-                        <option value="REFURBISHED">Refurbished</option>
-                    </select>
-                    <p class="text-sm text-gray-500 mt-2">Select the item condition</p>
+                    <p id="preview-condition" class="text-base text-gray-900"></p>
+                    <p class="text-sm text-gray-500 mt-2">Item condition (non-editable)</p>
                 </div>
 
                 <div>
@@ -307,9 +290,8 @@
                     <div id="preview-images" class="grid grid-cols-2 md:grid-cols-3 gap-4">
                         <!-- Images will be dynamically populated -->
                     </div>
-                    <textarea id="preview-image-urls" rows="4"
-                        class="input-field w-full px-4 py-4 rounded-xl text-base mt-3"></textarea>
-                    <p class="text-sm text-gray-500 mt-2">Edit image URLs (one per line, HTTPS only)</p>
+                    <p id="preview-image-urls" class="text-base text-gray-900 mt-3"></p>
+                    <p class="text-sm text-gray-500 mt-2">Image URLs (non-editable)</p>
                 </div>
 
                 <div id="preview-error" class="hidden bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-xl font-medium">
@@ -971,11 +953,7 @@ async function generatePreview(formData, button) {
 function displayPreview(data) {
     document.getElementById('preview-title').value = data.title || '';
     document.getElementById('preview-description').value = data.description.text || '';
-    document.getElementById('preview-price').value = data.price?.value || '';
-    document.getElementById('preview-currency').value = data.price?.currency || 'GBP';
-    document.getElementById('preview-quantity').value = data.quantity || 1;
-    document.getElementById('preview-condition').value = data.condition || 'NEW';
-
+    
     const aspectsContainer = document.getElementById('preview-aspects');
     aspectsContainer.innerHTML = '';
     Object.entries(data.aspects || {}).forEach(([key, values]) => {
@@ -988,6 +966,12 @@ function displayPreview(data) {
         aspectsContainer.appendChild(aspectDiv);
     });
 
+    const currencySymbols = { GBP: '£', USD: '$', EUR: '€' };
+    document.getElementById('preview-price-currency').textContent = 
+        `${currencySymbols[data.price?.currency] || data.price?.currency || 'GBP'} ${data.price?.value || '0.00'} ${data.price?.currency || 'GBP'}`;
+    document.getElementById('preview-quantity').textContent = data.quantity || 1;
+    document.getElementById('preview-condition').textContent = data.condition || 'NEW';
+
     const imagesContainer = document.getElementById('preview-images');
     imagesContainer.innerHTML = '';
     (data.images || []).forEach(url => {
@@ -997,7 +981,7 @@ function displayPreview(data) {
         `;
         imagesContainer.appendChild(imgDiv);
     });
-    document.getElementById('preview-image-urls').value = (data.images || []).join('\n');
+    document.getElementById('preview-image-urls').textContent = (data.images || []).join('\n') || 'No images provided';
 
     // Store the preview data for final publishing
     document.getElementById('preview-form').dataset.preview = JSON.stringify(data);
@@ -1077,18 +1061,12 @@ document.getElementById('preview-form').addEventListener('submit', async (e) => 
     button.disabled = true;
     button.textContent = 'Publishing...';
 
-    // Collect edited fields
+    // Collect edited fields (only Title, Description, and Aspects)
     previewData.title = document.getElementById('preview-title').value.trim();
     previewData.description.text = document.getElementById('preview-description').value.trim();
     previewData.description.html = previewData.description.used_html
         ? `<p>${previewData.description.text}</p>`
         : previewData.description.text;
-    previewData.price = {
-        value: parseFloat(document.getElementById('preview-price').value) || 0,
-        currency: document.getElementById('preview-currency').value
-    };
-    previewData.quantity = parseInt(document.getElementById('preview-quantity').value) || 1;
-    previewData.condition = document.getElementById('preview-condition').value;
 
     const aspectInputs = document.getElementById('preview-aspects').querySelectorAll('input[data-aspect]');
     const editedAspects = {};
@@ -1101,39 +1079,9 @@ document.getElementById('preview-form').addEventListener('submit', async (e) => 
     });
     previewData.aspects = editedAspects;
 
-    const imageUrls = document.getElementById('preview-image-urls').value
-        .split('\n')
-        .map(url => url.trim())
-        .filter(url => url.startsWith('https://'));
-    previewData.images = imageUrls;
-
-    // Basic validation
+    // Basic validation for editable fields
     if (!previewData.title) {
         document.getElementById('preview-error').textContent = 'Title is required.';
-        document.getElementById('preview-error').classList.remove('hidden');
-        document.getElementById('preview-success').classList.add('hidden');
-        button.disabled = false;
-        button.textContent = 'Publish to eBay';
-        return;
-    }
-    if (!imageUrls.length) {
-        document.getElementById('preview-error').textContent = 'At least one valid HTTPS image URL is required.';
-        document.getElementById('preview-error').classList.remove('hidden');
-        document.getElementById('preview-success').classList.add('hidden');
-        button.disabled = false;
-        button.textContent = 'Publish to eBay';
-        return;
-    }
-    if (previewData.price.value <= 0) {
-        document.getElementById('preview-error').textContent = 'Price must be greater than 0.';
-        document.getElementById('preview-error').classList.remove('hidden');
-        document.getElementById('preview-success').classList.add('hidden');
-        button.disabled = false;
-        button.textContent = 'Publish to eBay';
-        return;
-    }
-    if (previewData.quantity < 1) {
-        document.getElementById('preview-error').textContent = 'Quantity must be at least 1.';
         document.getElementById('preview-error').classList.remove('hidden');
         document.getElementById('preview-success').classList.add('hidden');
         button.disabled = false;
