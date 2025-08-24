@@ -16,6 +16,8 @@ from pathlib import Path
 from collections import Counter
 from openai import OpenAI
 import hashlib
+from werkzeug.utils import secure_filename
+
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 load_dotenv()
@@ -2125,66 +2127,33 @@ def allowed_file(filename):
 
 @app.route("/upload-profile-image", methods=["POST"])
 def upload_profile_image():
-    """Upload profile image to ImgBB and return the URL"""
-    if "user_id" not in session:
-        return jsonify({"error": "Please log in first"}), 401
-    
-    if not is_user_active(session["user_id"]):
-        return jsonify({"error": "Account is inactive"}), 403
-    
-    if not IMGBB_API_KEY:
-        return jsonify({"error": "Image upload service not configured"}), 500
-    
-    if 'image' not in request.files:
+    if "image" not in request.files:
         return jsonify({"error": "No image file provided"}), 400
     
-    file = request.files['image']
-    
-    if file.filename == '':
+    file = request.files["image"]
+    if file.filename == "":
         return jsonify({"error": "No file selected"}), 400
-    
-    if not allowed_file(file.filename):
-        return jsonify({"error": "Invalid file type. Only PNG, JPG, JPEG, GIF, WEBP are allowed"}), 400
-    
-    file.seek(0, os.SEEK_END)
-    file_size = file.tell()
-    file.seek(0)
-    
-    if file_size > MAX_FILE_SIZE:
-        return jsonify({"error": "File size too large. Maximum 5MB allowed"}), 400
-    
+
     try:
-        file_content = file.read()
-        encoded_image = base64.b64encode(file_content).decode('utf-8')
-        
+        encoded_image = base64.b64encode(file.read()).decode("utf-8")
         payload = {
-            'key': IMGBB_API_KEY,
-            'image': encoded_image,
-            'name': secure_filename(file.filename)
+            "key": IMGBB_API_KEY,
+            "image": encoded_image,
+            "name": secure_filename(file.filename)
         }
         
         response = requests.post(IMGBB_UPLOAD_URL, data=payload, timeout=30)
+        result = response.json()
         
-        if response.status_code == 200:
-            result = response.json()
-            if result.get('success'):
-                image_url = result['data']['url']
-                return jsonify({
-                    "status": "success", 
-                    "image_url": image_url,
-                    "message": "Image uploaded successfully"
-                })
-            else:
-                return jsonify({"error": "Image upload failed"}), 500
-        else:
-            return jsonify({"error": "Image upload service error"}), 500
-            
-    except requests.exceptions.Timeout:
-        return jsonify({"error": "Upload timeout. Please try again"}), 500
-    except requests.exceptions.RequestException as e:
-        return jsonify({"error": "Network error during upload"}), 500
+        if result.get("success"):
+            return jsonify({
+                "status": "success",
+                "image_url": result["data"]["url"]
+            })
+        return jsonify({"error": "Upload failed"}), 500
+
     except Exception as e:
-        return jsonify({"error": "Failed to process image"}), 500
+        return jsonify({"error": str(e)}), 500
 
 
 
