@@ -225,6 +225,67 @@
         </div>
     </div>
 
+    <!-- Preview Modal -->
+<div id="preview-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 modal-backdrop overflow-y-auto h-full w-full z-50">
+    <div class="relative top-8 mx-auto p-6 border w-11/12 md:w-4/5 lg:w-3/4 xl:w-2/3 shadow-2xl rounded-2xl bg-white max-w-4xl">
+        <div class="mt-3">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-900">Preview Listing</h3>
+                    <p class="text-gray-600 mt-1">Review and edit your listing before publishing to eBay</p>
+                </div>
+                <button id="close-preview" class="text-gray-400 hover:text-gray-600 hover-lift">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Preview Form -->
+            <form id="preview-form" class="space-y-6">
+                <div>
+                    <label class="block text-lg font-semibold text-gray-900 mb-3">Title</label>
+                    <input type="text" id="preview-title" maxlength="80"
+                        class="input-field w-full px-4 py-4 rounded-xl text-base">
+                    <p class="text-sm text-gray-500 mt-2">Max 80 characters</p>
+                </div>
+
+                <div>
+                    <label class="block text-lg font-semibold text-gray-900 mb-3">Description</label>
+                    <textarea id="preview-description" rows="6"
+                        class="input-field w-full px-4 py-4 rounded-xl text-base resize-none"></textarea>
+                    <p class="text-sm text-gray-500 mt-2">Edit the generated description if needed</p>
+                </div>
+
+                <div>
+                    <label class="block text-lg font-semibold text-gray-900 mb-3">Item Aspects</label>
+                    <div id="preview-aspects" class="space-y-3">
+                        <!-- Aspects will be dynamically populated -->
+                    </div>
+                    <p class="text-sm text-gray-500 mt-2">Edit or add aspect values as needed</p>
+                </div>
+
+                <div id="preview-error" class="hidden bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-xl font-medium">
+                </div>
+                <div id="preview-success" class="hidden bg-green-50 border border-green-200 text-green-800 px-6 py-4 rounded-xl font-medium">
+                </div>
+
+                <div class="flex space-x-3 pt-2">
+                    <button type="submit"
+                        class="bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 disabled:bg-gray-400 hover-lift">
+                        Publish to eBay
+                    </button>
+                    <button type="button" id="cancel-preview"
+                        class="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 hover-lift">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-6 lg:px-12 py-12">
         <!-- Header Section -->
@@ -341,6 +402,10 @@
                                 class="w-full bg-green-600 text-white py-4 px-8 rounded-xl text-lg font-semibold hover:bg-green-700 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed hover-lift pulse-animation">
                                 Publish to eBay
                             </button>
+                            <button type="button" id="preview-btn"
+                                class="flex-1 bg-blue-600 text-white py-4 px-8 rounded-xl text-lg font-semibold hover:bg-blue-700 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed hover-lift">
+                                Preview, Edit & Publish
+                            </button>
                         </div>
                     </div>
                 </form>
@@ -426,460 +491,642 @@
     </div>
 
     <script>
-    let currentUserProfile = null;
-    let currentListingsPage = 1;
-    let hasMoreListings = false;
+let currentUserProfile = null;
+let currentListingsPage = 1;
+let hasMoreListings = false;
 
-    window.addEventListener('load', async () => {
-        try {
-            const response = await fetch('/auth-status');
-            const data = await response.json();
+window.addEventListener('load', async () => {
+    try {
+        const response = await fetch('/auth-status');
+        const data = await response.json();
 
-            if (!data.is_logged_in) {
-                window.location.href = 'login.html';
-                return;
-            } else if (!data.has_profile) {
-                window.location.href = 'profile.html';
-                return;
-            } else if (!data.has_ebay_auth) {
-                window.location.href = 'ebay-auth.html';
-                return;
-            }
-
-            document.getElementById('user-email').textContent = data.email;
-        } catch (error) {
+        if (!data.is_logged_in) {
             window.location.href = 'login.html';
-        }
-    });
-
-    const aiStatusEl = document.getElementById('ai-status');
-    const aiStatusTextEl = document.getElementById('ai-status-text');
-    const aiProgressEl = document.getElementById('ai-progress');
-
-    function showAIStatus(message, progress = 0) {
-        aiStatusEl.classList.remove('hidden');
-        aiStatusTextEl.textContent = message;
-        aiProgressEl.style.width = `${progress}%`;
-    }
-
-    function hideAIStatus() {
-        aiStatusEl.classList.add('hidden');
-        aiProgressEl.style.width = '0%';
-    }
-
-    function updateAIProgress(message, progress) {
-        aiStatusTextEl.textContent = message;
-        aiProgressEl.style.width = `${progress}%`;
-    }
-
-    document.getElementById('autofill-btn').addEventListener('click', () => {
-        document.getElementById('raw_text').value = "Sainsbury's Mackerel Fillets in Olive Oil 125g - Premium quality mackerel fillets preserved in olive oil. Perfect for sandwiches, salads, or as a healthy snack. Rich in omega-3 fatty acids and protein. Best before date clearly marked on tin.";
-        document.getElementById('price_value').value = "19.99";
-        document.getElementById('quantity').value = "3";
-        document.getElementById('condition').value = "NEW";
-        document.getElementById('images').value = "https://assets.sainsburys-groceries.co.uk/gol/1261448/1/640x640.jpg";
-
-        document.getElementById('error-message').classList.add('hidden');
-        document.getElementById('success-message').classList.add('hidden');
-        document.getElementById('debug-panel').classList.add('hidden');
-
-        const form = document.getElementById('listing-form');
-        form.style.transform = 'scale(1.01)';
-        form.style.transition = 'transform 0.2s ease';
-        setTimeout(() => {
-            form.style.transform = 'scale(1)';
-        }, 200);
-    });
-
-    document.getElementById('logout-btn').addEventListener('click', async () => {
-        try {
-            await fetch('/logout', { method: 'POST' });
-            window.location.href = 'index.html';
-        } catch (error) {
-            console.error('Logout failed:', error);
-        }
-    });
-
-    document.getElementById('profile-btn').addEventListener('click', async () => {
-        document.getElementById('profile-modal').classList.remove('hidden');
-        await loadProfileData();
-    });
-
-    document.getElementById('close-profile').addEventListener('click', () => {
-        document.getElementById('profile-modal').classList.add('hidden');
-        resetAddressForm();
-    });
-
-    document.getElementById('profile-modal').addEventListener('click', (e) => {
-        if (e.target.id === 'profile-modal') {
-            document.getElementById('profile-modal').classList.add('hidden');
-            resetAddressForm();
-        }
-    });
-
-    async function loadProfileData() {
-        try {
-            const statsResponse = await fetch('/user-stats');
-            const statsData = await statsResponse.json();
-
-            if (statsResponse.ok) {
-                document.getElementById('total-listings-stat').textContent = statsData.total_listings;
-                document.getElementById('active-listings-stat').textContent = statsData.active_listings;
-                document.getElementById('inventory-value-stat').textContent = `£${statsData.total_inventory_value.toFixed(2)}`;
-                document.getElementById('profile-email').textContent = statsData.email;
-            }
-
-            await loadUserProfile();
-            await loadRecentListings();
-        } catch (error) {
-            console.error('Error loading profile data:', error);
-        }
-    }
-
-    async function loadUserProfile() {
-        try {
-            const response = await fetch('/profile');
-            const data = await response.json();
-
-            if (response.ok && data.profile) {
-                currentUserProfile = data.profile;
-                displayAddress(data.profile);
-            } else {
-                displayAddress(null);
-            }
-        } catch (error) {
-            console.error('Error loading user profile:', error);
-            displayAddress(null);
-        }
-    }
-
-    function displayAddress(profile) {
-        if (profile) {
-            document.getElementById('display-address-line1').textContent = profile.address_line1;
-            document.getElementById('display-city').textContent = profile.city;
-            document.getElementById('display-postal-code').textContent = profile.postal_code;
-            document.getElementById('display-country').textContent = profile.country === 'GB' ? 'United Kingdom' : profile.country;
-        } else {
-            document.getElementById('display-address-line1').textContent = 'No address set';
-            document.getElementById('display-city').textContent = '-';
-            document.getElementById('display-postal-code').textContent = '-';
-            document.getElementById('display-country').textContent = '-';
-        }
-    }
-
-    document.getElementById('edit-address-btn').addEventListener('click', () => {
-        showAddressEditForm();
-    });
-
-    document.getElementById('cancel-address-edit').addEventListener('click', () => {
-        resetAddressForm();
-    });
-
-    function showAddressEditForm() {
-        if (currentUserProfile) {
-            document.getElementById('edit-address-line1').value = currentUserProfile.address_line1 || '';
-            document.getElementById('edit-city').value = currentUserProfile.city || '';
-            document.getElementById('edit-postal-code').value = currentUserProfile.postal_code || '';
-            document.getElementById('edit-country').value = currentUserProfile.country || 'GB';
-        }
-
-        document.getElementById('address-display').classList.add('hidden');
-        document.getElementById('address-edit-form').classList.remove('hidden');
-        document.getElementById('edit-address-btn').classList.add('hidden');
-    }
-
-    function resetAddressForm() {
-        document.getElementById('address-edit-form').classList.add('hidden');
-        document.getElementById('address-display').classList.remove('hidden');
-        document.getElementById('edit-address-btn').classList.remove('hidden');
-
-        const messageEl = document.getElementById('address-update-message');
-        messageEl.classList.add('hidden');
-        messageEl.textContent = '';
-    }
-
-    document.getElementById('address-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const formData = {
-            address_line1: document.getElementById('edit-address-line1').value.trim(),
-            city: document.getElementById('edit-city').value.trim(),
-            postal_code: document.getElementById('edit-postal-code').value.trim().toUpperCase(),
-            country: document.getElementById('edit-country').value
-        };
-
-        if (!formData.address_line1 || !formData.city || !formData.postal_code) {
-            showAddressMessage('Please fill in all required fields.', 'error');
+            return;
+        } else if (!data.has_profile) {
+            window.location.href = 'profile.html';
+            return;
+        } else if (!data.has_ebay_auth) {
+            window.location.href = 'ebay-auth.html';
             return;
         }
 
-        try {
-            const response = await fetch('/profile', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
+        document.getElementById('user-email').textContent = data.email;
+    } catch (error) {
+        window.location.href = 'login.html';
+    }
+});
 
-            const data = await response.json();
+const aiStatusEl = document.getElementById('ai-status');
+const aiStatusTextEl = document.getElementById('ai-status-text');
+const aiProgressEl = document.getElementById('ai-progress');
 
-            if (response.ok) {
-                showAddressMessage('Address updated successfully!', 'success');
+function showAIStatus(message, progress = 0) {
+    aiStatusEl.classList.remove('hidden');
+    aiStatusTextEl.textContent = message;
+    aiProgressEl.style.width = `${progress}%`;
+}
 
-                currentUserProfile = { ...currentUserProfile, ...formData };
-                displayAddress(currentUserProfile);
+function hideAIStatus() {
+    aiStatusEl.classList.add('hidden');
+    aiProgressEl.style.width = '0%';
+}
 
-                setTimeout(() => {
-                    resetAddressForm();
-                }, 1500);
-            } else {
-                showAddressMessage(data.error || 'Failed to update address.', 'error');
-            }
-        } catch (error) {
-            showAddressMessage('Network error. Please try again.', 'error');
+function updateAIProgress(message, progress) {
+    aiStatusTextEl.textContent = message;
+    aiProgressEl.style.width = `${progress}%`;
+}
+
+document.getElementById('autofill-btn').addEventListener('click', () => {
+    document.getElementById('raw_text').value = "Sainsbury's Mackerel Fillets in Olive Oil 125g - Premium quality mackerel fillets preserved in olive oil. Perfect for sandwiches, salads, or as a healthy snack. Rich in omega-3 fatty acids and protein. Best before date clearly marked on tin.";
+    document.getElementById('price_value').value = "19.99";
+    document.getElementById('quantity').value = "3";
+    document.getElementById('condition').value = "NEW";
+    document.getElementById('images').value = "https://assets.sainsburys-groceries.co.uk/gol/1261448/1/640x640.jpg";
+
+    document.getElementById('error-message').classList.add('hidden');
+    document.getElementById('success-message').classList.add('hidden');
+    document.getElementById('debug-panel').classList.add('hidden');
+
+    const form = document.getElementById('listing-form');
+    form.style.transform = 'scale(1.01)';
+    form.style.transition = 'transform 0.2s ease';
+    setTimeout(() => {
+        form.style.transform = 'scale(1)';
+    }, 200);
+});
+
+document.getElementById('logout-btn').addEventListener('click', async () => {
+    try {
+        await fetch('/logout', { method: 'POST' });
+        window.location.href = 'index.html';
+    } catch (error) {
+        console.error('Logout failed:', error);
+    }
+});
+
+document.getElementById('profile-btn').addEventListener('click', async () => {
+    document.getElementById('profile-modal').classList.remove('hidden');
+    await loadProfileData();
+});
+
+document.getElementById('close-profile').addEventListener('click', () => {
+    document.getElementById('profile-modal').classList.add('hidden');
+    resetAddressForm();
+});
+
+document.getElementById('profile-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'profile-modal') {
+        document.getElementById('profile-modal').classList.add('hidden');
+        resetAddressForm();
+    }
+});
+
+async function loadProfileData() {
+    try {
+        const statsResponse = await fetch('/user-stats');
+        const statsData = await statsResponse.json();
+
+        if (statsResponse.ok) {
+            document.getElementById('total-listings-stat').textContent = statsData.total_listings;
+            document.getElementById('active-listings-stat').textContent = statsData.active_listings;
+            document.getElementById('inventory-value-stat').textContent = `£${statsData.total_inventory_value.toFixed(2)}`;
+            document.getElementById('profile-email').textContent = statsData.email;
         }
-    });
 
-    function showAddressMessage(message, type) {
-        const messageEl = document.getElementById('address-update-message');
-        messageEl.textContent = message;
-        messageEl.className = `mt-4 text-sm ${type === 'success' ? 'text-green-600' : 'text-red-600'}`;
-        messageEl.classList.remove('hidden');
+        await loadUserProfile();
+        await loadRecentListings();
+    } catch (error) {
+        console.error('Error loading profile data:', error);
+    }
+}
+
+async function loadUserProfile() {
+    try {
+        const response = await fetch('/profile');
+        const data = await response.json();
+
+        if (response.ok && data.profile) {
+            currentUserProfile = data.profile;
+            displayAddress(data.profile);
+        } else {
+            displayAddress(null);
+        }
+    } catch (error) {
+        console.error('Error loading user profile:', error);
+        displayAddress(null);
+    }
+}
+
+function displayAddress(profile) {
+    if (profile) {
+        document.getElementById('display-address-line1').textContent = profile.address_line1;
+        document.getElementById('display-city').textContent = profile.city;
+        document.getElementById('display-postal-code').textContent = profile.postal_code;
+        document.getElementById('display-country').textContent = profile.country === 'GB' ? 'United Kingdom' : profile.country;
+    } else {
+        document.getElementById('display-address-line1').textContent = 'No address set';
+        document.getElementById('display-city').textContent = '-';
+        document.getElementById('display-postal-code').textContent = '-';
+        document.getElementById('display-country').textContent = '-';
+    }
+}
+
+document.getElementById('edit-address-btn').addEventListener('click', () => {
+    showAddressEditForm();
+});
+
+document.getElementById('cancel-address-edit').addEventListener('click', () => {
+    resetAddressForm();
+});
+
+function showAddressEditForm() {
+    if (currentUserProfile) {
+        document.getElementById('edit-address-line1').value = currentUserProfile.address_line1 || '';
+        document.getElementById('edit-city').value = currentUserProfile.city || '';
+        document.getElementById('edit-postal-code').value = currentUserProfile.postal_code || '';
+        document.getElementById('edit-country').value = currentUserProfile.country || 'GB';
     }
 
-    async function loadRecentListings() {
-        try {
-            const response = await fetch('/my-listings?page=1');
-            const data = await response.json();
+    document.getElementById('address-display').classList.add('hidden');
+    document.getElementById('address-edit-form').classList.remove('hidden');
+    document.getElementById('edit-address-btn').classList.add('hidden');
+}
 
-            const container = document.getElementById('recent-listings');
+function resetAddressForm() {
+    document.getElementById('address-edit-form').classList.add('hidden');
+    document.getElementById('address-display').classList.remove('hidden');
+    document.getElementById('edit-address-btn').classList.remove('hidden');
 
-            if (response.ok && data.listings.length > 0) {
-                container.innerHTML = data.listings.slice(0, 5).map(listing => `
+    const messageEl = document.getElementById('address-update-message');
+    messageEl.classList.add('hidden');
+    messageEl.textContent = '';
+}
+
+document.getElementById('address-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const formData = {
+        address_line1: document.getElementById('edit-address-line1').value.trim(),
+        city: document.getElementById('edit-city').value.trim(),
+        postal_code: document.getElementById('edit-postal-code').value.trim().toUpperCase(),
+        country: document.getElementById('edit-country').value
+    };
+
+    if (!formData.address_line1 || !formData.city || !formData.postal_code) {
+        showAddressMessage('Please fill in all required fields.', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch('/profile', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            showAddressMessage('Address updated successfully!', 'success');
+
+            currentUserProfile = { ...currentUserProfile, ...formData };
+            displayAddress(currentUserProfile);
+
+            setTimeout(() => {
+                resetAddressForm();
+            }, 1500);
+        } else {
+            showAddressMessage(data.error || 'Failed to update address.', 'error');
+        }
+    } catch (error) {
+        showAddressMessage('Network error. Please try again.', 'error');
+    }
+});
+
+function showAddressMessage(message, type) {
+    const messageEl = document.getElementById('address-update-message');
+    messageEl.textContent = message;
+    messageEl.className = `mt-4 text-sm ${type === 'success' ? 'text-green-600' : 'text-red-600'}`;
+    messageEl.classList.remove('hidden');
+}
+
+async function loadRecentListings() {
+    try {
+        const response = await fetch('/my-listings?page=1');
+        const data = await response.json();
+
+        const container = document.getElementById('recent-listings');
+
+        if (response.ok && data.listings.length > 0) {
+            container.innerHTML = data.listings.slice(0, 5).map(listing => `
+                <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl hover-lift">
+                    <div class="flex-1">
+                        <h5 class="font-medium text-gray-900 text-sm">${listing.title}</h5>
+                        <p class="text-xs text-gray-500 mt-1">
+                            ${listing.category_name || 'Unknown Category'} • 
+                            £${listing.price_value} • 
+                            Qty: ${listing.quantity}
+                        </p>
+                    </div>
+                    ${listing.view_url ? `
+                        <a href="${listing.view_url}" target="_blank" class="text-blue-600 hover:text-blue-800 text-xs font-medium hover-lift">
+                            View →
+                        </a>
+                    ` : ''}
+                </div>
+            `).join('');
+        } else {
+            container.innerHTML = '<div class="text-center text-gray-500 py-8">No listings found</div>';
+        }
+    } catch (error) {
+        document.getElementById('recent-listings').innerHTML =
+            '<div class="text-center text-red-500 py-8">Error loading listings</div>';
+    }
+}
+
+document.getElementById('view-all-listings').addEventListener('click', async () => {
+    document.getElementById('recent-listings').closest('div').classList.add('hidden');
+    document.getElementById('all-listings-view').classList.remove('hidden');
+    await loadAllListings();
+});
+
+document.getElementById('back-to-recent').addEventListener('click', () => {
+    document.getElementById('all-listings-view').classList.add('hidden');
+    document.getElementById('recent-listings').closest('div').classList.remove('hidden');
+});
+
+async function loadAllListings(page = 1) {
+    try {
+        const response = await fetch(`/my-listings?page=${page}`);
+        const data = await response.json();
+
+        const container = document.getElementById('all-listings');
+
+        if (response.ok) {
+            if (page === 1) {
+                container.innerHTML = '';
+            }
+
+            if (data.listings.length > 0) {
+                container.innerHTML += data.listings.map(listing => `
                     <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl hover-lift">
                         <div class="flex-1">
                             <h5 class="font-medium text-gray-900 text-sm">${listing.title}</h5>
                             <p class="text-xs text-gray-500 mt-1">
                                 ${listing.category_name || 'Unknown Category'} • 
                                 £${listing.price_value} • 
-                                Qty: ${listing.quantity}
+                                Qty: ${listing.quantity} •
+                                ${new Date(listing.created_at).toLocaleDateString()}
                             </p>
                         </div>
-                        ${listing.view_url ? `
-                            <a href="${listing.view_url}" target="_blank" class="text-blue-600 hover:text-blue-800 text-xs font-medium hover-lift">
-                                View →
-                            </a>
-                        ` : ''}
+                        <div class="flex items-center space-x-3">
+                            <span class="px-3 py-1 text-xs rounded-full font-medium ${listing.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                                ${listing.status}
+                            </span>
+                            ${listing.view_url ? `
+                                <a href="${listing.view_url}" target="_blank" class="text-blue-600 hover:text-blue-800 text-xs font-medium hover-lift">
+                                    View →
+                                </a>
+                            ` : ''}
+                        </div>
                     </div>
                 `).join('');
-            } else {
+            } else if (page === 1) {
                 container.innerHTML = '<div class="text-center text-gray-500 py-8">No listings found</div>';
             }
-        } catch (error) {
-            document.getElementById('recent-listings').innerHTML =
-                '<div class="text-center text-red-500 py-8">Error loading listings</div>';
-        }
-    }
 
-    document.getElementById('view-all-listings').addEventListener('click', async () => {
-        document.getElementById('recent-listings').closest('div').classList.add('hidden');
-        document.getElementById('all-listings-view').classList.remove('hidden');
-        await loadAllListings();
-    });
+            hasMoreListings = data.has_more;
+            currentListingsPage = page;
 
-    document.getElementById('back-to-recent').addEventListener('click', () => {
-        document.getElementById('all-listings-view').classList.add('hidden');
-        document.getElementById('recent-listings').closest('div').classList.remove('hidden');
-    });
-
-    async function loadAllListings(page = 1) {
-        try {
-            const response = await fetch(`/my-listings?page=${page}`);
-            const data = await response.json();
-
-            const container = document.getElementById('all-listings');
-
-            if (response.ok) {
-                if (page === 1) {
-                    container.innerHTML = '';
-                }
-
-                if (data.listings.length > 0) {
-                    container.innerHTML += data.listings.map(listing => `
-                        <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl hover-lift">
-                            <div class="flex-1">
-                                <h5 class="font-medium text-gray-900 text-sm">${listing.title}</h5>
-                                <p class="text-xs text-gray-500 mt-1">
-                                    ${listing.category_name || 'Unknown Category'} • 
-                                    £${listing.price_value} • 
-                                    Qty: ${listing.quantity} •
-                                    ${new Date(listing.created_at).toLocaleDateString()}
-                                </p>
-                            </div>
-                            <div class="flex items-center space-x-3">
-                                <span class="px-3 py-1 text-xs rounded-full font-medium ${listing.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
-                                    ${listing.status}
-                                </span>
-                                ${listing.view_url ? `
-                                    <a href="${listing.view_url}" target="_blank" class="text-blue-600 hover:text-blue-800 text-xs font-medium hover-lift">
-                                        View →
-                                    </a>
-                                ` : ''}
-                            </div>
-                        </div>
-                    `).join('');
-                } else if (page === 1) {
-                    container.innerHTML = '<div class="text-center text-gray-500 py-8">No listings found</div>';
-                }
-
-                hasMoreListings = data.has_more;
-                currentListingsPage = page;
-
-                const loadMoreBtn = document.getElementById('load-more-listings');
-                if (hasMoreListings) {
-                    loadMoreBtn.classList.remove('hidden');
-                } else {
-                    loadMoreBtn.classList.add('hidden');
-                }
-            }
-        } catch (error) {
-            console.error('Error loading listings:', error);
-        }
-    }
-
-    document.getElementById('load-more-listings').addEventListener('click', () => {
-        loadAllListings(currentListingsPage + 1);
-    });
-
-    async function submitToPublish(formData, button) {
-        button.disabled = true;
-        button.textContent = 'Publishing...';
-
-        document.getElementById('error-message').classList.add('hidden');
-        document.getElementById('success-message').classList.add('hidden');
-        document.getElementById('debug-panel').classList.add('hidden');
-
-        showAIStatus('🤖 Analyzing your product description...', 10);
-        setTimeout(() => updateAIProgress('🔍 Extracting keywords and metadata...', 25), 500);
-        setTimeout(() => updateAIProgress('📂 Finding optimal eBay category...', 50), 1500);
-        setTimeout(() => updateAIProgress('📋 Filling product specifications...', 75), 2500);
-        setTimeout(() => updateAIProgress('✍️ Generating marketing description...', 90), 3500);
-
-        try {
-            const response = await fetch('/publish-item', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                updateAIProgress('✅ Published to eBay!', 100);
-
-                if (formData.include_debug && data.debug) {
-                    showDebugInfo(data.debug);
-                }
-
-                setTimeout(() => {
-                    hideAIStatus();
-                    localStorage.setItem('listing-success', JSON.stringify(data));
-                    window.location.href = 'success.html';
-                }, 1000);
+            const loadMoreBtn = document.getElementById('load-more-listings');
+            if (hasMoreListings) {
+                loadMoreBtn.classList.remove('hidden');
             } else {
-                hideAIStatus();
-                document.getElementById('error-message').textContent = data.error || 'Failed to publish listing';
-                document.getElementById('error-message').classList.remove('hidden');
+                loadMoreBtn.classList.add('hidden');
             }
-        } catch (error) {
+        }
+    } catch (error) {
+        console.error('Error loading listings:', error);
+    }
+}
+
+document.getElementById('load-more-listings').addEventListener('click', () => {
+    loadAllListings(currentListingsPage + 1);
+});
+
+async function submitToPublish(formData, button) {
+    button.disabled = true;
+    button.textContent = 'Publishing...';
+
+    document.getElementById('error-message').classList.add('hidden');
+    document.getElementById('success-message').classList.add('hidden');
+    document.getElementById('debug-panel').classList.add('hidden');
+
+    showAIStatus('🤖 Analyzing your product description...', 10);
+    setTimeout(() => updateAIProgress('🔍 Extracting keywords and metadata...', 25), 500);
+    setTimeout(() => updateAIProgress('📂 Finding optimal eBay category...', 50), 1500);
+    setTimeout(() => updateAIProgress('📋 Filling product specifications...', 75), 2500);
+    setTimeout(() => updateAIProgress('✍️ Generating marketing description...', 90), 3500);
+
+    try {
+        const response = await fetch('/publish-item', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            updateAIProgress('✅ Published to eBay!', 100);
+
+            if (formData.include_debug && data.debug) {
+                showDebugInfo(data.debug);
+            }
+
+            setTimeout(() => {
+                hideAIStatus();
+                localStorage.setItem('listing-success', JSON.stringify(data));
+                window.location.href = 'success.html';
+            }, 1000);
+        } else {
             hideAIStatus();
-            document.getElementById('error-message').textContent = 'Network error. Please try again.';
+            document.getElementById('error-message').textContent = data.error || 'Failed to publish listing';
             document.getElementById('error-message').classList.remove('hidden');
         }
-
-        button.disabled = false;
-        button.textContent = 'Publish to eBay';
+    } catch (error) {
+        hideAIStatus();
+        document.getElementById('error-message').textContent = 'Network error. Please try again.';
+        document.getElementById('error-message').classList.remove('hidden');
     }
 
-    document.getElementById('listing-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
+    button.disabled = false;
+    button.textContent = 'Publish to eBay';
+}
 
-        const imagesValue = document.getElementById('images').value.trim();
-        const validImages = imagesValue
-            .split('\n')
-            .map(url => url.trim())
-            .filter(url => url.startsWith('https://'));
+async function generatePreview(formData, button) {
+    button.disabled = true;
+    button.textContent = 'Generating Preview...';
 
-        if (!imagesValue || validImages.length === 0) {
-            document.getElementById('error-message').textContent = 'At least one valid HTTPS image URL is required.';
-            document.getElementById('error-message').classList.remove('hidden');
-            document.getElementById('success-message').classList.add('hidden');
-            return;
-        }
+    document.getElementById('error-message').classList.add('hidden');
+    document.getElementById('success-message').classList.add('hidden');
+    document.getElementById('debug-panel').classList.add('hidden');
+    document.getElementById('preview-error').classList.add('hidden');
+    document.getElementById('preview-success').classList.add('hidden');
 
-        const formData = {
-            raw_text: document.getElementById('raw_text').value.trim(),
-            price: {
-                value: parseFloat(document.getElementById('price_value').value),
-                currency: document.getElementById('currency').value
+    showAIStatus('🤖 Analyzing your product description...', 10);
+    setTimeout(() => updateAIProgress('🔍 Extracting keywords and metadata...', 25), 500);
+    setTimeout(() => updateAIProgress('📂 Finding optimal eBay category...', 50), 1500);
+    setTimeout(() => updateAIProgress('📋 Filling product specifications...', 75), 2500);
+    setTimeout(() => updateAIProgress('✍️ Generating marketing description...', 90), 3500);
+
+    try {
+        const response = await fetch('/preview-item', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
             },
-            quantity: parseInt(document.getElementById('quantity').value),
-            condition: document.getElementById('condition').value,
-            images: validImages,
-            use_html_description: document.getElementById('use_html_description').checked,
-            use_simple_prompt_description: document.getElementById('use_simple_prompt_description').checked,
-            include_debug: document.getElementById('include_debug').checked
-        };
+            body: JSON.stringify(formData),
+        });
 
-        const button = document.getElementById('publish-btn');
-        await submitToPublish(formData, button);
+        const data = await response.json();
+
+        if (response.ok) {
+            updateAIProgress('✅ Preview Generated!', 100);
+            displayPreview(data);
+
+            if (formData.include_debug && data.debug) {
+                showDebugInfo(data.debug);
+            }
+
+            setTimeout(() => {
+                hideAIStatus();
+                document.getElementById('preview-modal').classList.remove('hidden');
+            }, 1000);
+        } else {
+            hideAIStatus();
+            document.getElementById('error-message').textContent = data.error || 'Failed to generate preview';
+            document.getElementById('error-message').classList.remove('hidden');
+        }
+    } catch (error) {
+        hideAIStatus();
+        document.getElementById('error-message').textContent = 'Network error. Please try again.';
+        document.getElementById('error-message').classList.remove('hidden');
+    }
+
+    button.disabled = false;
+    button.textContent = 'Preview, Edit & Publish';
+}
+
+function displayPreview(data) {
+    document.getElementById('preview-title').value = data.title || '';
+    document.getElementById('preview-description').value = data.description.text || '';
+
+    const aspectsContainer = document.getElementById('preview-aspects');
+    aspectsContainer.innerHTML = '';
+
+    Object.entries(data.aspects || {}).forEach(([key, values]) => {
+        const aspectDiv = document.createElement('div');
+        aspectDiv.innerHTML = `
+            <label class="block text-sm font-medium text-gray-700 mb-2">${key}</label>
+            <input type="text" value="${values.join(', ')}" data-aspect="${key}"
+                class="input-field w-full px-4 py-3 rounded-lg mb-2">
+        `;
+        aspectsContainer.appendChild(aspectDiv);
     });
 
-    function showDebugInfo(debug) {
-        document.getElementById('debug-panel').classList.remove('hidden');
+    // Store the preview data for final publishing
+    document.getElementById('preview-form').dataset.preview = JSON.stringify(data);
+}
 
-        if (debug.step1_extract_keywords) {
-            const keywords = debug.step1_extract_keywords;
-            document.getElementById('debug-keywords').innerHTML = `
-                <strong>Title:</strong> ${keywords.normalized_title || 'N/A'}<br>
-                <strong>Category Keywords:</strong> ${(keywords.category_keywords || []).join(', ') || 'N/A'}<br>
-                <strong>Brand:</strong> ${keywords.brand || 'N/A'}
-            `;
-        }
+document.getElementById('listing-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-        if (debug.step2_category) {
-            const category = debug.step2_category;
-            document.getElementById('debug-category').innerHTML = `
-                <strong>Query:</strong> ${category.queryUsed || 'N/A'}<br>
-                <strong>Category:</strong> ${category.categoryName || 'N/A'}<br>
-                <strong>ID:</strong> ${category.categoryId || 'N/A'}
-            `;
-        }
+    const imagesValue = document.getElementById('images').value.trim();
+    const validImages = imagesValue
+        .split('\n')
+        .map(url => url.trim())
+        .filter(url => url.startsWith('https://'));
 
-        if (debug.step3_aspects) {
-            const aspects = debug.step3_aspects;
-            const filledAspects = Object.entries(aspects.filled || {})
-                .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
-                .join('<br>');
-            document.getElementById('debug-aspects').innerHTML = `
-                <strong>Required:</strong> ${(aspects.requiredAspects || []).join(', ') || 'None'}<br>
-                <strong>Filled:</strong><br>${filledAspects || 'None'}
-            `;
-        }
-
-        if (debug.description) {
-            const desc = debug.description;
-            document.getElementById('debug-description').innerHTML = `
-                <strong>HTML Mode:</strong> ${desc.used_html ? 'Yes' : 'No'}<br>
-                <strong>Preview:</strong><br>
-                <div class="mt-2 p-2 bg-gray-700 rounded text-xs">${desc.text.substring(0, 200)}...</div>
-            `;
-        }
+    if (!imagesValue || validImages.length === 0) {
+        document.getElementById('error-message').textContent = 'At least one valid HTTPS image URL is required.';
+        document.getElementById('error-message').classList.remove('hidden');
+        document.getElementById('success-message').classList.add('hidden');
+        return;
     }
-    </script>
+
+    const formData = {
+        raw_text: document.getElementById('raw_text').value.trim(),
+        price: {
+            value: parseFloat(document.getElementById('price_value').value),
+            currency: document.getElementById('currency').value
+        },
+        quantity: parseInt(document.getElementById('quantity').value),
+        condition: document.getElementById('condition').value,
+        images: validImages,
+        use_html_description: document.getElementById('use_html_description').checked,
+        use_simple_prompt_description: document.getElementById('use_simple_prompt_description').checked,
+        include_debug: document.getElementById('include_debug').checked
+    };
+
+    const button = document.getElementById('publish-btn');
+    await submitToPublish(formData, button);
+});
+
+document.getElementById('preview-btn').addEventListener('click', async () => {
+    const imagesValue = document.getElementById('images').value.trim();
+    const validImages = imagesValue
+        .split('\n')
+        .map(url => url.trim())
+        .filter(url => url.startsWith('https://'));
+
+    if (!imagesValue || validImages.length === 0) {
+        document.getElementById('error-message').textContent = 'At least one valid HTTPS image URL is required.';
+        document.getElementById('error-message').classList.remove('hidden');
+        document.getElementById('success-message').classList.add('hidden');
+        return;
+    }
+
+    const formData = {
+        raw_text: document.getElementById('raw_text').value.trim(),
+        price: {
+            value: parseFloat(document.getElementById('price_value').value),
+            currency: document.getElementById('currency').value
+        },
+        quantity: parseInt(document.getElementById('quantity').value),
+        condition: document.getElementById('condition').value,
+        images: validImages,
+        use_html_description: document.getElementById('use_html_description').checked,
+        use_simple_prompt_description: document.getElementById('use_simple_prompt_description').checked,
+        include_debug: document.getElementById('include_debug').checked
+    };
+
+    const button = document.getElementById('preview-btn');
+    await generatePreview(formData, button);
+});
+
+document.getElementById('preview-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const previewData = JSON.parse(document.getElementById('preview-form').dataset.preview || '{}');
+    const button = document.getElementById('preview-form').querySelector('button[type="submit"]');
+    button.disabled = true;
+    button.textContent = 'Publishing...';
+
+    // Collect edited fields
+    previewData.title = document.getElementById('preview-title').value.trim();
+    previewData.description.text = document.getElementById('preview-description').value.trim();
+    previewData.description.html = previewData.description.used_html
+        ? `<p>${previewData.description.text}</p>`
+        : previewData.description.text;
+
+    const aspectInputs = document.getElementById('preview-aspects').querySelectorAll('input[data-aspect]');
+    const editedAspects = {};
+    aspectInputs.forEach(input => {
+        const aspect = input.dataset.aspect;
+        const values = input.value.split(',').map(v => v.trim()).filter(v => v);
+        if (values.length) {
+            editedAspects[aspect] = values;
+        }
+    });
+    previewData.aspects = editedAspects;
+
+    try {
+        const response = await fetch('/publish-item-from-preview', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(previewData),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            document.getElementById('preview-success').textContent = 'Published to eBay!';
+            document.getElementById('preview-success').classList.remove('hidden');
+            document.getElementById('preview-error').classList.add('hidden');
+
+            setTimeout(() => {
+                localStorage.setItem('listing-success', JSON.stringify(data));
+                window.location.href = 'success.html';
+            }, 1500);
+        } else {
+            document.getElementById('preview-error').textContent = data.error || 'Failed to publish listing';
+            document.getElementById('preview-error').classList.remove('hidden');
+            document.getElementById('preview-success').classList.add('hidden');
+        }
+    } catch (error) {
+        document.getElementById('preview-error').textContent = 'Network error. Please try again.';
+        document.getElementById('preview-error').classList.remove('hidden');
+        document.getElementById('preview-success').classList.add('hidden');
+    }
+
+    button.disabled = false;
+    button.textContent = 'Publish to eBay';
+});
+
+document.getElementById('close-preview').addEventListener('click', () => {
+    document.getElementById('preview-modal').classList.add('hidden');
+});
+
+document.getElementById('cancel-preview').addEventListener('click', () => {
+    document.getElementById('preview-modal').classList.add('hidden');
+});
+
+document.getElementById('preview-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'preview-modal') {
+        document.getElementById('preview-modal').classList.add('hidden');
+    }
+});
+
+function showDebugInfo(debug) {
+    document.getElementById('debug-panel').classList.remove('hidden');
+
+    if (debug.step1_extract_keywords) {
+        const keywords = debug.step1_extract_keywords;
+        document.getElementById('debug-keywords').innerHTML = `
+            <strong>Title:</strong> ${keywords.normalized_title || 'N/A'}<br>
+            <strong>Category Keywords:</strong> ${(keywords.category_keywords || []).join(', ') || 'N/A'}<br>
+            <strong>Brand:</strong> ${keywords.brand || 'N/A'}
+        `;
+    }
+
+    if (debug.step2_category) {
+        const category = debug.step2_category;
+        document.getElementById('debug-category').innerHTML = `
+            <strong>Query:</strong> ${category.queryUsed || 'N/A'}<br>
+            <strong>Category:</strong> ${category.categoryName || 'N/A'}<br>
+            <strong>ID:</strong> ${category.categoryId || 'N/A'}
+        `;
+    }
+
+    if (debug.step3_aspects) {
+        const aspects = debug.step3_aspects;
+        const filledAspects = Object.entries(aspects.filled || {})
+            .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
+            .join('<br>');
+        document.getElementById('debug-aspects').innerHTML = `
+            <strong>Required:</strong> ${(aspects.requiredAspects || []).join(', ') || 'None'}<br>
+            <strong>Filled:</strong><br>${filledAspects || 'None'}
+        `;
+    }
+
+    if (debug.description) {
+        const desc = debug.description;
+        document.getElementById('debug-description').innerHTML = `
+            <strong>HTML Mode:</strong> ${desc.used_html ? 'Yes' : 'No'}<br>
+            <strong>Preview:</strong><br>
+            <div class="mt-2 p-2 bg-gray-700 rounded text-xs">${desc.text.substring(0, 200)}...</div>
+        `;
+    }
+}
+</script>
 </body>
 
 </html>
