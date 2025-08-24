@@ -134,7 +134,8 @@ PROFILE_SCHEMA = {
         "address_line1": {"type": "string", "minLength": 1, "maxLength": 200},
         "city": {"type": "string", "minLength": 1, "maxLength": 100},
         "postal_code": {"type": "string", "minLength": 1, "maxLength": 20},
-        "country": {"type": "string", "enum": ["GB"]}
+        "country": {"type": "string", "enum": ["GB"]},
+        "profile_pic_url": {"type": "string", "format": "uri", "pattern": "^https://.*"}
     }
 }
 
@@ -329,6 +330,7 @@ def init_db():
                     city TEXT NOT NULL,
                     postal_code TEXT NOT NULL,
                     country TEXT NOT NULL DEFAULT 'GB',
+                    profile_pic_url TEXT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (user_id) REFERENCES users(id)
@@ -466,7 +468,11 @@ def get_user_profile(user_id):
     conn = get_db_connection()
     try:
         with conn.cursor() as c:
-            c.execute("SELECT * FROM user_profiles WHERE user_id = %s", (user_id,))
+            c.execute("""
+                SELECT user_id, address_line1, city, postal_code, country, 
+                       profile_pic_url, created_at, updated_at 
+                FROM user_profiles WHERE user_id = %s
+            """, (user_id,))
             profile = c.fetchone()
             if profile:
                 return {
@@ -475,12 +481,14 @@ def get_user_profile(user_id):
                     "city": profile[2],
                     "postal_code": profile[3],
                     "country": profile[4],
-                    "created_at": profile[5],
-                    "updated_at": profile[6]
+                    "profile_pic_url": profile[5],
+                    "created_at": profile[6],
+                    "updated_at": profile[7]
                 }
             return None
     finally:
         close_db_connection(conn)
+
 
 def save_user_profile(user_id, profile_data):
     if not is_user_active(user_id):
@@ -490,16 +498,17 @@ def save_user_profile(user_id, profile_data):
         with conn.cursor() as c:
             c.execute("""
                 INSERT INTO user_profiles
-                (user_id, address_line1, city, postal_code, country, updated_at)
-                VALUES (%s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
+                (user_id, address_line1, city, postal_code, country, profile_pic_url, updated_at)
+                VALUES (%s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
                 ON CONFLICT (user_id) DO UPDATE
                 SET address_line1 = EXCLUDED.address_line1,
                     city = EXCLUDED.city,
                     postal_code = EXCLUDED.postal_code,
                     country = EXCLUDED.country,
+                    profile_pic_url = EXCLUDED.profile_pic_url, -- Update on conflict
                     updated_at = CURRENT_TIMESTAMP
             """, (user_id, profile_data['address_line1'], profile_data['city'],
-                  profile_data['postal_code'], profile_data['country']))
+                  profile_data['postal_code'], profile_data['country'], profile_data.get('profile_pic_url')))
             conn.commit()
             return True
     except psycopg2.Error:
@@ -507,6 +516,7 @@ def save_user_profile(user_id, profile_data):
         return False
     finally:
         close_db_connection(conn)
+
 
 def get_user_tokens(user_id):
     if not is_user_active(user_id):
