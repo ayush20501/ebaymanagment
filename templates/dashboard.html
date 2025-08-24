@@ -8,73 +8,106 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
         body {
             font-family: 'Inter', sans-serif;
         }
+
         .hero-gradient {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
             background-size: 200% 200%;
             animation: gradientShift 8s ease-in-out infinite;
         }
+
         @keyframes gradientShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
         }
+
         .hover-lift {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
+
         .hover-lift:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
         }
+
         .card-gradient {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
+
         .success-gradient {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         }
+
         .modal-backdrop {
             backdrop-filter: blur(8px);
         }
+
         .input-field {
             transition: all 0.3s ease;
             border: 2px solid #e5e7eb;
         }
+
         .input-field:focus {
             outline: none;
             border-color: #3b82f6;
             box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
         }
+
         .pulse-animation {
             animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
+
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: .8; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: .8;
+            }
         }
+
         .prose {
             line-height: 1.6;
         }
+
         .prose p {
             margin-bottom: 1em;
         }
+
         .prose p:last-child {
             margin-bottom: 0;
         }
+
         .prose strong {
             font-weight: 600;
         }
+
         .prose em {
             font-style: italic;
         }
-        .prose ul, .prose ol {
+
+        .prose ul,
+        .prose ol {
             margin: 1em 0;
             padding-left: 1.5em;
         }
+
         .prose li {
             margin-bottom: 0.5em;
         }
-
     </style>
 </head>
 
@@ -109,8 +142,10 @@
     </nav>
 
     <!-- Profile Modal -->
-    <div id="profile-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 modal-backdrop overflow-y-auto h-full w-full z-50">
-        <div class="relative top-8 mx-auto p-6 border w-11/12 md:w-4/5 lg:w-3/4 xl:w-2/3 shadow-2xl rounded-2xl bg-white max-w-4xl">
+    <div id="profile-modal"
+        class="hidden fixed inset-0 bg-black bg-opacity-50 modal-backdrop overflow-y-auto h-full w-full z-50">
+        <div
+            class="relative top-8 mx-auto p-6 border w-11/12 md:w-4/5 lg:w-3/4 xl:w-2/3 shadow-2xl rounded-2xl bg-white max-w-4xl">
             <div class="mt-3">
                 <div class="flex items-center justify-between mb-8">
                     <div>
@@ -147,14 +182,16 @@
                         <!-- Account Info -->
                         <div class="bg-gray-50 p-6 rounded-2xl">
                             <h4 class="font-semibold text-gray-900 mb-4">Account Information</h4>
-                            <p class="text-gray-600">Email: <span id="profile-email" class="font-medium text-gray-900"></span></p>
+                            <p class="text-gray-600">Email: <span id="profile-email"
+                                    class="font-medium text-gray-900"></span></p>
                         </div>
 
                         <!-- Address Info -->
                         <div class="bg-gray-50 p-6 rounded-2xl">
                             <div class="flex items-center justify-between mb-4">
                                 <h4 class="font-semibold text-gray-900">Warehouse Address</h4>
-                                <button id="edit-address-btn" class="text-blue-600 hover:text-blue-800 font-medium hover-lift">
+                                <button id="edit-address-btn"
+                                    class="text-blue-600 hover:text-blue-800 font-medium hover-lift">
                                     Edit Address
                                 </button>
                             </div>
@@ -170,7 +207,8 @@
                             <div id="address-edit-form" class="hidden">
                                 <form id="address-form" class="space-y-4">
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Address Line 1 *</label>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Address Line 1
+                                            *</label>
                                         <input type="text" id="edit-address-line1" required
                                             class="input-field w-full px-4 py-3 rounded-lg">
                                     </div>
@@ -181,7 +219,8 @@
                                                 class="input-field w-full px-4 py-3 rounded-lg">
                                         </div>
                                         <div>
-                                            <label class="block text-sm font-medium text-gray-700 mb-2">Postal Code *</label>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Postal Code
+                                                *</label>
                                             <input type="text" id="edit-postal-code" required
                                                 class="input-field w-full px-4 py-3 rounded-lg">
                                         </div>
@@ -214,13 +253,15 @@
                         <div class="bg-gray-50 p-6 rounded-2xl">
                             <div class="flex items-center justify-between mb-4">
                                 <h4 class="font-semibold text-gray-900">Recent Listings</h4>
-                                <button id="view-all-listings" class="text-blue-600 hover:text-blue-800 font-medium hover-lift">
+                                <button id="view-all-listings"
+                                    class="text-blue-600 hover:text-blue-800 font-medium hover-lift">
                                     View All →
                                 </button>
                             </div>
                             <div id="recent-listings" class="space-y-3 max-h-80 overflow-y-auto">
                                 <div class="text-center text-gray-500 py-8">
-                                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3">
+                                    <div
+                                        class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3">
                                     </div>
                                     Loading listings...
                                 </div>
@@ -230,7 +271,8 @@
                         <div id="all-listings-view" class="hidden bg-gray-50 p-6 rounded-2xl">
                             <div class="flex items-center justify-between mb-4">
                                 <h4 class="font-semibold text-gray-900">All Listings</h4>
-                                <button id="back-to-recent" class="text-blue-600 hover:text-blue-800 font-medium hover-lift">
+                                <button id="back-to-recent"
+                                    class="text-blue-600 hover:text-blue-800 font-medium hover-lift">
                                     ← Back to Recent
                                 </button>
                             </div>
@@ -249,8 +291,10 @@
     </div>
 
     <!-- Preview Modal -->
-    <div id="preview-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 modal-backdrop overflow-y-auto h-full w-full z-50">
-        <div class="relative top-8 mx-auto p-6 border w-11/12 md:w-4/5 lg:w-3/4 xl:w-2/3 shadow-2xl rounded-2xl bg-white max-w-4xl">
+    <div id="preview-modal"
+        class="hidden fixed inset-0 bg-black bg-opacity-50 modal-backdrop overflow-y-auto h-full w-full z-50">
+        <div
+            class="relative top-8 mx-auto p-6 border w-11/12 md:w-4/5 lg:w-3/4 xl:w-2/3 shadow-2xl rounded-2xl bg-white max-w-4xl">
             <div class="mt-3">
                 <div class="flex items-center justify-between mb-8">
                     <div>
@@ -276,20 +320,22 @@
 
                     <div>
                         <label class="block text-lg font-semibold text-gray-900 mb-3">Description</label>
-                        
+
                         <!-- Preview Display -->
                         <div class="mb-3">
                             <div class="bg-gray-50 p-4 rounded-lg border">
                                 <div class="text-sm font-medium text-gray-600 mb-2">Formatted Preview:</div>
-                                <div id="preview-description-formatted" class="prose prose-sm max-w-none text-gray-800"></div>
+                                <div id="preview-description-formatted" class="prose prose-sm max-w-none text-gray-800">
+                                </div>
                             </div>
                         </div>
-                        
+
                         <!-- Editable Text Area -->
                         <textarea id="preview-description" rows="6"
                             class="input-field w-full px-4 py-4 rounded-xl text-base resize-none"
                             placeholder="Enter description text here..."></textarea>
-                        <p class="text-sm text-gray-500 mt-2">Edit the generated description if needed. HTML tags will be preserved in the final listing.</p>
+                        <p class="text-sm text-gray-500 mt-2">Edit the generated description if needed. HTML tags will
+                            be preserved in the final listing.</p>
                     </div>
 
                     <div>
@@ -325,14 +371,19 @@
                             <!-- Images will be dynamically populated -->
                         </div>
                         <div class="bg-gray-50 p-4 rounded-lg">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Image URLs (non-editable)</label>
-                            <div id="preview-image-urls" class="text-sm text-gray-600 max-h-32 overflow-y-auto bg-white p-3 rounded border font-mono"></div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Image URLs
+                                (non-editable)</label>
+                            <div id="preview-image-urls"
+                                class="text-sm text-gray-600 max-h-32 overflow-y-auto bg-white p-3 rounded border font-mono">
+                            </div>
                         </div>
                     </div>
 
-                    <div id="preview-error" class="hidden bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-xl font-medium">
+                    <div id="preview-error"
+                        class="hidden bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-xl font-medium">
                     </div>
-                    <div id="preview-success" class="hidden bg-green-50 border border-green-200 text-green-800 px-6 py-4 rounded-xl font-medium">
+                    <div id="preview-success"
+                        class="hidden bg-green-50 border border-green-200 text-green-800 px-6 py-4 rounded-xl font-medium">
                     </div>
 
                     <div class="flex space-x-3 pt-2">
@@ -353,10 +404,13 @@
     <!-- Image Modal -->
     <div id="image-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
         <div class="relative max-w-4xl max-h-full">
-            <img id="modal-image" src="" alt="Full size preview" class="max-w-full max-h-full object-contain rounded-lg">
-            <button onclick="closeImageModal()" class="absolute top-4 right-4 text-white hover:text-gray-300 bg-black bg-opacity-50 rounded-full p-2">
+            <img id="modal-image" src="" alt="Full size preview"
+                class="max-w-full max-h-full object-contain rounded-lg">
+            <button onclick="closeImageModal()"
+                class="absolute top-4 right-4 text-white hover:text-gray-300 bg-black bg-opacity-50 rounded-full p-2">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
                 </svg>
             </button>
         </div>
@@ -374,15 +428,19 @@
                     </span>
                 </h2>
                 <p class="text-xl text-gray-600 leading-relaxed">
-                    Describe your product and let our AI create the perfect eBay listing with optimized titles, descriptions, and categories.
+                    Describe your product and let our AI create the perfect eBay listing with optimized titles,
+                    descriptions, and categories.
                 </p>
             </div>
         </div>
 
         <!-- Messages -->
-        <div id="error-message" class="hidden bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-xl mb-8 font-medium">
+        <div id="error-message"
+            class="hidden bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-xl mb-8 font-medium">
         </div>
-        <div id="success-message" class="hidden bg-green-50 border border-green-200 text-green-800 px-6 py-4 rounded-xl mb-8 font-medium"></div>
+        <div id="success-message"
+            class="hidden bg-green-50 border border-green-200 text-green-800 px-6 py-4 rounded-xl mb-8 font-medium">
+        </div>
 
         <!-- Main Form -->
         <div class="grid lg:grid-cols-3 gap-12">
@@ -390,7 +448,8 @@
             <div class="lg:col-span-2">
                 <form id="listing-form" class="bg-white rounded-2xl shadow-lg p-8">
                     <!-- Quick Fill Button -->
-                    <div class="mb-8 flex justify-between items-center p-4 bg-green-50 border border-green-200 rounded-xl">
+                    <div
+                        class="mb-8 flex justify-between items-center p-4 bg-green-50 border border-green-200 rounded-xl">
                         <button type="button" id="autofill-btn"
                             class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center hover-lift">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -399,16 +458,19 @@
                             </svg>
                             Fill Sample Data
                         </button>
-                        <span class="text-sm text-green-700 font-medium">Click to see how it works with example data</span>
+                        <span class="text-sm text-green-700 font-medium">Click to see how it works with example
+                            data</span>
                     </div>
 
                     <!-- Form Fields -->
                     <div class="space-y-8">
                         <div>
                             <label class="block text-lg font-semibold text-gray-900 mb-3">Product Description *</label>
-                            <textarea id="raw_text" required rows="5" placeholder="Describe your product in detail - include brand, model, features, condition details, etc."
+                            <textarea id="raw_text" required rows="5"
+                                placeholder="Describe your product in detail - include brand, model, features, condition details, etc."
                                 class="input-field w-full px-4 py-4 rounded-xl text-base resize-none"></textarea>
-                            <p class="text-sm text-gray-500 mt-3">💡 The more detail you provide, the better our AI can optimize your listing for search and sales</p>
+                            <p class="text-sm text-gray-500 mt-3">💡 The more detail you provide, the better our AI can
+                                optimize your listing for search and sales</p>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -447,7 +509,8 @@
                             <textarea id="images" required rows="4"
                                 placeholder="https://example.com/image1.jpg&#10;https://example.com/image2.jpg&#10;https://example.com/image3.jpg"
                                 class="input-field w-full px-4 py-4 rounded-xl text-base resize-none"></textarea>
-                            <p class="text-sm text-gray-500 mt-3">📸 Enter one HTTPS image URL per line. High-quality images improve sales significantly!</p>
+                            <p class="text-sm text-gray-500 mt-3">📸 Enter one HTTPS image URL per line. High-quality
+                                images improve sales significantly!</p>
                         </div>
 
                         <!-- AI Options -->
@@ -467,7 +530,8 @@
                                 <label class="flex items-center">
                                     <input type="checkbox" id="include_debug"
                                         class="h-5 w-5 text-blue-600 rounded mr-3">
-                                    <span class="text-gray-700 font-medium">Show technical details (for debugging)</span>
+                                    <span class="text-gray-700 font-medium">Show technical details (for
+                                        debugging)</span>
                                 </label>
                             </div>
                         </div>
@@ -485,7 +549,8 @@
                                 </button>
                             </div>
                             <p class="text-sm text-gray-500 text-center mt-3">
-                                💡 Use "Preview" to review and edit your listing before publishing, or "Publish" to go live immediately
+                                💡 Use "Preview" to review and edit your listing before publishing, or "Publish" to go
+                                live immediately
                             </p>
                         </div>
                     </div>
@@ -572,253 +637,253 @@
     </div>
 
     <script>
-let currentUserProfile = null;
-let currentListingsPage = 1;
-let hasMoreListings = false;
+        let currentUserProfile = null;
+        let currentListingsPage = 1;
+        let hasMoreListings = false;
 
-window.addEventListener('load', async () => {
-    try {
-        const response = await fetch('/auth-status');
-        const data = await response.json();
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch('/auth-status');
+                const data = await response.json();
 
-        if (!data.is_logged_in) {
-            window.location.href = 'login.html';
-            return;
-        } else if (!data.has_profile) {
-            window.location.href = 'profile.html';
-            return;
-        } else if (!data.has_ebay_auth) {
-            window.location.href = 'ebay-auth.html';
-            return;
-        }
+                if (!data.is_logged_in) {
+                    window.location.href = 'login.html';
+                    return;
+                } else if (!data.has_profile) {
+                    window.location.href = 'profile.html';
+                    return;
+                } else if (!data.has_ebay_auth) {
+                    window.location.href = 'ebay-auth.html';
+                    return;
+                }
 
-        document.getElementById('user-email').textContent = data.email;
-    } catch (error) {
-        window.location.href = 'login.html';
-    }
-});
-
-const aiStatusEl = document.getElementById('ai-status');
-const aiStatusTextEl = document.getElementById('ai-status-text');
-const aiProgressEl = document.getElementById('ai-progress');
-
-function showAIStatus(message, progress = 0) {
-    aiStatusEl.classList.remove('hidden');
-    aiStatusTextEl.textContent = message;
-    aiProgressEl.style.width = `${progress}%`;
-}
-
-function hideAIStatus() {
-    aiStatusEl.classList.add('hidden');
-    aiProgressEl.style.width = '0%';
-}
-
-function updateAIProgress(message, progress) {
-    aiStatusTextEl.textContent = message;
-    aiProgressEl.style.width = `${progress}%`;
-}
-
-function openImageModal(imageUrl) {
-    document.getElementById('modal-image').src = imageUrl;
-    document.getElementById('image-modal').classList.remove('hidden');
-}
-
-function closeImageModal() {
-    document.getElementById('image-modal').classList.add('hidden');
-}
-
-// Close modal when clicking outside the image
-document.getElementById('image-modal').addEventListener('click', (e) => {
-    if (e.target.id === 'image-modal') {
-        closeImageModal();
-    }
-});
-
-document.getElementById('autofill-btn').addEventListener('click', () => {
-    document.getElementById('raw_text').value = "Sainsbury's Mackerel Fillets in Olive Oil 125g - Premium quality mackerel fillets preserved in olive oil. Perfect for sandwiches, salads, or as a healthy snack. Rich in omega-3 fatty acids and protein. Best before date clearly marked on tin.";
-    document.getElementById('price_value').value = "19.99";
-    document.getElementById('quantity').value = "3";
-    document.getElementById('condition').value = "NEW";
-    document.getElementById('images').value = "https://assets.sainsburys-groceries.co.uk/gol/1261448/1/640x640.jpg";
-
-    document.getElementById('error-message').classList.add('hidden');
-    document.getElementById('success-message').classList.add('hidden');
-    document.getElementById('debug-panel').classList.add('hidden');
-
-    const form = document.getElementById('listing-form');
-    form.style.transform = 'scale(1.01)';
-    form.style.transition = 'transform 0.2s ease';
-    setTimeout(() => {
-        form.style.transform = 'scale(1)';
-    }, 200);
-});
-
-document.getElementById('logout-btn').addEventListener('click', async () => {
-    try {
-        await fetch('/logout', { method: 'POST' });
-        window.location.href = 'index.html';
-    } catch (error) {
-        console.error('Logout failed:', error);
-    }
-});
-
-document.getElementById('profile-btn').addEventListener('click', async () => {
-    document.getElementById('profile-modal').classList.remove('hidden');
-    await loadProfileData();
-});
-
-document.getElementById('close-profile').addEventListener('click', () => {
-    document.getElementById('profile-modal').classList.add('hidden');
-    resetAddressForm();
-});
-
-document.getElementById('profile-modal').addEventListener('click', (e) => {
-    if (e.target.id === 'profile-modal') {
-        document.getElementById('profile-modal').classList.add('hidden');
-        resetAddressForm();
-    }
-});
-
-async function loadProfileData() {
-    try {
-        const statsResponse = await fetch('/user-stats');
-        const statsData = await statsResponse.json();
-
-        if (statsResponse.ok) {
-            document.getElementById('total-listings-stat').textContent = statsData.total_listings;
-            document.getElementById('active-listings-stat').textContent = statsData.active_listings;
-            document.getElementById('inventory-value-stat').textContent = `£${statsData.total_inventory_value.toFixed(2)}`;
-            document.getElementById('profile-email').textContent = statsData.email;
-        }
-
-        await loadUserProfile();
-        await loadRecentListings();
-    } catch (error) {
-        console.error('Error loading profile data:', error);
-    }
-}
-
-async function loadUserProfile() {
-    try {
-        const response = await fetch('/profile');
-        const data = await response.json();
-
-        if (response.ok && data.profile) {
-            currentUserProfile = data.profile;
-            displayAddress(data.profile);
-        } else {
-            displayAddress(null);
-        }
-    } catch (error) {
-        console.error('Error loading user profile:', error);
-        displayAddress(null);
-    }
-}
-
-function displayAddress(profile) {
-    if (profile) {
-        document.getElementById('display-address-line1').textContent = profile.address_line1;
-        document.getElementById('display-city').textContent = profile.city;
-        document.getElementById('display-postal-code').textContent = profile.postal_code;
-        document.getElementById('display-country').textContent = profile.country === 'GB' ? 'United Kingdom' : profile.country;
-    } else {
-        document.getElementById('display-address-line1').textContent = 'No address set';
-        document.getElementById('display-city').textContent = '-';
-        document.getElementById('display-postal-code').textContent = '-';
-        document.getElementById('display-country').textContent = '-';
-    }
-}
-
-document.getElementById('edit-address-btn').addEventListener('click', () => {
-    showAddressEditForm();
-});
-
-document.getElementById('cancel-address-edit').addEventListener('click', () => {
-    resetAddressForm();
-});
-
-function showAddressEditForm() {
-    if (currentUserProfile) {
-        document.getElementById('edit-address-line1').value = currentUserProfile.address_line1 || '';
-        document.getElementById('edit-city').value = currentUserProfile.city || '';
-        document.getElementById('edit-postal-code').value = currentUserProfile.postal_code || '';
-        document.getElementById('edit-country').value = currentUserProfile.country || 'GB';
-    }
-
-    document.getElementById('address-display').classList.add('hidden');
-    document.getElementById('address-edit-form').classList.remove('hidden');
-    document.getElementById('edit-address-btn').classList.add('hidden');
-}
-
-function resetAddressForm() {
-    document.getElementById('address-edit-form').classList.add('hidden');
-    document.getElementById('address-display').classList.remove('hidden');
-    document.getElementById('edit-address-btn').classList.remove('hidden');
-
-    const messageEl = document.getElementById('address-update-message');
-    messageEl.classList.add('hidden');
-    messageEl.textContent = '';
-}
-
-document.getElementById('address-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const formData = {
-        address_line1: document.getElementById('edit-address-line1').value.trim(),
-        city: document.getElementById('edit-city').value.trim(),
-        postal_code: document.getElementById('edit-postal-code').value.trim().toUpperCase(),
-        country: document.getElementById('edit-country').value
-    };
-
-    if (!formData.address_line1 || !formData.city || !formData.postal_code) {
-        showAddressMessage('Please fill in all required fields.', 'error');
-        return;
-    }
-
-    try {
-        const response = await fetch('/profile', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData),
+                document.getElementById('user-email').textContent = data.email;
+            } catch (error) {
+                window.location.href = 'login.html';
+            }
         });
 
-        const data = await response.json();
+        const aiStatusEl = document.getElementById('ai-status');
+        const aiStatusTextEl = document.getElementById('ai-status-text');
+        const aiProgressEl = document.getElementById('ai-progress');
 
-        if (response.ok) {
-            showAddressMessage('Address updated successfully!', 'success');
-
-            currentUserProfile = { ...currentUserProfile, ...formData };
-            displayAddress(currentUserProfile);
-
-            setTimeout(() => {
-                resetAddressForm();
-            }, 1500);
-        } else {
-            showAddressMessage(data.error || 'Failed to update address.', 'error');
+        function showAIStatus(message, progress = 0) {
+            aiStatusEl.classList.remove('hidden');
+            aiStatusTextEl.textContent = message;
+            aiProgressEl.style.width = `${progress}%`;
         }
-    } catch (error) {
-        showAddressMessage('Network error. Please try again.', 'error');
-    }
-});
 
-function showAddressMessage(message, type) {
-    const messageEl = document.getElementById('address-update-message');
-    messageEl.textContent = message;
-    messageEl.className = `mt-4 text-sm ${type === 'success' ? 'text-green-600' : 'text-red-600'}`;
-    messageEl.classList.remove('hidden');
-}
+        function hideAIStatus() {
+            aiStatusEl.classList.add('hidden');
+            aiProgressEl.style.width = '0%';
+        }
 
-async function loadRecentListings() {
-    try {
-        const response = await fetch('/my-listings?page=1');
-        const data = await response.json();
+        function updateAIProgress(message, progress) {
+            aiStatusTextEl.textContent = message;
+            aiProgressEl.style.width = `${progress}%`;
+        }
 
-        const container = document.getElementById('recent-listings');
+        function openImageModal(imageUrl) {
+            document.getElementById('modal-image').src = imageUrl;
+            document.getElementById('image-modal').classList.remove('hidden');
+        }
 
-        if (response.ok && data.listings.length > 0) {
-            container.innerHTML = data.listings.slice(0, 5).map(listing => `
+        function closeImageModal() {
+            document.getElementById('image-modal').classList.add('hidden');
+        }
+
+        // Close modal when clicking outside the image
+        document.getElementById('image-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'image-modal') {
+                closeImageModal();
+            }
+        });
+
+        document.getElementById('autofill-btn').addEventListener('click', () => {
+            document.getElementById('raw_text').value = "Sainsbury's Mackerel Fillets in Olive Oil 125g - Premium quality mackerel fillets preserved in olive oil. Perfect for sandwiches, salads, or as a healthy snack. Rich in omega-3 fatty acids and protein. Best before date clearly marked on tin.";
+            document.getElementById('price_value').value = "19.99";
+            document.getElementById('quantity').value = "3";
+            document.getElementById('condition').value = "NEW";
+            document.getElementById('images').value = "https://assets.sainsburys-groceries.co.uk/gol/1261448/1/640x640.jpg";
+
+            document.getElementById('error-message').classList.add('hidden');
+            document.getElementById('success-message').classList.add('hidden');
+            document.getElementById('debug-panel').classList.add('hidden');
+
+            const form = document.getElementById('listing-form');
+            form.style.transform = 'scale(1.01)';
+            form.style.transition = 'transform 0.2s ease';
+            setTimeout(() => {
+                form.style.transform = 'scale(1)';
+            }, 200);
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            try {
+                await fetch('/logout', { method: 'POST' });
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('Logout failed:', error);
+            }
+        });
+
+        document.getElementById('profile-btn').addEventListener('click', async () => {
+            document.getElementById('profile-modal').classList.remove('hidden');
+            await loadProfileData();
+        });
+
+        document.getElementById('close-profile').addEventListener('click', () => {
+            document.getElementById('profile-modal').classList.add('hidden');
+            resetAddressForm();
+        });
+
+        document.getElementById('profile-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'profile-modal') {
+                document.getElementById('profile-modal').classList.add('hidden');
+                resetAddressForm();
+            }
+        });
+
+        async function loadProfileData() {
+            try {
+                const statsResponse = await fetch('/user-stats');
+                const statsData = await statsResponse.json();
+
+                if (statsResponse.ok) {
+                    document.getElementById('total-listings-stat').textContent = statsData.total_listings;
+                    document.getElementById('active-listings-stat').textContent = statsData.active_listings;
+                    document.getElementById('inventory-value-stat').textContent = `£${statsData.total_inventory_value.toFixed(2)}`;
+                    document.getElementById('profile-email').textContent = statsData.email;
+                }
+
+                await loadUserProfile();
+                await loadRecentListings();
+            } catch (error) {
+                console.error('Error loading profile data:', error);
+            }
+        }
+
+        async function loadUserProfile() {
+            try {
+                const response = await fetch('/profile');
+                const data = await response.json();
+
+                if (response.ok && data.profile) {
+                    currentUserProfile = data.profile;
+                    displayAddress(data.profile);
+                } else {
+                    displayAddress(null);
+                }
+            } catch (error) {
+                console.error('Error loading user profile:', error);
+                displayAddress(null);
+            }
+        }
+
+        function displayAddress(profile) {
+            if (profile) {
+                document.getElementById('display-address-line1').textContent = profile.address_line1;
+                document.getElementById('display-city').textContent = profile.city;
+                document.getElementById('display-postal-code').textContent = profile.postal_code;
+                document.getElementById('display-country').textContent = profile.country === 'GB' ? 'United Kingdom' : profile.country;
+            } else {
+                document.getElementById('display-address-line1').textContent = 'No address set';
+                document.getElementById('display-city').textContent = '-';
+                document.getElementById('display-postal-code').textContent = '-';
+                document.getElementById('display-country').textContent = '-';
+            }
+        }
+
+        document.getElementById('edit-address-btn').addEventListener('click', () => {
+            showAddressEditForm();
+        });
+
+        document.getElementById('cancel-address-edit').addEventListener('click', () => {
+            resetAddressForm();
+        });
+
+        function showAddressEditForm() {
+            if (currentUserProfile) {
+                document.getElementById('edit-address-line1').value = currentUserProfile.address_line1 || '';
+                document.getElementById('edit-city').value = currentUserProfile.city || '';
+                document.getElementById('edit-postal-code').value = currentUserProfile.postal_code || '';
+                document.getElementById('edit-country').value = currentUserProfile.country || 'GB';
+            }
+
+            document.getElementById('address-display').classList.add('hidden');
+            document.getElementById('address-edit-form').classList.remove('hidden');
+            document.getElementById('edit-address-btn').classList.add('hidden');
+        }
+
+        function resetAddressForm() {
+            document.getElementById('address-edit-form').classList.add('hidden');
+            document.getElementById('address-display').classList.remove('hidden');
+            document.getElementById('edit-address-btn').classList.remove('hidden');
+
+            const messageEl = document.getElementById('address-update-message');
+            messageEl.classList.add('hidden');
+            messageEl.textContent = '';
+        }
+
+        document.getElementById('address-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = {
+                address_line1: document.getElementById('edit-address-line1').value.trim(),
+                city: document.getElementById('edit-city').value.trim(),
+                postal_code: document.getElementById('edit-postal-code').value.trim().toUpperCase(),
+                country: document.getElementById('edit-country').value
+            };
+
+            if (!formData.address_line1 || !formData.city || !formData.postal_code) {
+                showAddressMessage('Please fill in all required fields.', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/profile', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showAddressMessage('Address updated successfully!', 'success');
+
+                    currentUserProfile = { ...currentUserProfile, ...formData };
+                    displayAddress(currentUserProfile);
+
+                    setTimeout(() => {
+                        resetAddressForm();
+                    }, 1500);
+                } else {
+                    showAddressMessage(data.error || 'Failed to update address.', 'error');
+                }
+            } catch (error) {
+                showAddressMessage('Network error. Please try again.', 'error');
+            }
+        });
+
+        function showAddressMessage(message, type) {
+            const messageEl = document.getElementById('address-update-message');
+            messageEl.textContent = message;
+            messageEl.className = `mt-4 text-sm ${type === 'success' ? 'text-green-600' : 'text-red-600'}`;
+            messageEl.classList.remove('hidden');
+        }
+
+        async function loadRecentListings() {
+            try {
+                const response = await fetch('/my-listings?page=1');
+                const data = await response.json();
+
+                const container = document.getElementById('recent-listings');
+
+                if (response.ok && data.listings.length > 0) {
+                    container.innerHTML = data.listings.slice(0, 5).map(listing => `
                 <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl hover-lift">
                     <div class="flex-1">
                         <h5 class="font-medium text-gray-900 text-sm">${listing.title}</h5>
@@ -835,40 +900,40 @@ async function loadRecentListings() {
                     ` : ''}
                 </div>
             `).join('');
-        } else {
-            container.innerHTML = '<div class="text-center text-gray-500 py-8">No listings found</div>';
-        }
-    } catch (error) {
-        document.getElementById('recent-listings').innerHTML =
-            '<div class="text-center text-red-500 py-8">Error loading listings</div>';
-    }
-}
-
-document.getElementById('view-all-listings').addEventListener('click', async () => {
-    document.getElementById('recent-listings').closest('div').classList.add('hidden');
-    document.getElementById('all-listings-view').classList.remove('hidden');
-    await loadAllListings();
-});
-
-document.getElementById('back-to-recent').addEventListener('click', () => {
-    document.getElementById('all-listings-view').classList.add('hidden');
-    document.getElementById('recent-listings').closest('div').classList.remove('hidden');
-});
-
-async function loadAllListings(page = 1) {
-    try {
-        const response = await fetch(`/my-listings?page=${page}`);
-        const data = await response.json();
-
-        const container = document.getElementById('all-listings');
-
-        if (response.ok) {
-            if (page === 1) {
-                container.innerHTML = '';
+                } else {
+                    container.innerHTML = '<div class="text-center text-gray-500 py-8">No listings found</div>';
+                }
+            } catch (error) {
+                document.getElementById('recent-listings').innerHTML =
+                    '<div class="text-center text-red-500 py-8">Error loading listings</div>';
             }
+        }
 
-            if (data.listings.length > 0) {
-                container.innerHTML += data.listings.map(listing => `
+        document.getElementById('view-all-listings').addEventListener('click', async () => {
+            document.getElementById('recent-listings').closest('div').classList.add('hidden');
+            document.getElementById('all-listings-view').classList.remove('hidden');
+            await loadAllListings();
+        });
+
+        document.getElementById('back-to-recent').addEventListener('click', () => {
+            document.getElementById('all-listings-view').classList.add('hidden');
+            document.getElementById('recent-listings').closest('div').classList.remove('hidden');
+        });
+
+        async function loadAllListings(page = 1) {
+            try {
+                const response = await fetch(`/my-listings?page=${page}`);
+                const data = await response.json();
+
+                const container = document.getElementById('all-listings');
+
+                if (response.ok) {
+                    if (page === 1) {
+                        container.innerHTML = '';
+                    }
+
+                    if (data.listings.length > 0) {
+                        container.innerHTML += data.listings.map(listing => `
                     <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl hover-lift">
                         <div class="flex-1">
                             <h5 class="font-medium text-gray-900 text-sm">${listing.title}</h5>
@@ -891,204 +956,197 @@ async function loadAllListings(page = 1) {
                         </div>
                     </div>
                 `).join('');
-            } else if (page === 1) {
-                container.innerHTML = '<div class="text-center text-gray-500 py-8">No listings found</div>';
+                    } else if (page === 1) {
+                        container.innerHTML = '<div class="text-center text-gray-500 py-8">No listings found</div>';
+                    }
+
+                    hasMoreListings = data.has_more;
+                    currentListingsPage = page;
+
+                    const loadMoreBtn = document.getElementById('load-more-listings');
+                    if (hasMoreListings) {
+                        loadMoreBtn.classList.remove('hidden');
+                    } else {
+                        loadMoreBtn.classList.add('hidden');
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading listings:', error);
+            }
+        }
+
+        document.getElementById('load-more-listings').addEventListener('click', () => {
+            loadAllListings(currentListingsPage + 1);
+        });
+
+        async function submitToPublish(formData, button) {
+            button.disabled = true;
+            button.textContent = 'Publishing...';
+
+            document.getElementById('error-message').classList.add('hidden');
+            document.getElementById('success-message').classList.add('hidden');
+            document.getElementById('debug-panel').classList.add('hidden');
+
+            showAIStatus('🤖 Analyzing your product description...', 10);
+            setTimeout(() => updateAIProgress('🔍 Extracting keywords and metadata...', 25), 500);
+            setTimeout(() => updateAIProgress('📂 Finding optimal eBay category...', 50), 1500);
+            setTimeout(() => updateAIProgress('📋 Filling product specifications...', 75), 2500);
+            setTimeout(() => updateAIProgress('✍️ Generating marketing description...', 90), 3500);
+
+            try {
+                const response = await fetch('/publish-item', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    updateAIProgress('✅ Published to eBay!', 100);
+
+                    if (formData.include_debug && data.debug) {
+                        showDebugInfo(data.debug);
+                    }
+
+                    setTimeout(() => {
+                        hideAIStatus();
+                        localStorage.setItem('listing-success', JSON.stringify(data));
+                        window.location.href = 'success.html';
+                    }, 1000);
+                } else {
+                    hideAIStatus();
+                    document.getElementById('error-message').textContent = data.error || 'Failed to publish listing';
+                    document.getElementById('error-message').classList.remove('hidden');
+                }
+            } catch (error) {
+                hideAIStatus();
+                document.getElementById('error-message').textContent = 'Network error. Please try again.';
+                document.getElementById('error-message').classList.remove('hidden');
             }
 
-            hasMoreListings = data.has_more;
-            currentListingsPage = page;
+            button.disabled = false;
+            button.textContent = 'Publish to eBay';
+        }
 
-            const loadMoreBtn = document.getElementById('load-more-listings');
-            if (hasMoreListings) {
-                loadMoreBtn.classList.remove('hidden');
+        async function generatePreview(formData, button) {
+            button.disabled = true;
+            button.textContent = 'Generating Preview...';
+
+            document.getElementById('error-message').classList.add('hidden');
+            document.getElementById('success-message').classList.add('hidden');
+            document.getElementById('debug-panel').classList.add('hidden');
+            document.getElementById('preview-error').classList.add('hidden');
+            document.getElementById('preview-success').classList.add('hidden');
+
+            showAIStatus('🤖 Analyzing your product description...', 10);
+            setTimeout(() => updateAIProgress('🔍 Extracting keywords and metadata...', 25), 500);
+            setTimeout(() => updateAIProgress('📂 Finding optimal eBay category...', 50), 1500);
+            setTimeout(() => updateAIProgress('📋 Filling product specifications...', 75), 2500);
+            setTimeout(() => updateAIProgress('✍️ Generating marketing description...', 90), 3500);
+
+            try {
+                const response = await fetch('/preview-item', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    updateAIProgress('✅ Preview Generated!', 100);
+                    displayPreview(data);
+
+                    if (formData.include_debug && data.debug) {
+                        showDebugInfo(data.debug);
+                    }
+
+                    setTimeout(() => {
+                        hideAIStatus();
+                        document.getElementById('preview-modal').classList.remove('hidden');
+                    }, 1000);
+                } else {
+                    hideAIStatus();
+                    document.getElementById('error-message').textContent = data.error || 'Failed to generate preview';
+                    document.getElementById('error-message').classList.remove('hidden');
+                }
+            } catch (error) {
+                hideAIStatus();
+                document.getElementById('error-message').textContent = 'Network error. Please try again.';
+                document.getElementById('error-message').classList.remove('hidden');
+            }
+
+            button.disabled = false;
+            button.textContent = 'Preview, Edit & Publish';
+        }
+
+        function displayPreview(data) {
+            document.getElementById('preview-title').value = data.title || '';
+
+            const descriptionText = data.description.text || '';
+            document.getElementById('preview-description').value = descriptionText;
+
+            const formattedPreview = document.getElementById('preview-description-formatted');
+            if (data.description.used_html && data.description.html) {
+                formattedPreview.innerHTML = data.description.html;
             } else {
-                loadMoreBtn.classList.add('hidden');
-            }
-        }
-    } catch (error) {
-        console.error('Error loading listings:', error);
-    }
-}
-
-document.getElementById('load-more-listings').addEventListener('click', () => {
-    loadAllListings(currentListingsPage + 1);
-});
-
-async function submitToPublish(formData, button) {
-    button.disabled = true;
-    button.textContent = 'Publishing...';
-
-    document.getElementById('error-message').classList.add('hidden');
-    document.getElementById('success-message').classList.add('hidden');
-    document.getElementById('debug-panel').classList.add('hidden');
-
-    showAIStatus('🤖 Analyzing your product description...', 10);
-    setTimeout(() => updateAIProgress('🔍 Extracting keywords and metadata...', 25), 500);
-    setTimeout(() => updateAIProgress('📂 Finding optimal eBay category...', 50), 1500);
-    setTimeout(() => updateAIProgress('📋 Filling product specifications...', 75), 2500);
-    setTimeout(() => updateAIProgress('✍️ Generating marketing description...', 90), 3500);
-
-    try {
-        const response = await fetch('/publish-item', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData),
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            updateAIProgress('✅ Published to eBay!', 100);
-
-            if (formData.include_debug && data.debug) {
-                showDebugInfo(data.debug);
+                const formatted = descriptionText
+                    .split('\n\n')
+                    .filter(p => p.trim())
+                    .map(p => `<p>${p.trim().replace(/\n/g, '<br>')}</p>`)
+                    .join('');
+                formattedPreview.innerHTML = formatted || '<p class="text-gray-400 italic">No description provided</p>';
             }
 
-            setTimeout(() => {
-                hideAIStatus();
-                localStorage.setItem('listing-success', JSON.stringify(data));
-                window.location.href = 'success.html';
-            }, 1000);
-        } else {
-            hideAIStatus();
-            document.getElementById('error-message').textContent = data.error || 'Failed to publish listing';
-            document.getElementById('error-message').classList.remove('hidden');
-        }
-    } catch (error) {
-        hideAIStatus();
-        document.getElementById('error-message').textContent = 'Network error. Please try again.';
-        document.getElementById('error-message').classList.remove('hidden');
-    }
+            const descriptionTextarea = document.getElementById('preview-description');
+            descriptionTextarea.removeEventListener('input', updatePreviewDescription);
+            descriptionTextarea.addEventListener('input', updatePreviewDescription);
 
-    button.disabled = false;
-    button.textContent = 'Publish to eBay';
-}
-
-async function generatePreview(formData, button) {
-    button.disabled = true;
-    button.textContent = 'Generating Preview...';
-
-    document.getElementById('error-message').classList.add('hidden');
-    document.getElementById('success-message').classList.add('hidden');
-    document.getElementById('debug-panel').classList.add('hidden');
-    document.getElementById('preview-error').classList.add('hidden');
-    document.getElementById('preview-success').classList.add('hidden');
-
-    showAIStatus('🤖 Analyzing your product description...', 10);
-    setTimeout(() => updateAIProgress('🔍 Extracting keywords and metadata...', 25), 500);
-    setTimeout(() => updateAIProgress('📂 Finding optimal eBay category...', 50), 1500);
-    setTimeout(() => updateAIProgress('📋 Filling product specifications...', 75), 2500);
-    setTimeout(() => updateAIProgress('✍️ Generating marketing description...', 90), 3500);
-
-    try {
-        const response = await fetch('/preview-item', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData),
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            updateAIProgress('✅ Preview Generated!', 100);
-            displayPreview(data);
-
-            if (formData.include_debug && data.debug) {
-                showDebugInfo(data.debug);
+            function updatePreviewDescription() {
+                const text = descriptionTextarea.value;
+                if (text.trim()) {
+                    const formatted = text
+                        .split('\n\n')
+                        .filter(p => p.trim())
+                        .map(p => `<p>${p.trim().replace(/\n/g, '<br>')}</p>`)
+                        .join('');
+                    formattedPreview.innerHTML = formatted;
+                } else {
+                    formattedPreview.innerHTML = '<p class="text-gray-400 italic">No description provided</p>';
+                }
             }
 
-            setTimeout(() => {
-                hideAIStatus();
-                document.getElementById('preview-modal').classList.remove('hidden');
-            }, 1000);
-        } else {
-            hideAIStatus();
-            document.getElementById('error-message').textContent = data.error || 'Failed to generate preview';
-            document.getElementById('error-message').classList.remove('hidden');
-        }
-    } catch (error) {
-        hideAIStatus();
-        document.getElementById('error-message').textContent = 'Network error. Please try again.';
-        document.getElementById('error-message').classList.remove('hidden');
-    }
-
-    button.disabled = false;
-    button.textContent = 'Preview, Edit & Publish';
-}
-
-function displayPreview(data) {
-    document.getElementById('preview-title').value = data.title || '';
-    
-    // Handle description with proper formatting
-    const descriptionText = data.description.text || '';
-    document.getElementById('preview-description').value = descriptionText;
-    
-    // Show formatted preview
-    const formattedPreview = document.getElementById('preview-description-formatted');
-    if (data.description.used_html && data.description.html) {
-        // If HTML was used, show the HTML rendered version
-        formattedPreview.innerHTML = data.description.html;
-    } else {
-        // If plain text, convert line breaks to paragraphs
-        const formatted = descriptionText
-            .split('\n\n')
-            .filter(p => p.trim())
-            .map(p => `<p>${p.trim().replace(/\n/g, '<br>')}</p>`)
-            .join('');
-        formattedPreview.innerHTML = formatted || '<p class="text-gray-400 italic">No description provided</p>';
-    }
-    
-    // Add real-time preview update
-    const descriptionTextarea = document.getElementById('preview-description');
-    // Remove any existing event listeners
-    descriptionTextarea.removeEventListener('input', updatePreviewDescription);
-    // Add new event listener
-    descriptionTextarea.addEventListener('input', updatePreviewDescription);
-    
-    function updatePreviewDescription() {
-        const text = descriptionTextarea.value;
-        if (text.trim()) {
-            const formatted = text
-                .split('\n\n')
-                .filter(p => p.trim())
-                .map(p => `<p>${p.trim().replace(/\n/g, '<br>')}</p>`)
-                .join('');
-            formattedPreview.innerHTML = formatted;
-        } else {
-            formattedPreview.innerHTML = '<p class="text-gray-400 italic">No description provided</p>';
-        }
-    }
-    
-    // Handle aspects
-    const aspectsContainer = document.getElementById('preview-aspects');
-    aspectsContainer.innerHTML = '';
-    Object.entries(data.aspects || {}).forEach(([key, values]) => {
-        const aspectDiv = document.createElement('div');
-        aspectDiv.innerHTML = `
+            // Handle aspects
+            const aspectsContainer = document.getElementById('preview-aspects');
+            aspectsContainer.innerHTML = '';
+            Object.entries(data.aspects || {}).forEach(([key, values]) => {
+                const aspectDiv = document.createElement('div');
+                aspectDiv.innerHTML = `
             <label class="block text-sm font-medium text-gray-700 mb-2">${key}</label>
             <input type="text" value="${values.join(', ')}" data-aspect="${key}"
                 class="input-field w-full px-4 py-3 rounded-lg mb-2">
         `;
-        aspectsContainer.appendChild(aspectDiv);
-    });
+                aspectsContainer.appendChild(aspectDiv);
+            });
 
-    const currencySymbols = { GBP: '£', USD: '$', EUR: '€' };
-    document.getElementById('preview-price-currency').textContent = 
-        `${currencySymbols[data.price?.currency] || data.price?.currency || 'GBP'} ${data.price?.value || '0.00'} ${data.price?.currency || 'GBP'}`;
-    document.getElementById('preview-quantity').textContent = data.quantity || 1;
-    document.getElementById('preview-condition').textContent = data.condition || 'NEW';
+            const currencySymbols = { GBP: '£', USD: '$', EUR: '€' };
+            document.getElementById('preview-price-currency').textContent =
+                `${currencySymbols[data.price?.currency] || data.price?.currency || 'GBP'} ${data.price?.value || '0.00'} ${data.price?.currency || 'GBP'}`;
+            document.getElementById('preview-quantity').textContent = data.quantity || 1;
+            document.getElementById('preview-condition').textContent = data.condition || 'NEW';
 
-    // Enhanced image preview
-    const imagesContainer = document.getElementById('preview-images');
-    imagesContainer.innerHTML = '';
-    (data.images || []).forEach((url, index) => {
-        const imgDiv = document.createElement('div');
-        imgDiv.className = 'relative group';
-        imgDiv.innerHTML = `
+            // Enhanced image preview
+            const imagesContainer = document.getElementById('preview-images');
+            imagesContainer.innerHTML = '';
+            (data.images || []).forEach((url, index) => {
+                const imgDiv = document.createElement('div');
+                imgDiv.className = 'relative group';
+                imgDiv.innerHTML = `
             <img src="${url}" alt="Listing Image ${index + 1}" 
                  class="w-full h-32 object-cover rounded-lg border-2 border-gray-200 hover:border-blue-400 transition-colors cursor-pointer"
                  onclick="openImageModal('${url}')"
@@ -1102,234 +1160,225 @@ function displayPreview(data) {
                 </svg>
             </div>
         `;
-        imagesContainer.appendChild(imgDiv);
-    });
+                imagesContainer.appendChild(imgDiv);
+            });
 
-    // Format URLs nicely
-    const urlsContainer = document.getElementById('preview-image-urls');
-    if (data.images && data.images.length > 0) {
-        urlsContainer.innerHTML = data.images.map((url, index) => 
-            `<div class="mb-1"><span class="text-gray-400">[${index + 1}]</span> ${url}</div>`
-        ).join('');
-    } else {
-        urlsContainer.innerHTML = '<div class="text-gray-400 italic">No images provided</div>';
-    }
+            const urlsContainer = document.getElementById('preview-image-urls');
+            if (data.images && data.images.length > 0) {
+                urlsContainer.innerHTML = data.images.map((url, index) =>
+                    `<div class="mb-1"><span class="text-gray-400">[${index + 1}]</span> ${url}</div>`
+                ).join('');
+            } else {
+                urlsContainer.innerHTML = '<div class="text-gray-400 italic">No images provided</div>';
+            }
 
-    // Store the preview data for final publishing
-    document.getElementById('preview-form').dataset.preview = JSON.stringify(data);
-}
-
-document.getElementById('listing-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const imagesValue = document.getElementById('images').value.trim();
-    const validImages = imagesValue
-        .split('\n')
-        .map(url => url.trim())
-        .filter(url => url.startsWith('https://'));
-
-    if (!imagesValue || validImages.length === 0) {
-        document.getElementById('error-message').textContent = 'At least one valid HTTPS image URL is required.';
-        document.getElementById('error-message').classList.remove('hidden');
-        document.getElementById('success-message').classList.add('hidden');
-        return;
-    }
-
-    const formData = {
-        raw_text: document.getElementById('raw_text').value.trim(),
-        price: {
-            value: parseFloat(document.getElementById('price_value').value),
-            currency: document.getElementById('currency').value
-        },
-        quantity: parseInt(document.getElementById('quantity').value),
-        condition: document.getElementById('condition').value,
-        images: validImages,
-        use_html_description: document.getElementById('use_html_description').checked,
-        use_simple_prompt_description: document.getElementById('use_simple_prompt_description').checked,
-        include_debug: document.getElementById('include_debug').checked
-    };
-
-    const button = document.getElementById('publish-btn');
-    await submitToPublish(formData, button);
-});
-
-document.getElementById('preview-btn').addEventListener('click', async () => {
-    const imagesValue = document.getElementById('images').value.trim();
-    const validImages = imagesValue
-        .split('\n')
-        .map(url => url.trim())
-        .filter(url => url.startsWith('https://'));
-
-    if (!imagesValue || validImages.length === 0) {
-        document.getElementById('error-message').textContent = 'At least one valid HTTPS image URL is required.';
-        document.getElementById('error-message').classList.remove('hidden');
-        document.getElementById('success-message').classList.add('hidden');
-        return;
-    }
-
-    const formData = {
-        raw_text: document.getElementById('raw_text').value.trim(),
-        price: {
-            value: parseFloat(document.getElementById('price_value').value),
-            currency: document.getElementById('currency').value
-        },
-        quantity: parseInt(document.getElementById('quantity').value),
-        condition: document.getElementById('condition').value,
-        images: validImages,
-        use_html_description: document.getElementById('use_html_description').checked,
-        use_simple_prompt_description: document.getElementById('use_simple_prompt_description').checked,
-        include_debug: document.getElementById('include_debug').checked
-    };
-
-    const button = document.getElementById('preview-btn');
-    await generatePreview(formData, button);
-});
-
-document.getElementById('preview-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const previewData = JSON.parse(document.getElementById('preview-form').dataset.preview || '{}');
-    const button = document.getElementById('preview-form').querySelector('button[type="submit"]');
-    button.disabled = true;
-    button.textContent = 'Publishing...';
-
-    // Collect edited fields (only Title, Description, and Aspects)
-    previewData.title = document.getElementById('preview-title').value.trim();
-    previewData.description.text = document.getElementById('preview-description').value.trim();
-    // previewData.description.html = previewData.description.used_html
-    //     ? `<p>${previewData.description.text}</p>`
-    //     : previewData.description.text;
-
-    if (previewData.description.used_html) {
-        // Convert the edited text to proper HTML paragraphs
-        const editedText = previewData.description.text;
-        if (editedText.trim()) {
-            // Split by double line breaks to create paragraphs
-            const paragraphs = editedText
-                .split('\n\n')
-                .filter(p => p.trim())
-                .map(p => `<p>${p.trim().replace(/\n/g, '<br>')}</p>`);
-            previewData.description.html = paragraphs.join('');
-        } else {
-            previewData.description.html = '<p>No description provided</p>';
+            document.getElementById('preview-form').dataset.preview = JSON.stringify(data);
         }
-    } else {
-        previewData.description.html = previewData.description.text;
-    }
 
-    const aspectInputs = document.getElementById('preview-aspects').querySelectorAll('input[data-aspect]');
-    const editedAspects = {};
-    aspectInputs.forEach(input => {
-        const aspect = input.dataset.aspect;
-        const values = input.value.split(',').map(v => v.trim()).filter(v => v);
-        if (values.length) {
-            editedAspects[aspect] = values;
-        }
-    });
-    previewData.aspects = editedAspects;
+        document.getElementById('listing-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-    // Basic validation for editable fields
-    if (!previewData.title) {
-        document.getElementById('preview-error').textContent = 'Title is required.';
-        document.getElementById('preview-error').classList.remove('hidden');
-        document.getElementById('preview-success').classList.add('hidden');
-        button.disabled = false;
-        button.textContent = 'Publish to eBay';
-        return;
-    }
+            const imagesValue = document.getElementById('images').value.trim();
+            const validImages = imagesValue
+                .split('\n')
+                .map(url => url.trim())
+                .filter(url => url.startsWith('https://'));
 
-    try {
-        const response = await fetch('/publish-item-from-preview', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(previewData),
+            if (!imagesValue || validImages.length === 0) {
+                document.getElementById('error-message').textContent = 'At least one valid HTTPS image URL is required.';
+                document.getElementById('error-message').classList.remove('hidden');
+                document.getElementById('success-message').classList.add('hidden');
+                return;
+            }
+
+            const formData = {
+                raw_text: document.getElementById('raw_text').value.trim(),
+                price: {
+                    value: parseFloat(document.getElementById('price_value').value),
+                    currency: document.getElementById('currency').value
+                },
+                quantity: parseInt(document.getElementById('quantity').value),
+                condition: document.getElementById('condition').value,
+                images: validImages,
+                use_html_description: document.getElementById('use_html_description').checked,
+                use_simple_prompt_description: document.getElementById('use_simple_prompt_description').checked,
+                include_debug: document.getElementById('include_debug').checked
+            };
+
+            const button = document.getElementById('publish-btn');
+            await submitToPublish(formData, button);
         });
 
-        const data = await response.json();
+        document.getElementById('preview-btn').addEventListener('click', async () => {
+            const imagesValue = document.getElementById('images').value.trim();
+            const validImages = imagesValue
+                .split('\n')
+                .map(url => url.trim())
+                .filter(url => url.startsWith('https://'));
 
-        if (response.ok) {
-            document.getElementById('preview-success').textContent = 'Published to eBay!';
-            document.getElementById('preview-success').classList.remove('hidden');
-            document.getElementById('preview-error').classList.add('hidden');
+            if (!imagesValue || validImages.length === 0) {
+                document.getElementById('error-message').textContent = 'At least one valid HTTPS image URL is required.';
+                document.getElementById('error-message').classList.remove('hidden');
+                document.getElementById('success-message').classList.add('hidden');
+                return;
+            }
 
-            setTimeout(() => {
-                localStorage.setItem('listing-success', JSON.stringify(data));
-                window.location.href = 'success.html';
-            }, 1500);
-        } else {
-            document.getElementById('preview-error').textContent = data.error || 'Failed to publish listing';
-            document.getElementById('preview-error').classList.remove('hidden');
-            document.getElementById('preview-success').classList.add('hidden');
-        }
-    } catch (error) {
-        document.getElementById('preview-error').textContent = 'Network error. Please try again.';
-        document.getElementById('preview-error').classList.remove('hidden');
-        document.getElementById('preview-success').classList.add('hidden');
-    }
+            const formData = {
+                raw_text: document.getElementById('raw_text').value.trim(),
+                price: {
+                    value: parseFloat(document.getElementById('price_value').value),
+                    currency: document.getElementById('currency').value
+                },
+                quantity: parseInt(document.getElementById('quantity').value),
+                condition: document.getElementById('condition').value,
+                images: validImages,
+                use_html_description: document.getElementById('use_html_description').checked,
+                use_simple_prompt_description: document.getElementById('use_simple_prompt_description').checked,
+                include_debug: document.getElementById('include_debug').checked
+            };
 
-    button.disabled = false;
-    button.textContent = 'Publish to eBay';
-});
+            const button = document.getElementById('preview-btn');
+            await generatePreview(formData, button);
+        });
 
-document.getElementById('close-preview').addEventListener('click', () => {
-    document.getElementById('preview-modal').classList.add('hidden');
-});
+        document.getElementById('preview-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-document.getElementById('cancel-preview').addEventListener('click', () => {
-    document.getElementById('preview-modal').classList.add('hidden');
-});
+            const previewData = JSON.parse(document.getElementById('preview-form').dataset.preview || '{}');
+            const button = document.getElementById('preview-form').querySelector('button[type="submit"]');
+            button.disabled = true;
+            button.textContent = 'Publishing...';
 
-document.getElementById('preview-modal').addEventListener('click', (e) => {
-    if (e.target.id === 'preview-modal') {
-        document.getElementById('preview-modal').classList.add('hidden');
-    }
-});
+            previewData.title = document.getElementById('preview-title').value.trim();
+            previewData.description.text = document.getElementById('preview-description').value.trim();
 
-function showDebugInfo(debug) {
-    document.getElementById('debug-panel').classList.remove('hidden');
+            if (previewData.description.used_html) {
+                const editedText = previewData.description.text;
+                if (editedText.trim()) {
+                    const paragraphs = editedText
+                        .split('\n\n')
+                        .filter(p => p.trim())
+                        .map(p => `<p>${p.trim().replace(/\n/g, '<br>')}</p>`);
+                    previewData.description.html = paragraphs.join('');
+                } else {
+                    previewData.description.html = '<p>No description provided</p>';
+                }
+            } else {
+                previewData.description.html = previewData.description.text;
+            }
 
-    if (debug.step1_extract_keywords) {
-        const keywords = debug.step1_extract_keywords;
-        document.getElementById('debug-keywords').innerHTML = `
+            const aspectInputs = document.getElementById('preview-aspects').querySelectorAll('input[data-aspect]');
+            const editedAspects = {};
+            aspectInputs.forEach(input => {
+                const aspect = input.dataset.aspect;
+                const values = input.value.split(',').map(v => v.trim()).filter(v => v);
+                if (values.length) {
+                    editedAspects[aspect] = values;
+                }
+            });
+            previewData.aspects = editedAspects;
+
+            if (!previewData.title) {
+                document.getElementById('preview-error').textContent = 'Title is required.';
+                document.getElementById('preview-error').classList.remove('hidden');
+                document.getElementById('preview-success').classList.add('hidden');
+                button.disabled = false;
+                button.textContent = 'Publish to eBay';
+                return;
+            }
+
+            try {
+                const response = await fetch('/publish-item-from-preview', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(previewData),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('preview-success').textContent = 'Published to eBay!';
+                    document.getElementById('preview-success').classList.remove('hidden');
+                    document.getElementById('preview-error').classList.add('hidden');
+
+                    setTimeout(() => {
+                        localStorage.setItem('listing-success', JSON.stringify(data));
+                        window.location.href = 'success.html';
+                    }, 1500);
+                } else {
+                    document.getElementById('preview-error').textContent = data.error || 'Failed to publish listing';
+                    document.getElementById('preview-error').classList.remove('hidden');
+                    document.getElementById('preview-success').classList.add('hidden');
+                }
+            } catch (error) {
+                document.getElementById('preview-error').textContent = 'Network error. Please try again.';
+                document.getElementById('preview-error').classList.remove('hidden');
+                document.getElementById('preview-success').classList.add('hidden');
+            }
+
+            button.disabled = false;
+            button.textContent = 'Publish to eBay';
+        });
+
+        document.getElementById('close-preview').addEventListener('click', () => {
+            document.getElementById('preview-modal').classList.add('hidden');
+        });
+
+        document.getElementById('cancel-preview').addEventListener('click', () => {
+            document.getElementById('preview-modal').classList.add('hidden');
+        });
+
+        document.getElementById('preview-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'preview-modal') {
+                document.getElementById('preview-modal').classList.add('hidden');
+            }
+        });
+
+        function showDebugInfo(debug) {
+            document.getElementById('debug-panel').classList.remove('hidden');
+
+            if (debug.step1_extract_keywords) {
+                const keywords = debug.step1_extract_keywords;
+                document.getElementById('debug-keywords').innerHTML = `
             <strong>Title:</strong> ${keywords.normalized_title || 'N/A'}<br>
             <strong>Category Keywords:</strong> ${(keywords.category_keywords || []).join(', ') || 'N/A'}<br>
             <strong>Brand:</strong> ${keywords.brand || 'N/A'}
         `;
-    }
+            }
 
-    if (debug.step2_category) {
-        const category = debug.step2_category;
-        document.getElementById('debug-category').innerHTML = `
+            if (debug.step2_category) {
+                const category = debug.step2_category;
+                document.getElementById('debug-category').innerHTML = `
             <strong>Query:</strong> ${category.queryUsed || 'N/A'}<br>
             <strong>Category:</strong> ${category.categoryName || 'N/A'}<br>
             <strong>ID:</strong> ${category.categoryId || 'N/A'}
         `;
-    }
+            }
 
-    if (debug.step3_aspects) {
-        const aspects = debug.step3_aspects;
-        const filledAspects = Object.entries(aspects.filled || {})
-            .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
-            .join('<br>');
-        document.getElementById('debug-aspects').innerHTML = `
+            if (debug.step3_aspects) {
+                const aspects = debug.step3_aspects;
+                const filledAspects = Object.entries(aspects.filled || {})
+                    .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
+                    .join('<br>');
+                document.getElementById('debug-aspects').innerHTML = `
             <strong>Required:</strong> ${(aspects.requiredAspects || []).join(', ') || 'None'}<br>
             <strong>Filled:</strong><br>${filledAspects || 'None'}
         `;
-    }
+            }
 
-    if (debug.description) {
-        const desc = debug.description;
-        document.getElementById('debug-description').innerHTML = `
+            if (debug.description) {
+                const desc = debug.description;
+                document.getElementById('debug-description').innerHTML = `
             <strong>HTML Mode:</strong> ${desc.used_html ? 'Yes' : 'No'}<br>
             <strong>Preview:</strong><br>
             <div class="mt-2 p-2 bg-gray-700 rounded text-xs">${desc.text.substring(0, 200)}...</div>
         `;
-    }
-}
+            }
+        }
 
-</script>
+    </script>
 </body>
 
 </html>
