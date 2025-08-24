@@ -52,6 +52,29 @@
             0%, 100% { opacity: 1; }
             50% { opacity: .8; }
         }
+        .prose {
+            line-height: 1.6;
+        }
+        .prose p {
+            margin-bottom: 1em;
+        }
+        .prose p:last-child {
+            margin-bottom: 0;
+        }
+        .prose strong {
+            font-weight: 600;
+        }
+        .prose em {
+            font-style: italic;
+        }
+        .prose ul, .prose ol {
+            margin: 1em 0;
+            padding-left: 1.5em;
+        }
+        .prose li {
+            margin-bottom: 0.5em;
+        }
+
     </style>
 </head>
 
@@ -253,9 +276,20 @@
 
                     <div>
                         <label class="block text-lg font-semibold text-gray-900 mb-3">Description</label>
+                        
+                        <!-- Preview Display -->
+                        <div class="mb-3">
+                            <div class="bg-gray-50 p-4 rounded-lg border">
+                                <div class="text-sm font-medium text-gray-600 mb-2">Formatted Preview:</div>
+                                <div id="preview-description-formatted" class="prose prose-sm max-w-none text-gray-800"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Editable Text Area -->
                         <textarea id="preview-description" rows="6"
-                            class="input-field w-full px-4 py-4 rounded-xl text-base resize-none"></textarea>
-                        <p class="text-sm text-gray-500 mt-2">Edit the generated description if needed</p>
+                            class="input-field w-full px-4 py-4 rounded-xl text-base resize-none"
+                            placeholder="Enter description text here..."></textarea>
+                        <p class="text-sm text-gray-500 mt-2">Edit the generated description if needed. HTML tags will be preserved in the final listing.</p>
                     </div>
 
                     <div>
@@ -988,8 +1022,48 @@ async function generatePreview(formData, button) {
 
 function displayPreview(data) {
     document.getElementById('preview-title').value = data.title || '';
-    document.getElementById('preview-description').value = data.description.text || '';
     
+    // Handle description with proper formatting
+    const descriptionText = data.description.text || '';
+    document.getElementById('preview-description').value = descriptionText;
+    
+    // Show formatted preview
+    const formattedPreview = document.getElementById('preview-description-formatted');
+    if (data.description.used_html && data.description.html) {
+        // If HTML was used, show the HTML rendered version
+        formattedPreview.innerHTML = data.description.html;
+    } else {
+        // If plain text, convert line breaks to paragraphs
+        const formatted = descriptionText
+            .split('\n\n')
+            .filter(p => p.trim())
+            .map(p => `<p>${p.trim().replace(/\n/g, '<br>')}</p>`)
+            .join('');
+        formattedPreview.innerHTML = formatted || '<p class="text-gray-400 italic">No description provided</p>';
+    }
+    
+    // Add real-time preview update
+    const descriptionTextarea = document.getElementById('preview-description');
+    // Remove any existing event listeners
+    descriptionTextarea.removeEventListener('input', updatePreviewDescription);
+    // Add new event listener
+    descriptionTextarea.addEventListener('input', updatePreviewDescription);
+    
+    function updatePreviewDescription() {
+        const text = descriptionTextarea.value;
+        if (text.trim()) {
+            const formatted = text
+                .split('\n\n')
+                .filter(p => p.trim())
+                .map(p => `<p>${p.trim().replace(/\n/g, '<br>')}</p>`)
+                .join('');
+            formattedPreview.innerHTML = formatted;
+        } else {
+            formattedPreview.innerHTML = '<p class="text-gray-400 italic">No description provided</p>';
+        }
+    }
+    
+    // Handle aspects
     const aspectsContainer = document.getElementById('preview-aspects');
     aspectsContainer.innerHTML = '';
     Object.entries(data.aspects || {}).forEach(([key, values]) => {
@@ -1018,7 +1092,7 @@ function displayPreview(data) {
             <img src="${url}" alt="Listing Image ${index + 1}" 
                  class="w-full h-32 object-cover rounded-lg border-2 border-gray-200 hover:border-blue-400 transition-colors cursor-pointer"
                  onclick="openImageModal('${url}')"
-                 onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xMiA5VjEzTTEyIDE3SDE2TTggMTdIMTJNOCAxM0gxMk04IDlIMTZNNCAxN1Y3QTIgMiAwIDAgMSA2IDVIMThBMiAyIDAgMCAxIDIwIDdWMTdBMiAyIDAgMCAxIDE4IDE5SDZBMiAyIDAgMCAxIDQgMTdaIiBzdHJva2U9IiM2QjczODAiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjwvc3ZnPgo='; this.className += ' opacity-50'">
+                 onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xMiA5VjEzTTEyIDE3SDE2TTggMTdIMTJNOCAxM0gxMk04IDlIMTZNNCAxN1Y3QTIgMiAwIDAgMSA2IDVIMThBMiAyIDAgMCExIDIwIDdWMTdBMiAyIDAgMCExIDE4IDE5SDZBMiAyIDAgMCExIDQgMTdaIiBzdHJva2U9IiM2QjczODAiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjwvc3ZnPgo='; this.className += ' opacity-50'">
             <div class="absolute top-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
                 ${index + 1}
             </div>
@@ -1237,6 +1311,7 @@ function showDebugInfo(debug) {
         `;
     }
 }
+
 </script>
 </body>
 
