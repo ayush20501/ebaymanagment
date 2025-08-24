@@ -613,10 +613,9 @@
 
     document.getElementById('close-after-publish').addEventListener('click', () => {
         document.getElementById('preview-modal').classList.add('hidden');
-        document.getElementById('listing-form').reset(); // Reset the form
-        document.getElementById('confirm-submit-btn').classList.remove('hidden'); // Show publish button again
-        document.getElementById('close-after-publish').classList.add('hidden'); // Hide this button
-        // Clear any success/error messages in the preview modal
+        document.getElementById('listing-form').reset();
+        document.getElementById('confirm-submit-btn').classList.remove('hidden');
+        document.getElementById('close-after-publish').classList.add('hidden');
         const previewContent = document.querySelector('#preview-modal .mt-3');
         const messages = previewContent.querySelectorAll('.bg-green-50, .bg-red-50');
         messages.forEach(msg => msg.remove());
@@ -865,11 +864,17 @@
         document.getElementById('success-message').classList.add('hidden');
         document.getElementById('debug-panel').classList.add('hidden');
 
-        showAIStatus('🤖 Analyzing your product description...', 10);
-        setTimeout(() => updateAIProgress('🔍 Extracting keywords and metadata...', 25), 500);
-        setTimeout(() => updateAIProgress('📂 Finding optimal eBay category...', 50), 1500);
-        setTimeout(() => updateAIProgress('📋 Filling product specifications...', 75), 2500);
-        setTimeout(() => updateAIProgress('✍️ Generating marketing description...', 90), 3500);
+        if (!fromPreview) {
+            // Show AI progress for direct publishing
+            showAIStatus('🤖 Analyzing your product description...', 10);
+            setTimeout(() => updateAIProgress('🔍 Extracting keywords and metadata...', 25), 500);
+            setTimeout(() => updateAIProgress('📂 Finding optimal eBay category...', 50), 1500);
+            setTimeout(() => updateAIProgress('📋 Filling product specifications...', 75), 2500);
+            setTimeout(() => updateAIProgress('✍️ Generating marketing description...', 90), 3500);
+        } else {
+            // Show simple publishing status for preview modal
+            showAIStatus('🚀 Publishing to eBay...', 50);
+        }
 
         try {
             const response = await fetch('/publish-item', {
@@ -892,7 +897,7 @@
                 setTimeout(() => {
                     hideAIStatus();
                     if (fromPreview) {
-                        // Show success message in the preview modal
+                        // Show success message in preview modal
                         document.getElementById('preview-modal').classList.remove('hidden');
                         const previewContent = document.querySelector('#preview-modal .mt-3');
                         const successMessage = document.createElement('div');
@@ -923,6 +928,7 @@
                     errorMessage.className = 'bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-xl mb-8 font-medium';
                     errorMessage.textContent = data.error || 'Failed to publish listing';
                     previewContent.insertBefore(errorMessage, previewContent.firstChild);
+                    document.getElementById('preview-modal').classList.remove('hidden');
                 }
             }
         } catch (error) {
@@ -935,6 +941,7 @@
                 errorMessage.className = 'bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-xl mb-8 font-medium';
                 errorMessage.textContent = 'Network error. Please try again.';
                 previewContent.insertBefore(errorMessage, previewContent.firstChild);
+                document.getElementById('preview-modal').classList.remove('hidden');
             }
         }
 
@@ -1050,7 +1057,6 @@
 
         document.getElementById('preview-modal').classList.add('hidden');
 
-        // Update formDataPreview with edited fields
         const title = document.getElementById('preview-title').value.trim();
         const description = document.getElementById('preview-description').value.trim();
         const aspects = {};
