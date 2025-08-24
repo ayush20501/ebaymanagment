@@ -295,6 +295,9 @@
                         <button id="confirm-submit-btn" class="bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 hover-lift">
                             Publish to eBay
                         </button>
+                        <button id="close-after-publish" class="hidden bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 hover-lift">
+                            Create New Listing
+                        </button>
                     </div>
                 </div>
             </div>
@@ -608,6 +611,17 @@
         }
     });
 
+    document.getElementById('close-after-publish').addEventListener('click', () => {
+        document.getElementById('preview-modal').classList.add('hidden');
+        document.getElementById('listing-form').reset(); // Reset the form
+        document.getElementById('confirm-submit-btn').classList.remove('hidden'); // Show publish button again
+        document.getElementById('close-after-publish').classList.add('hidden'); // Hide this button
+        // Clear any success/error messages in the preview modal
+        const previewContent = document.querySelector('#preview-modal .mt-3');
+        const messages = previewContent.querySelectorAll('.bg-green-50, .bg-red-50');
+        messages.forEach(msg => msg.remove());
+    });
+
     async function loadProfileData() {
         try {
             const statsResponse = await fetch('/user-stats');
@@ -843,7 +857,7 @@
         loadAllListings(currentListingsPage + 1);
     });
 
-    async function submitToPublish(formData, button) {
+    async function submitToPublish(formData, button, fromPreview = false) {
         button.disabled = true;
         button.textContent = 'Publishing...';
 
@@ -877,18 +891,51 @@
 
                 setTimeout(() => {
                     hideAIStatus();
-                    localStorage.setItem('listing-success', JSON.stringify(data));
-                    window.location.href = 'success.html';
+                    if (fromPreview) {
+                        // Show success message in the preview modal
+                        document.getElementById('preview-modal').classList.remove('hidden');
+                        const previewContent = document.querySelector('#preview-modal .mt-3');
+                        const successMessage = document.createElement('div');
+                        successMessage.className = 'bg-green-50 border border-green-200 text-green-800 px-6 py-4 rounded-xl mb-8 font-medium';
+                        successMessage.textContent = 'Listing published successfully to eBay! View it at: ' + (data.viewItemUrl || 'eBay');
+                        previewContent.insertBefore(successMessage, previewContent.firstChild);
+                        
+                        // Hide publish button and show create new listing button
+                        document.getElementById('confirm-submit-btn').classList.add('hidden');
+                        document.getElementById('close-after-publish').classList.remove('hidden');
+                        
+                        // Update recent listings
+                        loadRecentListings();
+                    } else {
+                        // Direct publish: redirect to success page
+                        localStorage.setItem('listing-success', JSON.stringify(data));
+                        window.location.href = 'success.html';
+                    }
                 }, 1000);
             } else {
                 hideAIStatus();
                 document.getElementById('error-message').textContent = data.error || 'Failed to publish listing';
                 document.getElementById('error-message').classList.remove('hidden');
+                if (fromPreview) {
+                    // Show error in preview modal
+                    const previewContent = document.querySelector('#preview-modal .mt-3');
+                    const errorMessage = document.createElement('div');
+                    errorMessage.className = 'bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-xl mb-8 font-medium';
+                    errorMessage.textContent = data.error || 'Failed to publish listing';
+                    previewContent.insertBefore(errorMessage, previewContent.firstChild);
+                }
             }
         } catch (error) {
             hideAIStatus();
             document.getElementById('error-message').textContent = 'Network error. Please try again.';
             document.getElementById('error-message').classList.remove('hidden');
+            if (fromPreview) {
+                const previewContent = document.querySelector('#preview-modal .mt-3');
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-xl mb-8 font-medium';
+                errorMessage.textContent = 'Network error. Please try again.';
+                previewContent.insertBefore(errorMessage, previewContent.firstChild);
+            }
         }
 
         button.disabled = false;
@@ -926,7 +973,7 @@
         };
 
         const button = document.getElementById('publish-btn');
-        await submitToPublish(formDataPreview, button);
+        await submitToPublish(formDataPreview, button, false);
     });
 
     document.getElementById('preview-btn').addEventListener('click', async () => {
@@ -1026,7 +1073,7 @@
         formDataPreview.description = description;
         formDataPreview.aspects = aspects;
 
-        await submitToPublish(formDataPreview, button);
+        await submitToPublish(formDataPreview, button, true);
     });
 
     function showPreviewModal(data) {
