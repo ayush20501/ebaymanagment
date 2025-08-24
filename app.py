@@ -2116,8 +2116,7 @@ def publish_item_from_preview():
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 MAX_FILE_SIZE = 5 * 1024 * 1024
-# IMGBB_API_KEY = os.getenv('IMGBB_API_KEY')
-IMGBB_API_KEY = "af88e4bff43f9b141ffdafb142ad5215"
+IMGBB_API_KEY = os.getenv('IMGBB_API_KEY')
 IMGBB_UPLOAD_URL = 'https://api.imgbb.com/1/upload'
 
 def allowed_file(filename):
