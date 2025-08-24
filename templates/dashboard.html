@@ -226,93 +226,108 @@
     </div>
 
     <!-- Preview Modal -->
-<div id="preview-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 modal-backdrop overflow-y-auto h-full w-full z-50">
-    <div class="relative top-8 mx-auto p-6 border w-11/12 md:w-4/5 lg:w-3/4 xl:w-2/3 shadow-2xl rounded-2xl bg-white max-w-4xl">
-        <div class="mt-3">
-            <div class="flex items-center justify-between mb-8">
-                <div>
-                    <h3 class="text-2xl font-bold text-gray-900">Preview Listing</h3>
-                    <p class="text-gray-600 mt-1">Review and edit your listing before publishing to eBay</p>
+    <div id="preview-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 modal-backdrop overflow-y-auto h-full w-full z-50">
+        <div class="relative top-8 mx-auto p-6 border w-11/12 md:w-4/5 lg:w-3/4 xl:w-2/3 shadow-2xl rounded-2xl bg-white max-w-4xl">
+            <div class="mt-3">
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-900">Preview Listing</h3>
+                        <p class="text-gray-600 mt-1">Review and edit your listing before publishing to eBay</p>
+                    </div>
+                    <button id="close-preview" class="text-gray-400 hover:text-gray-600 hover-lift">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
                 </div>
-                <button id="close-preview" class="text-gray-400 hover:text-gray-600 hover-lift">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
+
+                <!-- Preview Form -->
+                <form id="preview-form" class="space-y-6">
+                    <div>
+                        <label class="block text-lg font-semibold text-gray-900 mb-3">Title</label>
+                        <input type="text" id="preview-title" maxlength="80"
+                            class="input-field w-full px-4 py-4 rounded-xl text-base">
+                        <p class="text-sm text-gray-500 mt-2">Max 80 characters</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-lg font-semibold text-gray-900 mb-3">Description</label>
+                        <textarea id="preview-description" rows="6"
+                            class="input-field w-full px-4 py-4 rounded-xl text-base resize-none"></textarea>
+                        <p class="text-sm text-gray-500 mt-2">Edit the generated description if needed</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-lg font-semibold text-gray-900 mb-3">Item Aspects</label>
+                        <div id="preview-aspects" class="space-y-3">
+                            <!-- Aspects will be dynamically populated -->
+                        </div>
+                        <p class="text-sm text-gray-500 mt-2">Edit or add aspect values as needed (comma-separated)</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-lg font-semibold text-gray-900 mb-3">Price</label>
+                            <p id="preview-price-currency" class="text-base text-gray-900"></p>
+                            <p class="text-sm text-gray-500 mt-2">Price and currency (non-editable)</p>
+                        </div>
+                        <div>
+                            <label class="block text-lg font-semibold text-gray-900 mb-3">Quantity</label>
+                            <p id="preview-quantity" class="text-base text-gray-900"></p>
+                            <p class="text-sm text-gray-500 mt-2">Number of items available (non-editable)</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-lg font-semibold text-gray-900 mb-3">Condition</label>
+                        <p id="preview-condition" class="text-base text-gray-900"></p>
+                        <p class="text-sm text-gray-500 mt-2">Item condition (non-editable)</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-lg font-semibold text-gray-900 mb-3">Images</label>
+                        <div id="preview-images" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
+                            <!-- Images will be dynamically populated -->
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Image URLs (non-editable)</label>
+                            <div id="preview-image-urls" class="text-sm text-gray-600 max-h-32 overflow-y-auto bg-white p-3 rounded border font-mono"></div>
+                        </div>
+                    </div>
+
+                    <div id="preview-error" class="hidden bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-xl font-medium">
+                    </div>
+                    <div id="preview-success" class="hidden bg-green-50 border border-green-200 text-green-800 px-6 py-4 rounded-xl font-medium">
+                    </div>
+
+                    <div class="flex space-x-3 pt-2">
+                        <button type="submit"
+                            class="bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 disabled:bg-gray-400 hover-lift">
+                            Publish to eBay
+                        </button>
+                        <button type="button" id="cancel-preview"
+                            class="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 hover-lift">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
             </div>
-
-            <!-- Preview Form -->
-            <form id="preview-form" class="space-y-6">
-                <div>
-                    <label class="block text-lg font-semibold text-gray-900 mb-3">Title</label>
-                    <input type="text" id="preview-title" maxlength="80"
-                        class="input-field w-full px-4 py-4 rounded-xl text-base">
-                    <p class="text-sm text-gray-500 mt-2">Max 80 characters</p>
-                </div>
-
-                <div>
-                    <label class="block text-lg font-semibold text-gray-900 mb-3">Description</label>
-                    <textarea id="preview-description" rows="6"
-                        class="input-field w-full px-4 py-4 rounded-xl text-base resize-none"></textarea>
-                    <p class="text-sm text-gray-500 mt-2">Edit the generated description if needed</p>
-                </div>
-
-                <div>
-                    <label class="block text-lg font-semibold text-gray-900 mb-3">Item Aspects</label>
-                    <div id="preview-aspects" class="space-y-3">
-                        <!-- Aspects will be dynamically populated -->
-                    </div>
-                    <p class="text-sm text-gray-500 mt-2">Edit or add aspect values as needed (comma-separated)</p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-lg font-semibold text-gray-900 mb-3">Price</label>
-                        <p id="preview-price-currency" class="text-base text-gray-900"></p>
-                        <p class="text-sm text-gray-500 mt-2">Price and currency (non-editable)</p>
-                    </div>
-                    <div>
-                        <label class="block text-lg font-semibold text-gray-900 mb-3">Quantity</label>
-                        <p id="preview-quantity" class="text-base text-gray-900"></p>
-                        <p class="text-sm text-gray-500 mt-2">Number of items available (non-editable)</p>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-lg font-semibold text-gray-900 mb-3">Condition</label>
-                    <p id="preview-condition" class="text-base text-gray-900"></p>
-                    <p class="text-sm text-gray-500 mt-2">Item condition (non-editable)</p>
-                </div>
-
-                <div>
-                    <label class="block text-lg font-semibold text-gray-900 mb-3">Images</label>
-                    <div id="preview-images" class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        <!-- Images will be dynamically populated -->
-                    </div>
-                    <p id="preview-image-urls" class="text-base text-gray-900 mt-3"></p>
-                    <p class="text-sm text-gray-500 mt-2">Image URLs (non-editable)</p>
-                </div>
-
-                <div id="preview-error" class="hidden bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-xl font-medium">
-                </div>
-                <div id="preview-success" class="hidden bg-green-50 border border-green-200 text-green-800 px-6 py-4 rounded-xl font-medium">
-                </div>
-
-                <div class="flex space-x-3 pt-2">
-                    <button type="submit"
-                        class="bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 disabled:bg-gray-400 hover-lift">
-                        Publish to eBay
-                    </button>
-                    <button type="button" id="cancel-preview"
-                        class="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 hover-lift">
-                        Cancel
-                    </button>
-                </div>
-            </form>
         </div>
     </div>
-</div>
+
+    <!-- Image Modal -->
+    <div id="image-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
+        <div class="relative max-w-4xl max-h-full">
+            <img id="modal-image" src="" alt="Full size preview" class="max-w-full max-h-full object-contain rounded-lg">
+            <button onclick="closeImageModal()" class="absolute top-4 right-4 text-white hover:text-gray-300 bg-black bg-opacity-50 rounded-full p-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-6 lg:px-12 py-12">
         <!-- Header Section -->
@@ -425,14 +440,19 @@
 
                         <!-- Submit Button -->
                         <div class="pt-4">
-                            <button type="submit" id="publish-btn"
-                                class="w-full bg-green-600 text-white py-4 px-8 rounded-xl text-lg font-semibold hover:bg-green-700 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed hover-lift pulse-animation">
-                                Publish to eBay
-                            </button>
-                            <button type="button" id="preview-btn"
-                                class="flex-1 bg-blue-600 text-white py-4 px-8 rounded-xl text-lg font-semibold hover:bg-blue-700 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed hover-lift">
-                                Preview, Edit & Publish
-                            </button>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <button type="button" id="preview-btn"
+                                    class="bg-blue-600 text-white py-4 px-8 rounded-xl text-lg font-semibold hover:bg-blue-700 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed hover-lift order-2 md:order-1">
+                                    Preview, Edit & Publish
+                                </button>
+                                <button type="submit" id="publish-btn"
+                                    class="bg-green-600 text-white py-4 px-8 rounded-xl text-lg font-semibold hover:bg-green-700 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed hover-lift pulse-animation order-1 md:order-2">
+                                    Publish to eBay
+                                </button>
+                            </div>
+                            <p class="text-sm text-gray-500 text-center mt-3">
+                                💡 Use "Preview" to review and edit your listing before publishing, or "Publish" to go live immediately
+                            </p>
                         </div>
                     </div>
                 </form>
@@ -563,6 +583,22 @@ function updateAIProgress(message, progress) {
     aiStatusTextEl.textContent = message;
     aiProgressEl.style.width = `${progress}%`;
 }
+
+function openImageModal(imageUrl) {
+    document.getElementById('modal-image').src = imageUrl;
+    document.getElementById('image-modal').classList.remove('hidden');
+}
+
+function closeImageModal() {
+    document.getElementById('image-modal').classList.add('hidden');
+}
+
+// Close modal when clicking outside the image
+document.getElementById('image-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'image-modal') {
+        closeImageModal();
+    }
+});
 
 document.getElementById('autofill-btn').addEventListener('click', () => {
     document.getElementById('raw_text').value = "Sainsbury's Mackerel Fillets in Olive Oil 125g - Premium quality mackerel fillets preserved in olive oil. Perfect for sandwiches, salads, or as a healthy snack. Rich in omega-3 fatty acids and protein. Best before date clearly marked on tin.";
@@ -972,16 +1008,38 @@ function displayPreview(data) {
     document.getElementById('preview-quantity').textContent = data.quantity || 1;
     document.getElementById('preview-condition').textContent = data.condition || 'NEW';
 
+    // Enhanced image preview
     const imagesContainer = document.getElementById('preview-images');
     imagesContainer.innerHTML = '';
-    (data.images || []).forEach(url => {
+    (data.images || []).forEach((url, index) => {
         const imgDiv = document.createElement('div');
+        imgDiv.className = 'relative group';
         imgDiv.innerHTML = `
-            <img src="${url}" alt="Listing Image" class="w-full h-32 object-cover rounded-lg border border-gray-200">
+            <img src="${url}" alt="Listing Image ${index + 1}" 
+                 class="w-full h-32 object-cover rounded-lg border-2 border-gray-200 hover:border-blue-400 transition-colors cursor-pointer"
+                 onclick="openImageModal('${url}')"
+                 onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xMiA5VjEzTTEyIDE3SDE2TTggMTdIMTJNOCAxM0gxMk04IDlIMTZNNCAxN1Y3QTIgMiAwIDAgMSA2IDVIMThBMiAyIDAgMCAxIDIwIDdWMTdBMiAyIDAgMCAxIDE4IDE5SDZBMiAyIDAgMCAxIDQgMTdaIiBzdHJva2U9IiM2QjczODAiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjwvc3ZnPgo='; this.className += ' opacity-50'">
+            <div class="absolute top-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                ${index + 1}
+            </div>
+            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all rounded-lg flex items-center justify-center">
+                <svg class="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </div>
         `;
         imagesContainer.appendChild(imgDiv);
     });
-    document.getElementById('preview-image-urls').textContent = (data.images || []).join('\n') || 'No images provided';
+
+    // Format URLs nicely
+    const urlsContainer = document.getElementById('preview-image-urls');
+    if (data.images && data.images.length > 0) {
+        urlsContainer.innerHTML = data.images.map((url, index) => 
+            `<div class="mb-1"><span class="text-gray-400">[${index + 1}]</span> ${url}</div>`
+        ).join('');
+    } else {
+        urlsContainer.innerHTML = '<div class="text-gray-400 italic">No images provided</div>';
+    }
 
     // Store the preview data for final publishing
     document.getElementById('preview-form').dataset.preview = JSON.stringify(data);
