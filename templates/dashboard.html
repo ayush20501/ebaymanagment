@@ -1196,9 +1196,26 @@ document.getElementById('preview-form').addEventListener('submit', async (e) => 
     // Collect edited fields (only Title, Description, and Aspects)
     previewData.title = document.getElementById('preview-title').value.trim();
     previewData.description.text = document.getElementById('preview-description').value.trim();
-    previewData.description.html = previewData.description.used_html
-        ? `<p>${previewData.description.text}</p>`
-        : previewData.description.text;
+    // previewData.description.html = previewData.description.used_html
+    //     ? `<p>${previewData.description.text}</p>`
+    //     : previewData.description.text;
+
+    if (previewData.description.used_html) {
+        // Convert the edited text to proper HTML paragraphs
+        const editedText = previewData.description.text;
+        if (editedText.trim()) {
+            // Split by double line breaks to create paragraphs
+            const paragraphs = editedText
+                .split('\n\n')
+                .filter(p => p.trim())
+                .map(p => `<p>${p.trim().replace(/\n/g, '<br>')}</p>`);
+            previewData.description.html = paragraphs.join('');
+        } else {
+            previewData.description.html = '<p>No description provided</p>';
+        }
+    } else {
+        previewData.description.html = previewData.description.text;
+    }
 
     const aspectInputs = document.getElementById('preview-aspects').querySelectorAll('input[data-aspect]');
     const editedAspects = {};
