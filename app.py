@@ -2210,7 +2210,7 @@ def generate_and_store_otp(user_id, email, expires_in=600):
     finally:
         close_db_connection(conn)
 
-def send_otp_email(to_email, otp):
+def send_otp_email_password(to_email, otp):
     smtp_host = os.getenv("EMAIL_HOST")
     smtp_port = os.getenv("EMAIL_PORT", 587)
     smtp_user = os.getenv("EMAIL_USER")
@@ -2290,7 +2290,7 @@ def send_password_change_otp():
     if not otp:
         return jsonify({"error": "Failed to generate OTP"}), 500
 
-    if not send_otp_email(email, otp):
+    if not send_otp_email_password(email, otp):
         return jsonify({"error": "Failed to send verification code. Please try again."}), 500
 
     return jsonify({"status": "success", "message": "Verification code sent to your email"})
