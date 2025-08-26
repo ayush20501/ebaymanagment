@@ -14,6 +14,19 @@
         .input-field { transition: all 0.3s ease; border: 2px solid #e5e7eb; }
         .input-field:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59,130,246,0.1);}
         .bg-gradient-to-br { background-image: linear-gradient(135deg, #f093fb 0%, #764ba2 100%); }
+        .hero-gradient {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 8s ease-in-out infinite;
+        }
+        @keyframes gradientShift {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
     </style>
 </head>
 <body class="min-h-screen bg-gray-50">
@@ -39,13 +52,25 @@
         </div>
     </nav>
 
-    <!-- Profile Content -->
-    <div class="max-w-4xl mx-auto p-6 mt-8">
-        <div class="bg-white rounded-2xl shadow-lg p-8">
-            <div class="mb-8">
-                <h3 class="text-2xl font-bold text-gray-900">My Profile</h3>
-                <p class="text-gray-600 mt-1">Manage your account and listings</p>
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-6 lg:px-12 py-12">
+        <!-- Header Section -->
+        <div class="mb-12">
+            <div class="max-w-4xl">
+                <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                    Manage Your
+                    <span class="hero-gradient bg-clip-text text-transparent">
+                        Profile
+                    </span>
+                </h2>
+                <p class="text-xl text-gray-600 leading-relaxed">
+                    Update your account information, manage listings, and customize your store settings.
+                </p>
             </div>
+        </div>
+
+        <!-- Profile Content -->
+        <div class="bg-white rounded-2xl shadow-lg p-8">
             <!-- Stats Grid -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div class="bg-gradient-to-br from-blue-500 to-blue-600 p-6 rounded-2xl text-white hover-lift">
@@ -61,15 +86,83 @@
                     <div class="text-purple-100 text-sm font-medium">Inventory Value</div>
                 </div>
             </div>
+            
             <div class="grid lg:grid-cols-2 gap-8">
                 <!-- Left Column -->
                 <div class="space-y-6">
                     <!-- Account Info -->
                     <div class="bg-gray-50 p-6 rounded-2xl">
                         <h4 class="font-semibold text-gray-900 mb-4">Account Information</h4>
-                        <p class="text-gray-600">Email: <span id="profile-email"
-                                class="font-medium text-gray-900"></span></p>
+                        <p class="text-gray-600">Email: <span id="profile-email" class="font-medium text-gray-900"></span></p>
                     </div>
+
+                    <!-- Change Password Section -->
+                    <div class="bg-gray-50 p-6 rounded-2xl">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="font-semibold text-gray-900">Password</h4>
+                            <button id="change-password-btn"
+                                class="text-blue-600 hover:text-blue-800 font-medium hover-lift">
+                                Change Password
+                            </button>
+                        </div>
+                        <div id="password-display">
+                            <p class="text-gray-600">Password: <span class="font-medium text-gray-900">••••••••</span></p>
+                        </div>
+                        
+                        <!-- Change Password Form -->
+                        <div id="password-change-form" class="hidden">
+                            <!-- Step 1: Request OTP -->
+                            <div id="request-otp-step">
+                                <div class="mb-4">
+                                    <p class="text-sm text-gray-600 mb-4">To change your password, we'll send a verification code to your email address.</p>
+                                </div>
+                                <div class="flex space-x-3">
+                                    <button type="button" id="send-otp-btn"
+                                        class="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-400 hover-lift">
+                                        Send Verification Code
+                                    </button>
+                                    <button type="button" id="cancel-password-change"
+                                        class="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 hover-lift">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Step 2: Verify OTP and Set New Password -->
+                            <div id="verify-otp-step" class="hidden">
+                                <form id="password-change-final-form" class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Verification Code *</label>
+                                        <input type="text" id="otp-input" required maxlength="6" placeholder="Enter 6-digit code"
+                                            class="input-field w-full px-4 py-3 rounded-lg text-center text-lg font-mono">
+                                        <p class="text-xs text-gray-500 mt-1">Check your email for the verification code</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">New Password *</label>
+                                        <input type="password" id="new-password" required minlength="6"
+                                            class="input-field w-full px-4 py-3 rounded-lg">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Confirm New Password *</label>
+                                        <input type="password" id="confirm-password" required minlength="6"
+                                            class="input-field w-full px-4 py-3 rounded-lg">
+                                    </div>
+                                    <div class="flex space-x-3 pt-2">
+                                        <button type="submit"
+                                            class="bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 disabled:bg-gray-400 hover-lift">
+                                            Update Password
+                                        </button>
+                                        <button type="button" id="back-to-otp-request"
+                                            class="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 hover-lift">
+                                            Back
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div id="password-change-message" class="hidden mt-4 text-sm"></div>
+                        </div>
+                    </div>
+
                     <!-- Profile Picture Section -->
                     <div class="bg-gray-50 p-6 rounded-2xl">
                         <div class="flex items-center justify-between mb-4">
@@ -131,6 +224,7 @@
                             <div id="profile-pic-update-message" class="hidden mt-4 text-sm"></div>
                         </div>
                     </div>
+                    
                     <!-- Address Info -->
                     <div class="bg-gray-50 p-6 rounded-2xl">
                         <div class="flex items-center justify-between mb-4">
@@ -226,10 +320,12 @@
             </div>
         </div>
     </div>
+    
     <script>
         let currentUserProfile = null;
         let currentListingsPage = 1;
         let hasMoreListings = false;
+        
         window.addEventListener('load', async () => {
             try {
                 const response = await fetch('/auth-status');
@@ -306,8 +402,152 @@
                 document.getElementById('profile-pic-modal').src = 'https://via.placeholder.com/80';
             }
         }
+
+        // Password Change Functions
+        document.getElementById('change-password-btn').addEventListener('click', () => {
+            showPasswordChangeForm();
+        });
+
+        document.getElementById('cancel-password-change').addEventListener('click', () => {
+            resetPasswordChangeForm();
+        });
+
+        document.getElementById('back-to-otp-request').addEventListener('click', () => {
+            showOtpRequestStep();
+        });
+
+        function showPasswordChangeForm() {
+            document.getElementById('password-display').classList.add('hidden');
+            document.getElementById('password-change-form').classList.remove('hidden');
+            document.getElementById('change-password-btn').classList.add('hidden');
+            showOtpRequestStep();
+        }
+
+        function resetPasswordChangeForm() {
+            document.getElementById('password-change-form').classList.add('hidden');
+            document.getElementById('password-display').classList.remove('hidden');
+            document.getElementById('change-password-btn').classList.remove('hidden');
+            
+            // Clear form fields
+            document.getElementById('otp-input').value = '';
+            document.getElementById('new-password').value = '';
+            document.getElementById('confirm-password').value = '';
+            
+            // Hide message
+            const messageEl = document.getElementById('password-change-message');
+            messageEl.classList.add('hidden');
+            messageEl.textContent = '';
+            
+            showOtpRequestStep();
+        }
+
+        function showOtpRequestStep() {
+            document.getElementById('request-otp-step').classList.remove('hidden');
+            document.getElementById('verify-otp-step').classList.add('hidden');
+        }
+
+        function showVerifyOtpStep() {
+            document.getElementById('request-otp-step').classList.add('hidden');
+            document.getElementById('verify-otp-step').classList.remove('hidden');
+        }
+
+        // Send OTP
+        document.getElementById('send-otp-btn').addEventListener('click', async () => {
+            const sendButton = document.getElementById('send-otp-btn');
+            const originalText = sendButton.textContent;
+            sendButton.disabled = true;
+            sendButton.textContent = 'Sending...';
+
+            try {
+                const response = await fetch('/send-password-change-otp', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'}
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showPasswordChangeMessage('Verification code sent to your email. Please check your inbox.', 'success');
+                    showVerifyOtpStep();
+                } else {
+                    showPasswordChangeMessage(data.error || 'Failed to send verification code.', 'error');
+                }
+            } catch (error) {
+                showPasswordChangeMessage('Network error. Please try again.', 'error');
+            }
+
+            sendButton.disabled = false;
+            sendButton.textContent = originalText;
+        });
+
+        // Handle password change form submission
+        document.getElementById('password-change-final-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const otp = document.getElementById('otp-input').value.trim();
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+
+            // Validation
+            if (!otp || otp.length !== 6) {
+                showPasswordChangeMessage('Please enter a valid 6-digit verification code.', 'error');
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                showPasswordChangeMessage('Password must be at least 6 characters long.', 'error');
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                showPasswordChangeMessage('Passwords do not match.', 'error');
+                return;
+            }
+
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Updating...';
+
+            try {
+                const response = await fetch('/change-password', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        otp: otp,
+                        new_password: newPassword
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showPasswordChangeMessage('Password updated successfully!', 'success');
+                    setTimeout(() => {
+                        resetPasswordChangeForm();
+                    }, 2000);
+                } else {
+                    showPasswordChangeMessage(data.error || 'Failed to update password.', 'error');
+                }
+            } catch (error) {
+                showPasswordChangeMessage('Network error. Please try again.', 'error');
+            }
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+        });
+
+        function showPasswordChangeMessage(message, type) {
+            const messageEl = document.getElementById('password-change-message');
+            messageEl.textContent = message;
+            messageEl.className = `mt-4 text-sm ${type === 'success' ? 'text-green-600' : 'text-red-600'}`;
+            messageEl.classList.remove('hidden');
+        }
+
+        // Address Functions
         document.getElementById('edit-address-btn').addEventListener('click', () => { showAddressEditForm(); });
         document.getElementById('cancel-address-edit').addEventListener('click', () => { resetAddressForm(); });
+        
         function showAddressEditForm() {
             if (currentUserProfile) {
                 document.getElementById('edit-address-line1').value = currentUserProfile.address_line1 || '';
@@ -319,6 +559,7 @@
             document.getElementById('address-edit-form').classList.remove('hidden');
             document.getElementById('edit-address-btn').classList.add('hidden');
         }
+        
         function resetAddressForm() {
             document.getElementById('address-edit-form').classList.add('hidden');
             document.getElementById('address-display').classList.remove('hidden');
@@ -327,6 +568,7 @@
             messageEl.classList.add('hidden');
             messageEl.textContent = '';
         }
+        
         document.getElementById('address-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = {
@@ -357,12 +599,14 @@
                 showAddressMessage('Network error. Please try again.', 'error');
             }
         });
+        
         function showAddressMessage(message, type) {
             const messageEl = document.getElementById('address-update-message');
             messageEl.textContent = message;
             messageEl.className = `mt-4 text-sm ${type === 'success' ? 'text-green-600' : 'text-red-600'}`;
             messageEl.classList.remove('hidden');
         }
+
         // Profile picture editing functions
         document.getElementById('edit-profile-pic-btn').addEventListener('click', () => {
             showProfilePicEditForm();
