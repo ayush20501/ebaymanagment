@@ -985,36 +985,36 @@ def debug_admin():
     finally:
         close_db_connection(conn)
 
-@app.route("/signup", methods=["POST"])
-def signup():
-    data = request.get_json() or {}
-    email = data.get("email", "").strip().lower()
-    password = data.get("password", "")
+# @app.route("/signup", methods=["POST"])
+# def signup():
+#     data = request.get_json() or {}
+#     email = data.get("email", "").strip().lower()
+#     password = data.get("password", "")
 
-    if not email or not password:
-        return jsonify({"error": "Email and password are required"}), 400
+#     if not email or not password:
+#         return jsonify({"error": "Email and password are required"}), 400
 
-    if len(password) < 6:
-        return jsonify({"error": "Password must be at least 6 characters"}), 400
+#     if len(password) < 6:
+#         return jsonify({"error": "Password must be at least 6 characters"}), 400
 
-    conn = get_db_connection()
-    try:
-        with conn.cursor() as c:
-            c.execute("INSERT INTO users (email, password_hash, is_active) VALUES (%s, %s, TRUE) RETURNING id",
-                      (email, generate_password_hash(password)))
-            user_id = c.fetchone()[0]
-            conn.commit()
-            session["user_id"] = user_id
-            session["email"] = email
-            return jsonify({"status": "success", "message": "User registered successfully"})
-    except psycopg2.errors.UniqueViolation:
-        conn.rollback()
-        return jsonify({"error": "Email already exists"}), 400
-    except psycopg2.Error:
-        conn.rollback()
-        return jsonify({"error": "Registration failed"}), 500
-    finally:
-        close_db_connection(conn)
+#     conn = get_db_connection()
+#     try:
+#         with conn.cursor() as c:
+#             c.execute("INSERT INTO users (email, password_hash, is_active) VALUES (%s, %s, TRUE) RETURNING id",
+#                       (email, generate_password_hash(password)))
+#             user_id = c.fetchone()[0]
+#             conn.commit()
+#             session["user_id"] = user_id
+#             session["email"] = email
+#             return jsonify({"status": "success", "message": "User registered successfully"})
+#     except psycopg2.errors.UniqueViolation:
+#         conn.rollback()
+#         return jsonify({"error": "Email already exists"}), 400
+#     except psycopg2.Error:
+#         conn.rollback()
+#         return jsonify({"error": "Registration failed"}), 500
+#     finally:
+#         close_db_connection(conn)
 
 def is_admin_user(user_id):
     """Check if a user is an admin by comparing their email with ADMIN_EMAIL"""
@@ -2321,7 +2321,252 @@ def change_password():
         return jsonify({"error": "Failed to update password due to database error"}), 500
     finally:
         close_db_connection(conn)
+
+
+# Add these imports at the top if not already present
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from datetime import datetime, timedelta
+
+# In-memory OTP storage (no database changes needed)
+otp_store = {}
+pending_users = {}  # Store pending user registrations
+
+# Email configuration
+SMTP_SERVER = os.getenv("EMAIL_HOST")
+SMTP_PORT = 587
+EMAIL_ADDRESS = os.getenv("EMAIL_USER")
+EMAIL_PASSWORD = os.getenv("EMAIL_PASS")
+    
+def generate_otp():
+    """Generate a 6-digit OTP"""
+    return ''.join([str(random.randint(0, 9)) for _ in range(6)])
+
+def send_otp_email(email, otp):
+    """Send OTP via email"""
+    try:
+        msg = MIMEMultipart()
+        msg['From'] = EMAIL_ADDRESS
+        msg['To'] = email
+        msg['Subject'] = "Your ListFast.ai Verification Code"
         
+        body = f"""
+        <html>
+        <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center;">
+                <h1 style="color: white; margin: 0;">ListFast.ai</h1>
+            </div>
+            <div style="padding: 40px 30px; background: #f9f9f9;">
+                <h2 style="color: #333; margin-bottom: 20px;">Welcome to ListFast.ai!</h2>
+                <p style="color: #666; font-size: 16px; line-height: 1.6;">
+                    Thank you for signing up. Please use the verification code below to complete your registration:
+                </p>
+                <div style="background: white; padding: 30px; border-radius: 10px; text-align: center; margin: 30px 0;">
+                    <div style="font-size: 32px; font-weight: bold; color: #667eea; letter-spacing: 8px; font-family: monospace;">
+                        {otp}
+                    </div>
+                    <p style="color: #888; font-size: 14px; margin-top: 15px;">
+                        This code will expire in 10 minutes
+                    </p>
+                </div>
+                <p style="color: #666; font-size: 14px;">
+                    If you didn't request this code, please ignore this email.
+                </p>
+            </div>
+            <div style="background: #333; padding: 20px; text-align: center;">
+                <p style="color: #999; margin: 0; font-size: 12px;">
+                    © 2025 ListFast.ai. All rights reserved.
+                </p>
+            </div>
+        </body>
+        </html>
+        """
+        
+        msg.attach(MIMEText(body, 'html'))
+        
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        server.starttls()
+        server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+        text = msg.as_string()
+        server.sendmail(EMAIL_ADDRESS, email, text)
+        server.quit()
+        
+        return True
+    except Exception as e:
+        print(f"Error sending email: {e}")
+        return False
+
+# Replace your existing signup route with this:
+@app.route("/signup", methods=["POST"])
+def signup():
+    data = request.get_json() or {}
+    email = data.get("email", "").strip().lower()
+    password = data.get("password", "")
+
+    if not email or not password:
+        return jsonify({"error": "Email and password are required"}), 400
+
+    if len(password) < 6:
+        return jsonify({"error": "Password must be at least 6 characters"}), 400
+
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as c:
+            # Check if user already exists
+            c.execute("SELECT id FROM users WHERE email = %s", (email,))
+            existing_user = c.fetchone()
+            if existing_user:
+                return jsonify({"error": "User with this email already exists"}), 400
+
+            # Generate and store OTP (in memory, not database)
+            otp = generate_otp()
+            otp_store[email] = {
+                'otp': otp,
+                'password': password,  # Store temporarily for account creation
+                'timestamp': datetime.now(),
+                'attempts': 0
+            }
+            
+            # Send OTP email
+            if send_otp_email(email, otp):
+                return jsonify({'message': 'Verification code sent to your email'}), 200
+            else:
+                # Clean up on email failure
+                if email in otp_store:
+                    del otp_store[email]
+                return jsonify({"error": "Failed to send verification email"}), 500
+                
+    except psycopg2.Error as e:
+        print(f"Database error: {e}")
+        return jsonify({"error": "Registration failed"}), 500
+    finally:
+        close_db_connection(conn)
+
+@app.route('/verify-otp', methods=['POST'])
+def verify_otp():
+    try:
+        data = request.get_json()
+        email = data.get('email', '').strip().lower()
+        submitted_otp = data.get('otp', '')
+        
+        if not email or not submitted_otp:
+            return jsonify({'error': 'Email and OTP are required'}), 400
+        
+        # Check if OTP exists for this email
+        if email not in otp_store:
+            return jsonify({'error': 'No verification code found. Please request a new one.'}), 400
+        
+        otp_data = otp_store[email]
+        
+        # Check if OTP is expired (10 minutes)
+        if datetime.now() - otp_data['timestamp'] > timedelta(minutes=10):
+            del otp_store[email]
+            return jsonify({'error': 'Verification code expired. Please request a new one.'}), 400
+        
+        # Check attempt limit
+        if otp_data['attempts'] >= 5:
+            del otp_store[email]
+            return jsonify({'error': 'Too many incorrect attempts. Please request a new code.'}), 400
+        
+        # Verify OTP
+        if submitted_otp != otp_data['otp']:
+            otp_data['attempts'] += 1
+            return jsonify({'error': 'Invalid verification code'}), 400
+        
+        # OTP is correct - create the user account NOW
+        password = otp_data['password']
+        hashed_password = generate_password_hash(password)
+        
+        conn = get_db_connection()
+        try:
+            with conn.cursor() as c:
+                c.execute("""
+                    INSERT INTO users (email, password_hash, is_active) 
+                    VALUES (%s, %s, TRUE) 
+                    RETURNING id
+                """, (email, hashed_password))
+                user_id = c.fetchone()[0]
+                conn.commit()
+                
+                # Clean up OTP data
+                del otp_store[email]
+                
+                # Log the user in
+                session["user_id"] = user_id
+                session["email"] = email
+                
+                return jsonify({
+                    'message': 'Email verified successfully! Account created.',
+                    'user_id': user_id
+                }), 200
+                
+        except psycopg2.errors.UniqueViolation:
+            conn.rollback()
+            # Clean up OTP data
+            if email in otp_store:
+                del otp_store[email]
+            return jsonify({'error': 'Email already exists'}), 400
+        except psycopg2.Error as e:
+            conn.rollback()
+            print(f"Database error: {e}")
+            return jsonify({'error': 'Account creation failed'}), 500
+        finally:
+            close_db_connection(conn)
+        
+    except Exception as e:
+        print(f"OTP verification error: {e}")
+        return jsonify({'error': 'Verification failed'}), 500
+
+@app.route('/resend-otp', methods=['POST'])
+def resend_otp():
+    try:
+        data = request.get_json()
+        email = data.get('email', '').strip().lower()
+        
+        if not email:
+            return jsonify({'error': 'Email is required'}), 400
+        
+        # Check if there's pending signup for this email
+        if email not in otp_store:
+            return jsonify({'error': 'No pending verification for this email'}), 400
+        
+        # Check rate limiting (prevent spam)
+        otp_data = otp_store[email]
+        if datetime.now() - otp_data['timestamp'] < timedelta(minutes=1):
+            return jsonify({'error': 'Please wait before requesting a new code'}), 429
+        
+        # Generate new OTP
+        new_otp = generate_otp()
+        otp_store[email].update({
+            'otp': new_otp,
+            'timestamp': datetime.now(),
+            'attempts': 0
+        })
+        
+        # Send new OTP
+        if send_otp_email(email, new_otp):
+            return jsonify({'message': 'New verification code sent'}), 200
+        else:
+            return jsonify({'error': 'Failed to send verification email'}), 500
+            
+    except Exception as e:
+        print(f"Resend OTP error: {e}")
+        return jsonify({'error': 'Failed to resend code'}), 500
+
+# Optional: Cleanup expired OTPs periodically
+def cleanup_expired_otps():
+    """Remove expired OTPs from memory"""
+    current_time = datetime.now()
+    expired_emails = []
+    
+    for email, otp_data in otp_store.items():
+        if current_time - otp_data['timestamp'] > timedelta(minutes=10):
+            expired_emails.append(email)
+    
+    for email in expired_emails:
+        del otp_store[email]
+
 if __name__ == "__main__":
     if not all([CLIENT_ID, CLIENT_SECRET, RU_NAME, DB_URL]):
         print("Missing required environment variables (CLIENT_ID, CLIENT_SECRET, RU_NAME, or DB_URL)")
