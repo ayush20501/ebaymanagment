@@ -20,8 +20,7 @@
         }
 
         @keyframes gradientShift {
-            0%,
-            100% {
+            0%, 100% {
                 background-position: 0% 50%;
             }
             50% {
@@ -66,8 +65,7 @@
         }
 
         @keyframes pulse {
-            0%,
-            100% {
+            0%, 100% {
                 opacity: 1;
             }
             50% {
@@ -95,14 +93,17 @@
             font-style: italic;
         }
 
-        .prose ul,
-        .prose ol {
+        .prose ul, .prose ol {
             margin: 1em 0;
             padding-left: 1.5em;
         }
 
         .prose li {
             margin-bottom: 0.5em;
+        }
+
+        .image-input {
+            border-radius: 8px;
         }
     </style>
 </head>
@@ -165,7 +166,6 @@
 
                     <div>
                         <label class="block text-lg font-semibold text-gray-900 mb-3">Description</label>
-
                         <!-- Preview Display -->
                         <div class="mb-3">
                             <div class="bg-gray-50 p-4 rounded-lg border">
@@ -214,13 +214,6 @@
                         <label class="block text-lg font-semibold text-gray-900 mb-3">Images</label>
                         <div id="preview-images" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
                             <!-- Images will be dynamically populated -->
-                        </div>
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Image URLs
-                                (non-editable)</label>
-                            <div id="preview-image-urls"
-                                class="text-sm text-gray-600 max-h-32 overflow-y-auto bg-white p-3 rounded border font-mono">
-                            </div>
                         </div>
                     </div>
 
@@ -349,12 +342,29 @@
                             </div>
                         </div>
 
+                        <!-- New Image Input Section -->
                         <div>
                             <label class="block text-lg font-semibold text-gray-900 mb-3">Product Images *</label>
-                            <textarea id="images" required rows="4"
-                                placeholder="https://example.com/image1.jpg&#10;https://example.com/image2.jpg&#10;https://example.com/image3.jpg"
-                                class="input-field w-full px-4 py-4 rounded-xl text-base resize-none"></textarea>
-                            <p class="text-sm text-gray-500 mt-3">📸 Enter one HTTPS image URL per line. High-quality
+                            <div class="space-y-4">
+                                <div class="flex gap-2">
+                                    <button type="button" id="upload-image-btn"
+                                        class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium hover-lift">
+                                        📷 Upload Image
+                                    </button>
+                                    <input type="file" id="upload-image-input" accept="image/*" class="hidden">
+                                </div>
+                                <div id="images-container" class="space-y-2">
+                                    <div class="flex items-center gap-2">
+                                        <input type="text" name="image_url" placeholder="Paste an image URL or upload above"
+                                            class="image-input input-field flex-1 px-4 py-3 rounded-lg text-base">
+                                        <button type="button" id="add-image-btn"
+                                            class="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-bold text-lg">
+                                            +
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-3">📸 You can upload images or paste HTTPS URLs. High-quality
                                 images improve sales significantly!</p>
                         </div>
 
@@ -481,7 +491,7 @@
         </div>
     </div>
 
-<script>
+    <script>
     const aiStatusEl = document.getElementById('ai-status');
     const aiStatusTextEl = document.getElementById('ai-status-text');
     const aiProgressEl = document.getElementById('ai-progress');
@@ -551,12 +561,111 @@
         }
     });
 
+    // Add new image input field on + click
+    const addImageBtn = document.getElementById('add-image-btn');
+    const imagesContainer = document.getElementById('images-container');
+    
+    addImageBtn.addEventListener('click', () => {
+        const newRow = document.createElement('div');
+        newRow.className = 'flex items-center gap-2';
+        
+        const newInput = document.createElement('input');
+        newInput.type = 'text';
+        newInput.name = 'image_url';
+        newInput.placeholder = 'Paste an image URL or upload above';
+        newInput.className = 'image-input input-field flex-1 px-4 py-3 rounded-lg text-base';
+        
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-bold text-lg';
+        removeBtn.textContent = '−';
+        removeBtn.addEventListener('click', () => {
+            newRow.remove();
+        });
+        
+        newRow.appendChild(newInput);
+        newRow.appendChild(removeBtn);
+        imagesContainer.appendChild(newRow);
+    });
+
+    // Handle image upload
+    const uploadBtn = document.getElementById('upload-image-btn');
+    const uploadInput = document.getElementById('upload-image-input');
+    
+    uploadBtn.addEventListener('click', () => {
+        uploadInput.click();
+    });
+
+    uploadInput.addEventListener('change', async () => {
+        if (!uploadInput.files.length) return;
+        
+        const file = uploadInput.files[0];
+        if (!file.type.startsWith('image/')) {
+            alert('Please select an image file.');
+            return;
+        }
+        if (file.size > 10 * 1024 * 1024) {
+            alert('Image file size must be less than 10MB.');
+            return;
+        }
+
+        uploadBtn.disabled = true;
+        uploadBtn.textContent = 'Uploading...';
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+            const response = await fetch('/upload-profile-image', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+            if (response.ok && data.status === 'success') {
+                // Find first empty input or add new one
+                const inputs = imagesContainer.querySelectorAll('input[name="image_url"]');
+                let emptyInput = null;
+                for (let input of inputs) {
+                    if (!input.value.trim()) {
+                        emptyInput = input;
+                        break;
+                    }
+                }
+                
+                if (emptyInput) {
+                    emptyInput.value = data.image_url;
+                } else {
+                    // Add new row
+                    addImageBtn.click();
+                    const newInputs = imagesContainer.querySelectorAll('input[name="image_url"]');
+                    newInputs[newInputs.length - 1].value = data.image_url;
+                }
+                
+                alert('Image uploaded successfully!');
+            } else {
+                alert('Image upload failed: ' + (data.error || 'Unknown error'));
+            }
+        } catch (err) {
+            alert('Error uploading image: ' + err.message);
+        }
+        
+        uploadBtn.disabled = false;
+        uploadBtn.textContent = '📷 Upload Image';
+        uploadInput.value = '';
+    });
+
     document.getElementById('autofill-btn').addEventListener('click', () => {
         document.getElementById('raw_text').value = "Sainsbury's Mackerel Fillets in Olive Oil 125g - Premium quality mackerel fillets preserved in olive oil. Perfect for sandwiches, salads, or as a healthy snack. Rich in omega-3 fatty acids and protein. Best before date clearly marked on tin.";
         document.getElementById('price_value').value = "19.99";
         document.getElementById('quantity').value = "3";
         document.getElementById('condition').value = "NEW";
-        document.getElementById('images').value = "https://assets.sainsburys-groceries.co.uk/gol/1261448/1/640x640.jpg";
+        
+        // Fill first image input
+        const firstImageInput = imagesContainer.querySelector('input[name="image_url"]');
+        if (firstImageInput) {
+            firstImageInput.value = "https://assets.sainsburys-groceries.co.uk/gol/1261448/1/640x640.jpg";
+        }
 
         document.getElementById('error-message').classList.add('hidden');
         document.getElementById('success-message').classList.add('hidden');
@@ -579,10 +688,18 @@
         }
     });
 
-    // Profile button now redirects to profile.html
-    document.getElementById('profile-btn').addEventListener('click', () => {
-        window.location.href = 'display-profile.html';
-    });
+    // Collect images from all inputs
+    function collectImages() {
+        const inputs = imagesContainer.querySelectorAll('input[name="image_url"]');
+        const images = [];
+        inputs.forEach(input => {
+            const val = input.value.trim();
+            if (val && val.startsWith('https://')) {
+                images.push(val);
+            }
+        });
+        return images;
+    }
 
     async function submitToPublish(formData, button) {
         button.disabled = true;
@@ -768,28 +885,15 @@
             imagesContainer.appendChild(imgDiv);
         });
 
-        const urlsContainer = document.getElementById('preview-image-urls');
-        if (data.images && data.images.length > 0) {
-            urlsContainer.innerHTML = data.images.map((url, index) =>
-                `<div class="mb-1"><span class="text-gray-400">[${index + 1}]</span> ${url}</div>`
-            ).join('');
-        } else {
-            urlsContainer.innerHTML = '<div class="text-gray-400 italic">No images provided</div>';
-        }
-
         document.getElementById('preview-form').dataset.preview = JSON.stringify(data);
     }
 
     document.getElementById('listing-form').addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const imagesValue = document.getElementById('images').value.trim();
-        const validImages = imagesValue
-            .split('\n')
-            .map(url => url.trim())
-            .filter(url => url.startsWith('https://'));
+        const images = collectImages();
 
-        if (!imagesValue || validImages.length === 0) {
+        if (images.length === 0) {
             document.getElementById('error-message').textContent = 'At least one valid HTTPS image URL is required.';
             document.getElementById('error-message').classList.remove('hidden');
             document.getElementById('success-message').classList.add('hidden');
@@ -804,7 +908,7 @@
             },
             quantity: parseInt(document.getElementById('quantity').value),
             condition: document.getElementById('condition').value,
-            images: validImages,
+            images: images,
             use_html_description: document.getElementById('use_html_description').checked,
             use_simple_prompt_description: document.getElementById('use_simple_prompt_description').checked,
             include_debug: document.getElementById('include_debug').checked
@@ -815,13 +919,9 @@
     });
 
     document.getElementById('preview-btn').addEventListener('click', async () => {
-        const imagesValue = document.getElementById('images').value.trim();
-        const validImages = imagesValue
-            .split('\n')
-            .map(url => url.trim())
-            .filter(url => url.startsWith('https://'));
+        const images = collectImages();
 
-        if (!imagesValue || validImages.length === 0) {
+        if (images.length === 0) {
             document.getElementById('error-message').textContent = 'At least one valid HTTPS image URL is required.';
             document.getElementById('error-message').classList.remove('hidden');
             document.getElementById('success-message').classList.add('hidden');
@@ -836,7 +936,7 @@
             },
             quantity: parseInt(document.getElementById('quantity').value),
             condition: document.getElementById('condition').value,
-            images: validImages,
+            images: images,
             use_html_description: document.getElementById('use_html_description').checked,
             use_simple_prompt_description: document.getElementById('use_simple_prompt_description').checked,
             include_debug: document.getElementById('include_debug').checked
@@ -982,7 +1082,7 @@
         `;
         }
     }
-</script>
+    </script>
 
 </body>
 </html>
