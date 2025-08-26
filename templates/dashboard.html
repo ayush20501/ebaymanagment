@@ -527,7 +527,7 @@
                 window.location.href = 'login.html';
                 return;
             } else if (!data.has_profile) {
-                window.location.href = 'profile.html';
+                window.location.href = 'display-profile.html';
                 return;
             } else if (!data.has_ebay_auth) {
                 window.location.href = 'ebay-auth.html';
@@ -581,7 +581,7 @@
 
     // Profile button now redirects to profile.html
     document.getElementById('profile-btn').addEventListener('click', () => {
-        window.location.href = 'profile.html';
+        window.location.href = 'display-profile.html';
     });
 
     async function submitToPublish(formData, button) {
