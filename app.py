@@ -17,7 +17,10 @@ from collections import Counter
 from openai import OpenAI
 import hashlib
 from werkzeug.utils import secure_filename
-
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import random
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 load_dotenv()
@@ -404,6 +407,29 @@ def init_db():
         db_pool.putconn(conn)
 
 init_db()
+
+def init_otp_table():
+    conn = db_pool.getconn()
+    try:
+        with conn.cursor() as c:
+            c.execute("""
+                CREATE TABLE IF NOT EXISTS otps (
+                    id SERIAL PRIMARY KEY,
+                    user_id INTEGER NOT NULL,
+                    otp TEXT NOT NULL,
+                    expires_at TIMESTAMP NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (user_id) REFERENCES users(id)
+                )
+            """)
+            conn.commit()
+    except psycopg2.Error as e:
+        print(f"Database error creating OTP table: {e}")
+        raise
+    finally:
+        db_pool.putconn(conn)
+
+init_otp_table()
 
 def init_user_listings_table():
     conn = db_pool.getconn()
@@ -2159,8 +2185,143 @@ def upload_profile_image():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# --------------------------------------------------------------------
 
+def generate_and_store_otp(user_id, email, expires_in=600):
+    """Generate a 6-digit OTP and store it in the database."""
+    otp = str(random.randint(100000, 999999))
+    expires_at = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(_now() + expires_in))
+    
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as c:
+            c.execute("DELETE FROM otps WHERE user_id = %s", (user_id,))
+            c.execute("""
+                INSERT INTO otps (user_id, otp, expires_at)
+                VALUES (%s, %s, %s)
+            """, (user_id, otp, expires_at))
+            conn.commit()
+        return otp
+    except psycopg2.Error as e:
+        print(f"Error storing OTP: {e}")
+        conn.rollback()
+        return None
+    finally:
+        close_db_connection(conn)
 
+def send_otp_email(to_email, otp):
+    smtp_host = os.getenv("EMAIL_HOST")
+    smtp_port = os.getenv("EMAIL_PORT", 587)
+    smtp_user = os.getenv("EMAIL_USER")
+    smtp_pass = os.getenv("EMAIL_PASS")
+
+    if not all([smtp_host, smtp_port, smtp_user, smtp_pass]):
+        print("Missing email configuration in environment variables")
+        return False
+
+    subject = "ListFast.ai Password Reset OTP"
+    body = f"""
+    Dear User,
+
+    Your One-Time Password (OTP) for resetting your ListFast.ai account password is:
+
+    {otp}
+
+    This code is valid for 10 minutes. Please enter it on the password reset page to proceed.
+
+    If you did not request a password reset, please ignore this email or contact support at rahul@listfast.ai.
+
+    Best regards,
+    ListFast.ai Team
+    """
+
+    msg = MIMEMultipart()
+    msg['From'] = smtp_user
+    msg['To'] = to_email
+    msg['Subject'] = subject
+    msg.attach(MIMEText(body, 'plain'))
+
+    try:
+        server = smtplib.SMTP(smtp_host, smtp_port)
+        server.starttls()
+        server.login(smtp_user, smtp_pass)
+        server.sendmail(smtp_user, to_email, msg.as_string())
+        server.quit()
+        return True
+    except Exception as e:
+        print(f"Error sending OTP email: {e}")
+        return False
+
+@app.route("/send-password-change-otp", methods=["POST"])
+def send_password_change_otp():
+    if "user_id" not in session:
+        return jsonify({"error": "Please log in first"}), 401
+    if not is_user_active(session["user_id"]):
+        return jsonify({"error": "Account is inactive"}), 403
+
+    email = session.get("email")
+    if not email:
+        return jsonify({"error": "No email associated with this account"}), 400
+
+    otp = generate_and_store_otp(session["user_id"], email)
+    if not otp:
+        return jsonify({"error": "Failed to generate OTP"}), 500
+
+    if not send_otp_email(email, otp):
+        return jsonify({"error": "Failed to send verification code. Please try again."}), 500
+
+    return jsonify({"status": "success", "message": "Verification code sent to your email"})
+
+@app.route("/change-password", methods=["POST"])
+def change_password():
+    if "user_id" not in session:
+        return jsonify({"error": "Please log in first"}), 401
+    if not is_user_active(session["user_id"]):
+        return jsonify({"error": "Account is inactive"}), 403
+
+    data = request.get_json() or {}
+    otp = data.get("otp", "").strip()
+    new_password = data.get("new_password", "").strip()
+
+    if not otp or len(otp) != 6 or not otp.isdigit():
+        return jsonify({"error": "Please enter a valid 6-digit verification code"}), 400
+
+    if len(new_password) < 6:
+        return jsonify({"error": "Password must be at least 6 characters long"}), 400
+
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as c:
+            c.execute("""
+                SELECT otp, expires_at FROM otps 
+                WHERE user_id = %s AND otp = %s
+            """, (session["user_id"], otp))
+            otp_record = c.fetchone()
+
+            if not otp_record:
+                return jsonify({"error": "Invalid or expired verification code"}), 400
+
+            otp_stored, expires_at = otp_record
+            if _now() > time.mktime(expires_at.timetuple()):
+                return jsonify({"error": "Verification code has expired"}), 400
+
+            password_hash = generate_password_hash(new_password)
+            c.execute("""
+                UPDATE users 
+                SET password_hash = %s 
+                WHERE id = %s
+            """, (password_hash, session["user_id"]))
+
+            c.execute("DELETE FROM otps WHERE user_id = %s", (session["user_id"],))
+            conn.commit()
+
+            return jsonify({"status": "success", "message": "Password updated successfully"})
+    except psycopg2.Error as e:
+        conn.rollback()
+        return jsonify({"error": "Failed to update password due to database error"}), 500
+    finally:
+        close_db_connection(conn)
+        
 if __name__ == "__main__":
     if not all([CLIENT_ID, CLIENT_SECRET, RU_NAME, DB_URL]):
         print("Missing required environment variables (CLIENT_ID, CLIENT_SECRET, RU_NAME, or DB_URL)")
