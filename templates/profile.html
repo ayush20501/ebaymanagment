@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - ListFast.ai</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f9fafb; }
+        .hover-lift { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .hover-lift:hover { transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
+        .input-field { transition: all 0.3s ease; border: 2px solid #e5e7eb; }
+        .input-field:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59,130,246,0.1);}
+        .bg-gradient-to-br { background-image: linear-gradient(135deg, #f093fb 0%, #764ba2 100%); }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <nav class="bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
+            <div class="flex justify-between h-20">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-gray-900">ListFast.ai</h1>
+                    <div class="ml-8 text-sm text-gray-500">Profile</div>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <a href="dashboard.html" class="text-blue-600 hover:text-blue-800 font-medium hover-lift">
+                        ← Back to Dashboard
+                    </a>
+                    <span id="user-email" class="text-gray-600 text-sm"></span>
+                    <button id="logout-btn"
+                        class="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors font-medium hover-lift">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Profile Content -->
+    <div class="max-w-4xl mx-auto p-6 mt-8">
+        <div class="bg-white rounded-2xl shadow-lg p-8">
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold text-gray-900">My Profile</h3>
+                <p class="text-gray-600 mt-1">Manage your account and listings</p>
+            </div>
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-gradient-to-br from-blue-500 to-blue-600 p-6 rounded-2xl text-white hover-lift">
+                    <div class="text-3xl font-bold" id="total-listings-stat">-</div>
+                    <div class="text-blue-100 text-sm font-medium">Total Listings</div>
+                </div>
+                <div class="bg-gradient-to-br from-green-500 to-green-600 p-6 rounded-2xl text-white hover-lift">
+                    <div class="text-3xl font-bold" id="active-listings-stat">-</div>
+                    <div class="text-green-100 text-sm font-medium">Active Listings</div>
+                </div>
+                <div class="bg-gradient-to-br from-purple-500 to-purple-600 p-6 rounded-2xl text-white hover-lift">
+                    <div class="text-3xl font-bold" id="inventory-value-stat">£-</div>
+                    <div class="text-purple-100 text-sm font-medium">Inventory Value</div>
+                </div>
+            </div>
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Left Column -->
+                <div class="space-y-6">
+                    <!-- Account Info -->
+                    <div class="bg-gray-50 p-6 rounded-2xl">
+                        <h4 class="font-semibold text-gray-900 mb-4">Account Information</h4>
+                        <p class="text-gray-600">Email: <span id="profile-email"
+                                class="font-medium text-gray-900"></span></p>
+                    </div>
+                    <!-- Profile Picture Section -->
+                    <div class="bg-gray-50 p-6 rounded-2xl">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="font-semibold text-gray-900">Store Logo</h4>
+                            <button id="edit-profile-pic-btn"
+                                    class="text-blue-600 hover:text-blue-800 font-medium hover-lift">
+                                    Change Picture
+                            </button>
+                        </div>
+                        <div id="profile-pic-display" class="flex items-center space-x-4">
+                            <img id="profile-pic-modal" src="https://via.placeholder.com/80" alt="Profile Picture"
+                                class="w-20 h-20 rounded-full border-2 border-gray-200 object-cover">
+                            <div>
+                                <p class="text-sm text-gray-600">Current store logo</p>
+                            </div>
+                        </div>
+                        <div id="profile-pic-edit-form" class="hidden">
+                            <form id="profile-pic-form" class="space-y-4" enctype="multipart/form-data">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Upload Store Logo</label>
+                                    <div class="flex items-center justify-center w-full">
+                                        <label for="profile-pic-file"
+                                            class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 hover:border-gray-400 transition-colors">
+                                            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                                <svg class="w-8 h-8 mb-4 text-gray-500" aria-hidden="true"
+                                                    xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                    viewBox="0 0 20 16">
+                                                    <path stroke="currentColor" stroke-linecap="round"
+                                                        stroke-linejoin="round" stroke-width="2"
+                                                        d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
+                                                </svg>
+                                                <p class="mb-2 text-sm text-gray-500">
+                                                    <span class="font-semibold">Click to upload</span> or drag and drop
+                                                </p>
+                                                <p class="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                                            </div>
+                                            <input id="profile-pic-file" type="file" class="hidden" accept="image/*" />
+                                        </label>
+                                    </div>
+                                    <!-- Preview uploaded image -->
+                                    <div id="image-preview" class="hidden mt-4">
+                                        <p class="text-sm font-medium text-gray-700 mb-2">Preview:</p>
+                                        <img id="preview-img" src="" alt="Preview"
+                                            class="w-20 h-20 rounded-full border-2 border-gray-200 object-cover">
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">Upload a store logo (JPEG, PNG, GIF format supported)</p>
+                                </div>
+                                <div class="flex space-x-3 pt-2">
+                                    <button type="submit"
+                                    class="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-400 hover-lift">
+                                        Save Picture
+                                    </button>
+                                    <button type="button" id="cancel-profile-pic-edit"
+                                        class="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 hover-lift">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                            <div id="profile-pic-update-message" class="hidden mt-4 text-sm"></div>
+                        </div>
+                    </div>
+                    <!-- Address Info -->
+                    <div class="bg-gray-50 p-6 rounded-2xl">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="font-semibold text-gray-900">Warehouse Address</h4>
+                            <button id="edit-address-btn"
+                                class="text-blue-600 hover:text-blue-800 font-medium hover-lift">
+                                Edit Address
+                            </button>
+                        </div>
+                        <div id="address-display">
+                            <div class="text-gray-600 space-y-1">
+                                <p id="display-address-line1" class="font-medium text-gray-900">-</p>
+                                <p><span id="display-city">-</span>, <span id="display-postal-code">-</span></p>
+                                <p id="display-country">-</p>
+                            </div>
+                        </div>
+                        <div id="address-edit-form" class="hidden">
+                            <form id="address-form" class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Address Line 1 *</label>
+                                    <input type="text" id="edit-address-line1" required
+                                        class="input-field w-full px-4 py-3 rounded-lg">
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">City *</label>
+                                        <input type="text" id="edit-city" required
+                                            class="input-field w-full px-4 py-3 rounded-lg">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Postal Code *</label>
+                                        <input type="text" id="edit-postal-code" required
+                                            class="input-field w-full px-4 py-3 rounded-lg">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Country</label>
+                                    <select id="edit-country" disabled
+                                        class="input-field w-full px-4 py-3 rounded-lg bg-gray-100">
+                                        <option value="GB">United Kingdom</option>
+                                    </select>
+                                </div>
+                                <div class="flex space-x-3 pt-2">
+                                    <button type="submit"
+                                        class="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-400 hover-lift">
+                                        Save Changes
+                                    </button>
+                                    <button type="button" id="cancel-address-edit"
+                                        class="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 hover-lift">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                            <div id="address-update-message" class="hidden mt-4 text-sm"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column - Listings -->
+                <div>
+                    <div class="bg-gray-50 p-6 rounded-2xl">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="font-semibold text-gray-900">Recent Listings</h4>
+                            <button id="view-all-listings"
+                                class="text-blue-600 hover:text-blue-800 font-medium hover-lift">
+                                View All →
+                            </button>
+                        </div>
+                        <div id="recent-listings" class="space-y-3 max-h-80 overflow-y-auto">
+                            <div class="text-center text-gray-500 py-8">
+                                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3"></div>
+                                Loading listings...
+                            </div>
+                        </div>
+                    </div>
+                    <div id="all-listings-view" class="hidden bg-gray-50 p-6 rounded-2xl mt-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="font-semibold text-gray-900">All Listings</h4>
+                            <button id="back-to-recent"
+                                class="text-blue-600 hover:text-blue-800 font-medium hover-lift">
+                                ← Back to Recent
+                            </button>
+                        </div>
+                        <div id="all-listings" class="space-y-3 max-h-80 overflow-y-auto"></div>
+                        <div class="mt-4 flex justify-center">
+                            <button id="load-more-listings"
+                                class="hidden bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-medium hover-lift">
+                                Load More
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let currentUserProfile = null;
+        let currentListingsPage = 1;
+        let hasMoreListings = false;
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch('/auth-status');
+                const data = await response.json();
+                if (!data.is_logged_in) {
+                    window.location.href = 'login.html'; return;
+                } else if (!data.has_profile) {
+                    window.location.href = 'profile.html'; return;
+                } else if (!data.has_ebay_auth) {
+                    window.location.href = 'ebay-auth.html'; return;
+                }
+                document.getElementById('user-email').textContent = data.email;
+                await loadProfileData();
+            } catch (error) {
+                window.location.href = 'login.html';
+            }
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            try {
+                await fetch('/logout', { method: 'POST' });
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('Logout failed:', error);
+            }
+        });
+
+        async function loadProfileData() {
+            try {
+                const statsResponse = await fetch('/user-stats');
+                const statsData = await statsResponse.json();
+                if (statsResponse.ok) {
+                    document.getElementById('total-listings-stat').textContent = statsData.total_listings;
+                    document.getElementById('active-listings-stat').textContent = statsData.active_listings;
+                    document.getElementById('inventory-value-stat').textContent = `£${statsData.total_inventory_value.toFixed(2)}`;
+                    document.getElementById('profile-email').textContent = statsData.email;
+                }
+                await loadUserProfile();
+                await loadRecentListings();
+            } catch (error) {
+                console.error('Error loading profile data:', error);
+            }
+        }
+
+        async function loadUserProfile() {
+            try {
+                const response = await fetch('/profile');
+                const data = await response.json();
+                if (response.ok && data.profile) {
+                    currentUserProfile = data.profile;
+                    displayAddress(data.profile);
+                } else {
+                    displayAddress(null);
+                }
+            } catch (error) {
+                console.error('Error loading user profile:', error);
+                displayAddress(null);
+            }
+        }
+
+        function displayAddress(profile) {
+            if (profile) {
+                document.getElementById('display-address-line1').textContent = profile.address_line1;
+                document.getElementById('display-city').textContent = profile.city;
+                document.getElementById('display-postal-code').textContent = profile.postal_code;
+                document.getElementById('display-country').textContent = profile.country === 'GB' ? 'United Kingdom' : profile.country;
+                const profilePicUrl = profile.profile_pic_url || 'https://via.placeholder.com/80';
+                document.getElementById('profile-pic-modal').src = profilePicUrl;
+            } else {
+                document.getElementById('display-address-line1').textContent = 'No address set';
+                document.getElementById('display-city').textContent = '-';
+                document.getElementById('display-postal-code').textContent = '-';
+                document.getElementById('display-country').textContent = '-';
+                document.getElementById('profile-pic-modal').src = 'https://via.placeholder.com/80';
+            }
+        }
+        document.getElementById('edit-address-btn').addEventListener('click', () => { showAddressEditForm(); });
+        document.getElementById('cancel-address-edit').addEventListener('click', () => { resetAddressForm(); });
+        function showAddressEditForm() {
+            if (currentUserProfile) {
+                document.getElementById('edit-address-line1').value = currentUserProfile.address_line1 || '';
+                document.getElementById('edit-city').value = currentUserProfile.city || '';
+                document.getElementById('edit-postal-code').value = currentUserProfile.postal_code || '';
+                document.getElementById('edit-country').value = currentUserProfile.country || 'GB';
+            }
+            document.getElementById('address-display').classList.add('hidden');
+            document.getElementById('address-edit-form').classList.remove('hidden');
+            document.getElementById('edit-address-btn').classList.add('hidden');
+        }
+        function resetAddressForm() {
+            document.getElementById('address-edit-form').classList.add('hidden');
+            document.getElementById('address-display').classList.remove('hidden');
+            document.getElementById('edit-address-btn').classList.remove('hidden');
+            const messageEl = document.getElementById('address-update-message');
+            messageEl.classList.add('hidden');
+            messageEl.textContent = '';
+        }
+        document.getElementById('address-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = {
+                address_line1: document.getElementById('edit-address-line1').value.trim(),
+                city: document.getElementById('edit-city').value.trim(),
+                postal_code: document.getElementById('edit-postal-code').value.trim().toUpperCase(),
+                country: document.getElementById('edit-country').value
+            };
+            if (!formData.address_line1 || !formData.city || !formData.postal_code) {
+                showAddressMessage('Please fill in all required fields.', 'error'); return;
+            }
+            try {
+                const response = await fetch('/profile', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json',},
+                    body: JSON.stringify(formData),
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    showAddressMessage('Address updated successfully!', 'success');
+                    currentUserProfile = { ...currentUserProfile, ...formData };
+                    displayAddress(currentUserProfile);
+                    setTimeout(() => { resetAddressForm(); }, 1500);
+                } else {
+                    showAddressMessage(data.error || 'Failed to update address.', 'error');
+                }
+            } catch (error) {
+                showAddressMessage('Network error. Please try again.', 'error');
+            }
+        });
+        function showAddressMessage(message, type) {
+            const messageEl = document.getElementById('address-update-message');
+            messageEl.textContent = message;
+            messageEl.className = `mt-4 text-sm ${type === 'success' ? 'text-green-600' : 'text-red-600'}`;
+            messageEl.classList.remove('hidden');
+        }
+        // Profile picture editing functions
+        document.getElementById('edit-profile-pic-btn').addEventListener('click', () => {
+            showProfilePicEditForm();
+        });
+        document.getElementById('cancel-profile-pic-edit').addEventListener('click', () => {
+            resetProfilePicForm();
+        });
+        document.getElementById('profile-pic-file').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                if (!file.type.startsWith('image/')) {
+                    showProfilePicMessage('Please select a valid image file.', 'error'); return;
+                }
+                if (file.size > 10 * 1024 * 1024) {
+                    showProfilePicMessage('File size must be less than 10MB.', 'error'); return;
+                }
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('preview-img').src = e.target.result;
+                    document.getElementById('image-preview').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        function showProfilePicEditForm() {
+            document.getElementById('profile-pic-display').classList.add('hidden');
+            document.getElementById('profile-pic-edit-form').classList.remove('hidden');
+            document.getElementById('edit-profile-pic-btn').classList.add('hidden');
+            document.getElementById('profile-pic-file').value = '';
+            document.getElementById('image-preview').classList.add('hidden');
+        }
+        function resetProfilePicForm() {
+            document.getElementById('profile-pic-edit-form').classList.add('hidden');
+            document.getElementById('profile-pic-display').classList.remove('hidden');
+            document.getElementById('edit-profile-pic-btn').classList.remove('hidden');
+            document.getElementById('profile-pic-file').value = '';
+            document.getElementById('image-preview').classList.add('hidden');
+            const messageEl = document.getElementById('profile-pic-update-message');
+            messageEl.classList.add('hidden');
+            messageEl.textContent = '';
+        }
+        document.getElementById('profile-pic-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const fileInput = document.getElementById('profile-pic-file');
+            const file = fileInput.files[0];
+            if (!file) {
+                showProfilePicMessage('Please select an image file.', 'error'); return;
+            }
+            if (!file.type.startsWith('image/')) {
+                showProfilePicMessage('Please select a valid image file.', 'error'); return;
+            }
+            if (file.size > 10 * 1024 * 1024) {
+                showProfilePicMessage('File size must be less than 10MB.', 'error'); return;
+            }
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Uploading...';
+            try {
+                const formData = new FormData();
+                formData.append('image', file);
+                const response = await fetch('/upload-profile-image', { method: 'POST', body: formData });
+                const data = await response.json();
+                if (response.ok && data.status === 'success') {
+                    const profileResponse = await fetch('/profile', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json',},
+                        body: JSON.stringify({
+                            ...currentUserProfile,
+                            profile_pic_url: data.image_url
+                        }),
+                    });
+                    const profileData = await profileResponse.json();
+                    if (profileResponse.ok) {
+                        showProfilePicMessage('Profile picture updated successfully!', 'success');
+                        currentUserProfile = { ...currentUserProfile, profile_pic_url: data.image_url };
+                        displayAddress(currentUserProfile);
+                        setTimeout(() => { resetProfilePicForm(); }, 1500);
+                    } else {
+                        showProfilePicMessage(profileData.error || 'Failed to update profile picture.', 'error');
+                    }
+                } else {
+                    showProfilePicMessage(data.error || 'Failed to upload image.', 'error');
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                showProfilePicMessage('Network error. Please try again.', 'error');
+            }
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+        });
+        function showProfilePicMessage(message, type) {
+            const messageEl = document.getElementById('profile-pic-update-message');
+            messageEl.textContent = message;
+            messageEl.className = `mt-4 text-sm ${type === 'success' ? 'text-green-600' : 'text-red-600'}`;
+            messageEl.classList.remove('hidden');
+        }
+
+        // Listings functions
+        async function loadRecentListings() {
+            try {
+                const response = await fetch('/my-listings?page=1');
+                const data = await response.json();
+                const container = document.getElementById('recent-listings');
+                if (response.ok && data.listings.length > 0) {
+                    container.innerHTML = data.listings.slice(0, 5).map(listing => `
+                    <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl hover-lift">
+                        <div class="flex-1">
+                            <h5 class="font-medium text-gray-900 text-sm">${listing.title}</h5>
+                            <p class="text-xs text-gray-500 mt-1">
+                                ${listing.category_name || 'Unknown Category'} • 
+                                £${listing.price_value} • 
+                                Qty: ${listing.quantity}
+                            </p>
+                        </div>
+                        ${listing.view_url ? `
+                            <a href="${listing.view_url}" target="_blank" class="text-blue-600 hover:text-blue-800 text-xs font-medium hover-lift">
+                                View →
+                            </a>
+                        ` : ''}
+                    </div>
+                `).join('');
+                } else {
+                    container.innerHTML = '<div class="text-center text-gray-500 py-8">No listings found</div>';
+                }
+            } catch (error) {
+                document.getElementById('recent-listings').innerHTML =
+                    '<div class="text-center text-red-500 py-8">Error loading listings</div>';
+            }
+        }
+
+        document.getElementById('view-all-listings').addEventListener('click', async () => {
+            document.getElementById('recent-listings').closest('div').classList.add('hidden');
+            document.getElementById('all-listings-view').classList.remove('hidden');
+            await loadAllListings();
+        });
+
+        document.getElementById('back-to-recent').addEventListener('click', () => {
+            document.getElementById('all-listings-view').classList.add('hidden');
+            document.getElementById('recent-listings').closest('div').classList.remove('hidden');
+        });
+
+        async function loadAllListings(page = 1) {
+            try {
+                const response = await fetch(`/my-listings?page=${page}`);
+                const data = await response.json();
+                const container = document.getElementById('all-listings');
+                if (response.ok) {
+                    if (page === 1) {
+                        container.innerHTML = '';
+                    }
+                    if (data.listings.length > 0) {
+                        container.innerHTML += data.listings.map(listing => `
+                        <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl hover-lift">
+                            <div class="flex-1">
+                                <h5 class="font-medium text-gray-900 text-sm">${listing.title}</h5>
+                                <p class="text-xs text-gray-500 mt-1">
+                                    ${listing.category_name || 'Unknown Category'} • 
+                                    £${listing.price_value} • 
+                                    Qty: ${listing.quantity} •
+                                    ${new Date(listing.created_at).toLocaleDateString()}
+                                </p>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <span class="px-3 py-1 text-xs rounded-full font-medium ${listing.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                                    ${listing.status}
+                                </span>
+                                ${listing.view_url ? `
+                                    <a href="${listing.view_url}" target="_blank" class="text-blue-600 hover:text-blue-800 text-xs font-medium hover-lift">
+                                        View →
+                                    </a>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `).join('');
+                    } else if (page === 1) {
+                        container.innerHTML = '<div class="text-center text-gray-500 py-8">No listings found</div>';
+                    }
+                    hasMoreListings = data.has_more;
+                    currentListingsPage = page;
+                    const loadMoreBtn = document.getElementById('load-more-listings');
+                    if (hasMoreListings) {
+                        loadMoreBtn.classList.remove('hidden');
+                    } else {
+                        loadMoreBtn.classList.add('hidden');
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading listings:', error);
+            }
+        }
+        document.getElementById('load-more-listings').addEventListener('click', () => {
+            loadAllListings(currentListingsPage + 1);
+        });
+    </script>
+</body>
+</html>
