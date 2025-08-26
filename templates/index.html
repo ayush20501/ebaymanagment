@@ -100,43 +100,37 @@
             margin-bottom: 1rem;
             display: none;
         }
-        .info-message {
-            background: #eff6ff;
-            border: 1px solid #bfdbfe;
-            color: #1d4ed8;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1rem;
-            display: none;
-        }
-        .step-indicator {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 2rem;
-        }
-        .step {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #e5e7eb;
-            margin: 0 8px;
-            transition: background 0.3s ease;
-        }
-        .step.active {
-            background: #3b82f6;
-        }
-        .step.completed {
-            background: #10b981;
-        }
         .otp-input {
+            width: 3rem;
+            height: 3rem;
             text-align: center;
-            font-size: 1.5rem;
-            letter-spacing: 0.5rem;
+            font-size: 1.25rem;
             font-weight: 600;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            transition: border-color 0.3s ease;
         }
-        .resend-timer {
+        .otp-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .timer {
             color: #6b7280;
             font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+        .resend-button {
+            color: #3b82f6;
+            background: none;
+            border: none;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        .resend-button:disabled {
+            color: #9ca3af;
+            cursor: not-allowed;
         }
     </style>
 </head>
@@ -275,85 +269,38 @@
     <!-- Signup Modal -->
     <div id="signupModal" class="modal">
         <div class="modal-content">
-            <!-- Step Indicator -->
-            <div class="step-indicator">
-                <div class="step active" id="step1"></div>
-                <div class="step" id="step2"></div>
-            </div>
-
-            <!-- Step 1: Account Details -->
-            <div id="signupStep1">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold text-gray-900">Create Account</h2>
-                    <button onclick="closeModal('signupModal')" class="text-gray-400 hover:text-gray-600 text-2xl">×</button>
-                </div>
-                
-                <div id="signupError" class="error-message"></div>
-                
-                <form onsubmit="handleSignupStep1(event)">
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                            <input type="email" id="signupEmail" required class="input-field" placeholder="Enter your email">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                            <input type="password" id="signupPassword" required class="input-field" placeholder="Create a password" minlength="6">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
-                            <input type="password" id="confirmPassword" required class="input-field" placeholder="Confirm your password">
-                        </div>
-                        <button type="submit" id="signupStep1Btn" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
-                            Send Verification Code
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Step 2: OTP Verification -->
-            <div id="signupStep2" style="display: none;">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold text-gray-900">Verify Email</h2>
-                    <button onclick="closeModal('signupModal')" class="text-gray-400 hover:text-gray-600 text-2xl">×</button>
-                </div>
-                
-                <div id="otpInfo" class="info-message">
-                    📧 We've sent a 6-digit verification code to your email. Please enter it below.
-                </div>
-                
-                <div id="otpSuccess" class="success-message">
-                    🎉 Account created successfully! Welcome to ListFast.ai
-                </div>
-                
-                <div id="otpError" class="error-message"></div>
-                
-                <form onsubmit="handleOtpVerification(event)">
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2 text-center">Enter Verification Code</label>
-                            <input type="text" id="otpInput" required class="input-field otp-input" placeholder="000000" maxlength="6" pattern="[0-9]{6}">
-                        </div>
-                        <button type="submit" id="verifyOtpBtn" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
-                            Verify & Create Account
-                        </button>
-                    </div>
-                </form>
-                
-                <div class="text-center mt-4">
-                    <p class="text-gray-600">Didn't receive the code? 
-                        <button onclick="resendOtp()" id="resendBtn" class="text-blue-600 hover:text-blue-700 font-medium">
-                            Resend Code
-                        </button>
-                        <span id="resendTimer" class="resend-timer"></span>
-                    </p>
-                    <button onclick="backToStep1()" class="text-gray-600 hover:text-gray-700 font-medium mt-2 text-sm">
-                        ← Back to account details
-                    </button>
-                </div>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">Get Started</h2>
+                <button onclick="closeModal('signupModal')" class="text-gray-400 hover:text-gray-600 text-2xl">×</button>
             </div>
             
-            <div class="text-center mt-4" id="loginSwitchText">
+            <div id="signupSuccess" class="success-message">
+                📧 Please check your email for the verification code
+            </div>
+            
+            <div id="signupError" class="error-message"></div>
+            
+            <form onsubmit="handleSignup(event)">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input type="email" required class="input-field" placeholder="Enter your email">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                        <input type="password" required class="input-field" placeholder="Create a password">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+                        <input type="password" required class="input-field" placeholder="Confirm your password">
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                        Create Account
+                    </button>
+                </div>
+            </form>
+            
+            <div class="text-center mt-4">
                 <p class="text-gray-600">Already have an account? 
                     <button onclick="switchToLogin()" class="text-blue-600 hover:text-blue-700 font-medium">Sign in</button>
                 </p>
@@ -361,10 +308,58 @@
         </div>
     </div>
 
+    <!-- OTP Verification Modal -->
+    <div id="otpModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">Verify Your Email</h2>
+                <button onclick="closeModal('otpModal')" class="text-gray-400 hover:text-gray-600 text-2xl">×</button>
+            </div>
+            
+            <div class="text-center mb-6">
+                <p class="text-gray-600 mb-2">We've sent a 6-digit code to</p>
+                <p class="font-medium text-gray-900" id="otpEmail"></p>
+            </div>
+            
+            <div id="otpSuccess" class="success-message">
+                🎉 Email verified successfully! Your account has been created.
+            </div>
+            
+            <div id="otpError" class="error-message"></div>
+            
+            <form onsubmit="handleOtpVerification(event)">
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3 text-center">Enter verification code</label>
+                        <div class="flex justify-center space-x-2" id="otpInputs">
+                            <input type="text" maxlength="1" class="otp-input" oninput="handleOtpInput(this, 0)">
+                            <input type="text" maxlength="1" class="otp-input" oninput="handleOtpInput(this, 1)">
+                            <input type="text" maxlength="1" class="otp-input" oninput="handleOtpInput(this, 2)">
+                            <input type="text" maxlength="1" class="otp-input" oninput="handleOtpInput(this, 3)">
+                            <input type="text" maxlength="1" class="otp-input" oninput="handleOtpInput(this, 4)">
+                            <input type="text" maxlength="1" class="otp-input" oninput="handleOtpInput(this, 5)">
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="timer" id="otpTimer">Code expires in: 10:00</div>
+                        <button type="button" class="resend-button" id="resendButton" onclick="resendOtp()" disabled>
+                            Resend Code
+                        </button>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                        Verify Code
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
-        let signupData = {};
-        let resendTimeout = 0;
-        let resendInterval;
+        let otpTimer;
+        let otpTimeLeft = 600; // 10 minutes
+        let pendingSignupData = null;
 
         function showLoginModal() {
             document.getElementById('loginModal').classList.add('show');
@@ -374,99 +369,37 @@
         function showSignupModal() {
             document.getElementById('signupModal').classList.add('show');
             document.body.style.overflow = 'hidden';
-            resetSignupModal();
+        }
+
+        function showOtpModal(email) {
+            document.getElementById('otpEmail').textContent = email;
+            document.getElementById('otpModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+            startOtpTimer();
+            
+            // Focus on first OTP input
+            document.querySelectorAll('.otp-input')[0].focus();
         }
 
         function closeModal(modalId) {
             document.getElementById(modalId).classList.remove('show');
             document.body.style.overflow = 'auto';
-            hideAllMessages();
-            if (modalId === 'signupModal') {
-                resetSignupModal();
-            }
-        }
-
-        function hideAllMessages() {
+            
+            // Hide all messages when closing
             document.getElementById('loginSuccess').style.display = 'none';
             document.getElementById('loginError').style.display = 'none';
+            document.getElementById('signupSuccess').style.display = 'none';
             document.getElementById('signupError').style.display = 'none';
             document.getElementById('otpSuccess').style.display = 'none';
             document.getElementById('otpError').style.display = 'none';
-            document.getElementById('otpInfo').style.display = 'none';
-        }
-
-        function resetSignupModal() {
-            // Reset to step 1
-            document.getElementById('signupStep1').style.display = 'block';
-            document.getElementById('signupStep2').style.display = 'none';
-            document.getElementById('loginSwitchText').style.display = 'block';
             
-            // Reset step indicators
-            document.getElementById('step1').classList.add('active');
-            document.getElementById('step1').classList.remove('completed');
-            document.getElementById('step2').classList.remove('active');
-            
-            // Reset forms
-            document.querySelector('#signupStep1 form').reset();
-            document.querySelector('#signupStep2 form').reset();
-            
-            // Clear signup data
-            signupData = {};
-            
-            // Clear timers
-            if (resendInterval) {
-                clearInterval(resendInterval);
-            }
-        }
-
-        function goToStep2() {
-            document.getElementById('signupStep1').style.display = 'none';
-            document.getElementById('signupStep2').style.display = 'block';
-            document.getElementById('loginSwitchText').style.display = 'none';
-            
-            // Update step indicators
-            document.getElementById('step1').classList.remove('active');
-            document.getElementById('step1').classList.add('completed');
-            document.getElementById('step2').classList.add('active');
-            
-            // Show info message and focus OTP input
-            document.getElementById('otpInfo').style.display = 'block';
-            document.getElementById('otpInput').focus();
-            
-            startResendTimer();
-        }
-
-        function backToStep1() {
-            document.getElementById('signupStep1').style.display = 'block';
-            document.getElementById('signupStep2').style.display = 'none';
-            document.getElementById('loginSwitchText').style.display = 'block';
-            
-            // Reset step indicators
-            document.getElementById('step1').classList.add('active');
-            document.getElementById('step1').classList.remove('completed');
-            document.getElementById('step2').classList.remove('active');
-            
-            hideAllMessages();
-        }
-
-        function startResendTimer() {
-            resendTimeout = 60;
-            const resendBtn = document.getElementById('resendBtn');
-            const resendTimer = document.getElementById('resendTimer');
-            
-            resendBtn.style.display = 'none';
-            resendTimer.style.display = 'inline';
-            
-            resendInterval = setInterval(() => {
-                resendTimeout--;
-                resendTimer.textContent = `(${resendTimeout}s)`;
-                
-                if (resendTimeout <= 0) {
-                    clearInterval(resendInterval);
-                    resendBtn.style.display = 'inline';
-                    resendTimer.style.display = 'none';
+            // Clear OTP inputs
+            if (modalId === 'otpModal') {
+                document.querySelectorAll('.otp-input').forEach(input => input.value = '');
+                if (otpTimer) {
+                    clearInterval(otpTimer);
                 }
-            }, 1000);
+            }
         }
 
         function switchToSignup() {
@@ -479,140 +412,71 @@
             setTimeout(() => showLoginModal(), 200);
         }
 
-        async function handleSignupStep1(event) {
-            event.preventDefault();
+        function handleOtpInput(input, index) {
+            // Only allow digits
+            input.value = input.value.replace(/[^0-9]/g, '');
             
-            const email = document.getElementById('signupEmail').value;
-            const password = document.getElementById('signupPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const submitBtn = document.getElementById('signupStep1Btn');
-            
-            hideAllMessages();
-            
-            if (password !== confirmPassword) {
-                document.getElementById('signupError').textContent = 'Passwords do not match!';
-                document.getElementById('signupError').style.display = 'block';
-                return;
+            // Move to next input if current is filled
+            if (input.value && index < 5) {
+                document.querySelectorAll('.otp-input')[index + 1].focus();
             }
             
-            if (password.length < 6) {
-                document.getElementById('signupError').textContent = 'Password must be at least 6 characters long!';
-                document.getElementById('signupError').style.display = 'block';
-                return;
-            }
-            
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Sending Code...';
-            
-            // Store signup data
-            signupData = { email, password };
-            
-            try {
-                const response = await fetch('/signup', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ email, password }),
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
-                    // Move to OTP verification step
-                    goToStep2();
-                } else {
-                    document.getElementById('signupError').textContent = data.error || 'Registration failed';
-                    document.getElementById('signupError').style.display = 'block';
+            // Move to previous input on backspace
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && !input.value && index > 0) {
+                    document.querySelectorAll('.otp-input')[index - 1].focus();
                 }
-            } catch (error) {
-                document.getElementById('signupError').textContent = 'Network error. Please try again.';
-                document.getElementById('signupError').style.display = 'block';
-            }
-            
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Send Verification Code';
+            });
         }
 
-        async function handleOtpVerification(event) {
-            event.preventDefault();
+        function startOtpTimer() {
+            otpTimeLeft = 600; // 10 minutes
+            const timerDisplay = document.getElementById('otpTimer');
+            const resendButton = document.getElementById('resendButton');
             
-            const otp = document.getElementById('otpInput').value;
-            const submitBtn = document.getElementById('verifyOtpBtn');
+            resendButton.disabled = true;
             
-            hideAllMessages();
-            
-            if (otp.length !== 6 || !/^\d{6}$/.test(otp)) {
-                document.getElementById('otpError').textContent = 'Please enter a valid 6-digit verification code';
-                document.getElementById('otpError').style.display = 'block';
-                return;
-            }
-            
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Verifying...';
-            
-            try {
-                const response = await fetch('/verify-signup-otp', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ 
-                        email: signupData.email,
-                        otp: otp 
-                    }),
-                });
+            otpTimer = setInterval(() => {
+                const minutes = Math.floor(otpTimeLeft / 60);
+                const seconds = otpTimeLeft % 60;
+                timerDisplay.textContent = `Code expires in: ${minutes}:${seconds.toString().padStart(2, '0')}`;
                 
-                const data = await response.json();
-                
-                if (response.ok) {
-                    document.getElementById('otpSuccess').style.display = 'block';
-                    
-                    setTimeout(() => {
-                        window.location.href = 'profile.html';
-                    }, 1500);
-                } else {
-                    document.getElementById('otpError').textContent = data.error || 'Verification failed';
-                    document.getElementById('otpError').style.display = 'block';
+                if (otpTimeLeft <= 0) {
+                    clearInterval(otpTimer);
+                    timerDisplay.textContent = 'Code expired';
+                    resendButton.disabled = false;
+                    resendButton.textContent = 'Resend Code';
                 }
-            } catch (error) {
-                document.getElementById('otpError').textContent = 'Network error. Please try again.';
-                document.getElementById('otpError').style.display = 'block';
-            }
-            
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Verify & Create Account';
+                
+                otpTimeLeft--;
+            }, 1000);
         }
 
         async function resendOtp() {
-            const resendBtn = document.getElementById('resendBtn');
+            if (!pendingSignupData) return;
             
-            if (!signupData.email) {
-                document.getElementById('otpError').textContent = 'Please go back and enter your email again';
-                document.getElementById('otpError').style.display = 'block';
-                return;
-            }
-            
-            resendBtn.disabled = true;
-            resendBtn.textContent = 'Sending...';
+            const resendButton = document.getElementById('resendButton');
+            resendButton.disabled = true;
+            resendButton.textContent = 'Sending...';
             
             try {
-                const response = await fetch('/resend-signup-otp', {
+                const response = await fetch('/resend-otp', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ email: signupData.email }),
+                    body: JSON.stringify({ email: pendingSignupData.email }),
                 });
                 
-                const data = await response.json();
-                
                 if (response.ok) {
-                    document.getElementById('otpInfo').textContent = '📧 Verification code resent to your email';
-                    document.getElementById('otpInfo').style.display = 'block';
-                    document.getElementById('otpError').style.display = 'none';
-                    startResendTimer();
+                    startOtpTimer();
+                    document.getElementById('otpSuccess').textContent = '📧 New verification code sent!';
+                    document.getElementById('otpSuccess').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('otpSuccess').style.display = 'none';
+                    }, 3000);
                 } else {
+                    const data = await response.json();
                     document.getElementById('otpError').textContent = data.error || 'Failed to resend code';
                     document.getElementById('otpError').style.display = 'block';
                 }
@@ -620,9 +484,6 @@
                 document.getElementById('otpError').textContent = 'Network error. Please try again.';
                 document.getElementById('otpError').style.display = 'block';
             }
-            
-            resendBtn.disabled = false;
-            resendBtn.textContent = 'Resend Code';
         }
 
         async function handleLogin(event) {
@@ -633,7 +494,9 @@
             const password = form.querySelector('input[type="password"]').value;
             const submitBtn = form.querySelector('button[type="submit"]');
             
-            hideAllMessages();
+            // Hide any previous messages
+            document.getElementById('loginSuccess').style.display = 'none';
+            document.getElementById('loginError').style.display = 'none';
             
             submitBtn.disabled = true;
             submitBtn.textContent = 'Signing in...';
@@ -652,8 +515,10 @@
                 if (response.ok) {
                     console.log('Login response:', JSON.stringify(data, null, 2));
                     
+                    // Show success message
                     document.getElementById('loginSuccess').style.display = 'block';
                     
+                    // Handle admin redirect
                     if (data.is_admin === true && data.redirect) {
                         console.log('Admin user detected, redirecting to:', data.redirect);
                         setTimeout(() => {
@@ -662,6 +527,7 @@
                         return;
                     }
                     
+                    // Handle regular user redirect
                     if (data.redirect) {
                         console.log('Regular user with redirect:', data.redirect);
                         setTimeout(() => {
@@ -670,6 +536,7 @@
                         return;
                     }
                     
+                    // Fallback for regular users
                     console.log('Regular user, checking auth status');
                     const statusResponse = await fetch('/auth-status');
                     const statusData = await statusResponse.json();
@@ -702,33 +569,141 @@
             submitBtn.textContent = 'Sign In';
         }
 
-        // OTP input formatting
-        document.getElementById('otpInput').addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
-            if (value.length > 6) value = value.slice(0, 6); // Limit to 6 digits
-            e.target.value = value;
-        });
-
-        // Auto-submit when 6 digits are entered
-        document.getElementById('otpInput').addEventListener('input', function(e) {
-            if (e.target.value.length === 6) {
-                // Small delay to allow user to see the complete code
-                setTimeout(() => {
-                    document.querySelector('#signupStep2 form').dispatchEvent(new Event('submit'));
-                }, 500);
+        async function handleSignup(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const email = form.querySelector('input[type="email"]').value;
+            const password = form.querySelector('input[type="password"]').value;
+            const confirmPassword = form.querySelectorAll('input[type="password"]')[1].value;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            
+            // Hide any previous messages
+            document.getElementById('signupSuccess').style.display = 'none';
+            document.getElementById('signupError').style.display = 'none';
+            
+            if (password !== confirmPassword) {
+                document.getElementById('signupError').textContent = 'Passwords do not match!';
+                document.getElementById('signupError').style.display = 'block';
+                return;
             }
-        });
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending verification...';
+            
+            try {
+                const response = await fetch('/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }),
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Store signup data for potential resend
+                    pendingSignupData = { email, password };
+                    
+                    // Show success message
+                    document.getElementById('signupSuccess').style.display = 'block';
+                    
+                    // Switch to OTP modal after a short delay
+                    setTimeout(() => {
+                        closeModal('signupModal');
+                        showOtpModal(email);
+                    }, 1500);
+                } else {
+                    document.getElementById('signupError').textContent = data.error || 'Registration failed';
+                    document.getElementById('signupError').style.display = 'block';
+                }
+            } catch (error) {
+                document.getElementById('signupError').textContent = 'Network error. Please try again.';
+                document.getElementById('signupError').style.display = 'block';
+            }
+            
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Create Account';
+        }
+
+        async function handleOtpVerification(event) {
+            event.preventDefault();
+            
+            const otpInputs = document.querySelectorAll('.otp-input');
+            const otp = Array.from(otpInputs).map(input => input.value).join('');
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            
+            // Hide any previous messages
+            document.getElementById('otpSuccess').style.display = 'none';
+            document.getElementById('otpError').style.display = 'none';
+            
+            if (otp.length !== 6) {
+                document.getElementById('otpError').textContent = 'Please enter all 6 digits';
+                document.getElementById('otpError').style.display = 'block';
+                return;
+            }
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Verifying...';
+            
+            try {
+                const response = await fetch('/verify-otp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        email: pendingSignupData.email,
+                        otp: otp 
+                    }),
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('otpSuccess').style.display = 'block';
+                    
+                    // Clear the timer
+                    if (otpTimer) {
+                        clearInterval(otpTimer);
+                    }
+                    
+                    // Redirect to profile page after successful verification
+                    setTimeout(() => {
+                        window.location.href = 'profile.html';
+                    }, 1500);
+                } else {
+                    document.getElementById('otpError').textContent = data.error || 'Invalid verification code';
+                    document.getElementById('otpError').style.display = 'block';
+                    
+                    // Clear OTP inputs on error
+                    otpInputs.forEach(input => input.value = '');
+                    otpInputs[0].focus();
+                }
+            } catch (error) {
+                document.getElementById('otpError').textContent = 'Network error. Please try again.';
+                document.getElementById('otpError').style.display = 'block';
+            }
+            
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Verify Code';
+        }
 
         // Close modal when clicking outside
         window.onclick = function(event) {
             const loginModal = document.getElementById('loginModal');
             const signupModal = document.getElementById('signupModal');
+            const otpModal = document.getElementById('otpModal');
             
             if (event.target === loginModal) {
                 closeModal('loginModal');
             }
             if (event.target === signupModal) {
                 closeModal('signupModal');
+            }
+            if (event.target === otpModal) {
+                closeModal('otpModal');
             }
         }
 
@@ -737,6 +712,7 @@
             if (event.key === 'Escape') {
                 closeModal('loginModal');
                 closeModal('signupModal');
+                closeModal('otpModal');
             }
         });
     </script>
