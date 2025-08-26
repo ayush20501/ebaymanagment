@@ -876,6 +876,10 @@ def index():
 def profile_page():
     return send_from_directory(app.template_folder, 'profile.html')
 
+@app.route("/display-profile.html")
+def display_profile_page():
+    return send_from_directory(app.template_folder, 'display-profile.html')
+    
 @app.route("/ebay-auth.html")
 def ebay_auth_page():
     return send_from_directory(app.template_folder, 'ebay-auth.html')
