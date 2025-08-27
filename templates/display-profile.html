@@ -94,9 +94,11 @@
                     <div class="bg-gray-50 p-6 rounded-2xl">
                         <h4 class="font-semibold text-gray-900 mb-4">Account Information</h4>
                         <p class="text-gray-600">Email: <span id="profile-email" class="font-medium text-gray-900"></span></p>
-                        <button id="disconnect-ebay-btn" class="text-red-600 hover:text-red-800 font-medium hover-lift mt-4">
-                            Disconnect eBay Account
+                       <button id="reauthenticate-ebay-btn"
+                            class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 font-medium hover-lift">
+                            Reauthenticate with eBay
                         </button>
+
                     </div>
 
                     <!-- Change Password Section -->
@@ -804,27 +806,20 @@
         document.getElementById('load-more-listings').addEventListener('click', () => {
             loadAllListings(currentListingsPage + 1);
         });
-        document.getElementById('disconnect-ebay-btn').addEventListener('click', async () => {
-    if (!confirm('Are you sure you want to disconnect your eBay account? You will need to reauthenticate to continue listing items.')) {
-        return;
-    }
+        document.getElementById('reauthenticate-ebay-btn').addEventListener('click', async () => {
     try {
-        const response = await fetch('/delete-ebay-tokens', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-        });
+        const response = await fetch('/revoke-ebay-auth', { method: 'POST' });
         const data = await response.json();
         if (response.ok) {
-            alert('eBay account disconnected. Please reconnect your eBay account.');
-            window.location.href = '/auth/ebay';
+            window.location.href = '/ebay-auth.html';
         } else {
-            alert(data.error || 'Failed to disconnect eBay account.');
+            alert(data.error || 'Failed to revoke eBay authentication');
         }
     } catch (error) {
-        console.error('Error disconnecting eBay account:', error);
-        alert('Network error. Please try again.');
+        console.error('Error revoking eBay auth:', error);
     }
 });
+
     </script>
 </body>
 </html>
