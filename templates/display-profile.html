@@ -12,7 +12,7 @@
         .hover-lift { transition: transform 0.3s ease, box-shadow 0.3s ease; }
         .hover-lift:hover { transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
         .input-field { transition: all 0.3s ease; border: 2px solid #e5e7eb; }
-        .input-field:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59,130,246,0.1); }
+        .input-field:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59,130,246,0.1);}
         .bg-gradient-to-br { background-image: linear-gradient(135deg, #f093fb 0%, #764ba2 100%); }
         .hero-gradient {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
@@ -20,12 +20,15 @@
             animation: gradientShift 8s ease-in-out infinite;
         }
         @keyframes gradientShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
         }
     </style>
 </head>
-
 <body class="min-h-screen bg-gray-50">
     <!-- Header -->
     <nav class="bg-white border-b border-gray-200">
@@ -83,7 +86,7 @@
                     <div class="text-purple-100 text-sm font-medium">Inventory Value</div>
                 </div>
             </div>
-
+            
             <div class="grid lg:grid-cols-2 gap-8">
                 <!-- Left Column -->
                 <div class="space-y-6">
@@ -91,14 +94,9 @@
                     <div class="bg-gray-50 p-6 rounded-2xl">
                         <h4 class="font-semibold text-gray-900 mb-4">Account Information</h4>
                         <p class="text-gray-600">Email: <span id="profile-email" class="font-medium text-gray-900"></span></p>
-                        <p class="text-gray-600 mt-2">eBay Account: <span id="ebay-account-info" class="font-medium text-gray-900">-</span></p>
-                        <div class="flex space-x-3 mt-4">
-                            <button id="change-ebay-account-btn"
-                                class="text-blue-600 hover:text-blue-800 font-medium hover-lift">
-                                Change eBay Account
-                            </button>
-                        </div>
-                        <div id="ebay-message" class="hidden mt-4 text-sm"></div>
+                        <button id="disconnect-ebay-btn" class="text-red-600 hover:text-red-800 font-medium hover-lift mt-4">
+                            Disconnect eBay Account
+                        </button>
                     </div>
 
                     <!-- Change Password Section -->
@@ -113,6 +111,7 @@
                         <div id="password-display">
                             <p class="text-gray-600">Password: <span class="font-medium text-gray-900">••••••••</span></p>
                         </div>
+                        
                         <!-- Change Password Form -->
                         <div id="password-change-form" class="hidden">
                             <!-- Step 1: Request OTP -->
@@ -131,6 +130,7 @@
                                     </button>
                                 </div>
                             </div>
+
                             <!-- Step 2: Verify OTP and Set New Password -->
                             <div id="verify-otp-step" class="hidden">
                                 <form id="password-change-final-form" class="space-y-4">
@@ -215,7 +215,7 @@
                                 </div>
                                 <div class="flex space-x-3 pt-2">
                                     <button type="submit"
-                                        class="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-400 hover-lift">
+                                    class="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-400 hover-lift">
                                         Save Picture
                                     </button>
                                     <button type="button" id="cancel-profile-pic-edit"
@@ -227,7 +227,7 @@
                             <div id="profile-pic-update-message" class="hidden mt-4 text-sm"></div>
                         </div>
                     </div>
-
+                    
                     <!-- Address Info -->
                     <div class="bg-gray-50 p-6 rounded-2xl">
                         <div class="flex items-center justify-between mb-4">
@@ -323,27 +323,26 @@
             </div>
         </div>
     </div>
-
+    
     <script>
         let currentUserProfile = null;
         let currentListingsPage = 1;
         let hasMoreListings = false;
-
+        
         window.addEventListener('load', async () => {
             try {
                 const response = await fetch('/auth-status');
                 const data = await response.json();
                 if (!data.is_logged_in) {
-                    window.location.href = 'login.html';
-                    return;
+                    window.location.href = 'login.html'; return;
                 } else if (!data.has_profile) {
-                    window.location.href = 'profile.html';
-                    return;
+                    window.location.href = 'profile.html'; return;
+                } else if (!data.has_ebay_auth) {
+                    window.location.href = 'ebay-auth.html'; return;
                 }
                 document.getElementById('user-email').textContent = data.email;
                 await loadProfileData();
             } catch (error) {
-                console.error('Auth status error:', error);
                 window.location.href = 'login.html';
             }
         });
@@ -369,7 +368,6 @@
                 }
                 await loadUserProfile();
                 await loadRecentListings();
-                await loadEbayAccountInfo();
             } catch (error) {
                 console.error('Error loading profile data:', error);
             }
@@ -408,90 +406,6 @@
             }
         }
 
-        // eBay Account Functions
-        async function loadEbayAccountInfo() {
-            try {
-                const response = await fetch('/ebay-account-info');
-                const data = await response.json();
-                const ebayInfo = document.getElementById('ebay-account-info');
-                const changeEbayBtn = document.getElementById('change-ebay-account-btn');
-                if (response.ok && data.status === 'success') {
-                    ebayInfo.textContent = data.username || data.email || 'Connected';
-                    changeEbayBtn.textContent = 'Change eBay Account';
-                } else {
-                    ebayInfo.textContent = 'Not connected';
-                    changeEbayBtn.textContent = 'Connect eBay Account';
-                }
-            } catch (error) {
-                console.error('Error loading eBay account info:', error);
-                document.getElementById('ebay-account-info').textContent = 'Error';
-                document.getElementById('change-ebay-account-btn').textContent = 'Connect eBay Account';
-            }
-        }
-
-        async function clearBrowserCache() {
-            try {
-                // Clear localStorage and sessionStorage
-                localStorage.clear();
-                sessionStorage.clear();
-
-                // Clear Cache API storage (used by service workers)
-                if ('caches' in window) {
-                    const cacheNames = await caches.keys();
-                    await Promise.all(cacheNames.map(cacheName => caches.delete(cacheName)));
-                }
-
-                // Optionally clear cookies (client-side, if needed)
-                document.cookie.split(';').forEach(cookie => {
-                    const [name] = cookie.split('=');
-                    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
-                });
-
-                return true;
-            } catch (error) {
-                console.error('Error clearing browser cache:', error);
-                return false;
-            }
-        }
-
-        document.getElementById('change-ebay-account-btn').addEventListener('click', async () => {
-            const changeEbayBtn = document.getElementById('change-ebay-account-btn');
-            const originalText = changeEbayBtn.textContent;
-            changeEbayBtn.disabled = true;
-            changeEbayBtn.textContent = 'Processing...';
-
-            try {
-                const cacheCleared = await clearBrowserCache();
-                if (cacheCleared) {
-                    showEbayMessage('Browser cache cleared. Redirecting to eBay authentication...', 'success');
-                    setTimeout(() => {
-                        window.location.href = '/ebay-login';
-                    }, 1500);
-                } else {
-                    showEbayMessage('Failed to clear browser cache. Redirecting anyway...', 'error');
-                    setTimeout(() => {
-                        window.location.href = '/ebay-login';
-                    }, 1500);
-                }
-            } catch (error) {
-                console.error('Error during eBay account change:', error);
-                showEbayMessage('Network error. Please try again.', 'error');
-                changeEbayBtn.disabled = false;
-                changeEbayBtn.textContent = originalText;
-            }
-        });
-
-        function showEbayMessage(message, type) {
-            const messageEl = document.getElementById('ebay-message');
-            messageEl.textContent = message;
-            messageEl.className = `mt-4 text-sm ${type === 'success' ? 'text-green-600' : 'text-red-600'}`;
-            messageEl.classList.remove('hidden');
-            setTimeout(() => {
-                messageEl.classList.add('hidden');
-                messageEl.textContent = '';
-            }, 3000);
-        }
-
         // Password Change Functions
         document.getElementById('change-password-btn').addEventListener('click', () => {
             showPasswordChangeForm();
@@ -516,12 +430,17 @@
             document.getElementById('password-change-form').classList.add('hidden');
             document.getElementById('password-display').classList.remove('hidden');
             document.getElementById('change-password-btn').classList.remove('hidden');
+            
+            // Clear form fields
             document.getElementById('otp-input').value = '';
             document.getElementById('new-password').value = '';
             document.getElementById('confirm-password').value = '';
+            
+            // Hide message
             const messageEl = document.getElementById('password-change-message');
             messageEl.classList.add('hidden');
             messageEl.textContent = '';
+            
             showOtpRequestStep();
         }
 
@@ -535,6 +454,7 @@
             document.getElementById('verify-otp-step').classList.remove('hidden');
         }
 
+        // Send OTP
         document.getElementById('send-otp-btn').addEventListener('click', async () => {
             const sendButton = document.getElementById('send-otp-btn');
             const originalText = sendButton.textContent;
@@ -544,9 +464,11 @@
             try {
                 const response = await fetch('/send-password-change-otp', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
+                    headers: {'Content-Type': 'application/json'}
                 });
+
                 const data = await response.json();
+                
                 if (response.ok) {
                     showPasswordChangeMessage('Verification code sent to your email. Please check your inbox.', 'success');
                     showVerifyOtpStep();
@@ -561,12 +483,15 @@
             sendButton.textContent = originalText;
         });
 
+        // Handle password change form submission
         document.getElementById('password-change-final-form').addEventListener('submit', async (e) => {
             e.preventDefault();
+
             const otp = document.getElementById('otp-input').value.trim();
             const newPassword = document.getElementById('new-password').value;
             const confirmPassword = document.getElementById('confirm-password').value;
 
+            // Validation
             if (!otp || otp.length !== 6) {
                 showPasswordChangeMessage('Please enter a valid 6-digit verification code.', 'error');
                 return;
@@ -590,13 +515,15 @@
             try {
                 const response = await fetch('/change-password', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
                         otp: otp,
                         new_password: newPassword
                     })
                 });
+
                 const data = await response.json();
+                
                 if (response.ok) {
                     showPasswordChangeMessage('Password updated successfully!', 'success');
                     setTimeout(() => {
@@ -623,7 +550,7 @@
         // Address Functions
         document.getElementById('edit-address-btn').addEventListener('click', () => { showAddressEditForm(); });
         document.getElementById('cancel-address-edit').addEventListener('click', () => { resetAddressForm(); });
-
+        
         function showAddressEditForm() {
             if (currentUserProfile) {
                 document.getElementById('edit-address-line1').value = currentUserProfile.address_line1 || '';
@@ -635,7 +562,7 @@
             document.getElementById('address-edit-form').classList.remove('hidden');
             document.getElementById('edit-address-btn').classList.add('hidden');
         }
-
+        
         function resetAddressForm() {
             document.getElementById('address-edit-form').classList.add('hidden');
             document.getElementById('address-display').classList.remove('hidden');
@@ -644,7 +571,7 @@
             messageEl.classList.add('hidden');
             messageEl.textContent = '';
         }
-
+        
         document.getElementById('address-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = {
@@ -654,14 +581,13 @@
                 country: document.getElementById('edit-country').value
             };
             if (!formData.address_line1 || !formData.city || !formData.postal_code) {
-                showAddressMessage('Please fill in all required fields.', 'error');
-                return;
+                showAddressMessage('Please fill in all required fields.', 'error'); return;
             }
             try {
                 const response = await fetch('/profile', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(formData)
+                    headers: {'Content-Type': 'application/json',},
+                    body: JSON.stringify(formData),
                 });
                 const data = await response.json();
                 if (response.ok) {
@@ -676,7 +602,7 @@
                 showAddressMessage('Network error. Please try again.', 'error');
             }
         });
-
+        
         function showAddressMessage(message, type) {
             const messageEl = document.getElementById('address-update-message');
             messageEl.textContent = message;
@@ -684,7 +610,7 @@
             messageEl.classList.remove('hidden');
         }
 
-        // Profile Picture Functions
+        // Profile picture editing functions
         document.getElementById('edit-profile-pic-btn').addEventListener('click', () => {
             showProfilePicEditForm();
         });
@@ -695,12 +621,10 @@
             const file = e.target.files[0];
             if (file) {
                 if (!file.type.startsWith('image/')) {
-                    showProfilePicMessage('Please select a valid image file.', 'error');
-                    return;
+                    showProfilePicMessage('Please select a valid image file.', 'error'); return;
                 }
                 if (file.size > 10 * 1024 * 1024) {
-                    showProfilePicMessage('File size must be less than 10MB.', 'error');
-                    return;
+                    showProfilePicMessage('File size must be less than 10MB.', 'error'); return;
                 }
                 const reader = new FileReader();
                 reader.onload = function (e) {
@@ -710,7 +634,6 @@
                 reader.readAsDataURL(file);
             }
         });
-
         function showProfilePicEditForm() {
             document.getElementById('profile-pic-display').classList.add('hidden');
             document.getElementById('profile-pic-edit-form').classList.remove('hidden');
@@ -718,7 +641,6 @@
             document.getElementById('profile-pic-file').value = '';
             document.getElementById('image-preview').classList.add('hidden');
         }
-
         function resetProfilePicForm() {
             document.getElementById('profile-pic-edit-form').classList.add('hidden');
             document.getElementById('profile-pic-display').classList.remove('hidden');
@@ -729,22 +651,18 @@
             messageEl.classList.add('hidden');
             messageEl.textContent = '';
         }
-
         document.getElementById('profile-pic-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const fileInput = document.getElementById('profile-pic-file');
             const file = fileInput.files[0];
             if (!file) {
-                showProfilePicMessage('Please select an image file.', 'error');
-                return;
+                showProfilePicMessage('Please select an image file.', 'error'); return;
             }
             if (!file.type.startsWith('image/')) {
-                showProfilePicMessage('Please select a valid image file.', 'error');
-                return;
+                showProfilePicMessage('Please select a valid image file.', 'error'); return;
             }
             if (file.size > 10 * 1024 * 1024) {
-                showProfilePicMessage('File size must be less than 10MB.', 'error');
-                return;
+                showProfilePicMessage('File size must be less than 10MB.', 'error'); return;
             }
             const submitBtn = e.target.querySelector('button[type="submit"]');
             const originalText = submitBtn.textContent;
@@ -758,11 +676,11 @@
                 if (response.ok && data.status === 'success') {
                     const profileResponse = await fetch('/profile', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {'Content-Type': 'application/json',},
                         body: JSON.stringify({
                             ...currentUserProfile,
                             profile_pic_url: data.image_url
-                        })
+                        }),
                     });
                     const profileData = await profileResponse.json();
                     if (profileResponse.ok) {
@@ -783,7 +701,6 @@
             submitBtn.disabled = false;
             submitBtn.textContent = originalText;
         });
-
         function showProfilePicMessage(message, type) {
             const messageEl = document.getElementById('profile-pic-update-message');
             messageEl.textContent = message;
@@ -791,7 +708,7 @@
             messageEl.classList.remove('hidden');
         }
 
-        // Listings Functions
+        // Listings functions
         async function loadRecentListings() {
             try {
                 const response = await fetch('/my-listings?page=1');
@@ -799,22 +716,22 @@
                 const container = document.getElementById('recent-listings');
                 if (response.ok && data.listings.length > 0) {
                     container.innerHTML = data.listings.slice(0, 5).map(listing => `
-                        <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl hover-lift">
-                            <div class="flex-1">
-                                <h5 class="font-medium text-gray-900 text-sm">${listing.title}</h5>
-                                <p class="text-xs text-gray-500 mt-1">
-                                    ${listing.category_name || 'Unknown Category'} • 
-                                    £${listing.price_value} • 
-                                    Qty: ${listing.quantity}
-                                </p>
-                            </div>
-                            ${listing.view_url ? `
-                                <a href="${listing.view_url}" target="_blank" class="text-blue-600 hover:text-blue-800 text-xs font-medium hover-lift">
-                                    View →
-                                </a>
-                            ` : ''}
+                    <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl hover-lift">
+                        <div class="flex-1">
+                            <h5 class="font-medium text-gray-900 text-sm">${listing.title}</h5>
+                            <p class="text-xs text-gray-500 mt-1">
+                                ${listing.category_name || 'Unknown Category'} • 
+                                £${listing.price_value} • 
+                                Qty: ${listing.quantity}
+                            </p>
                         </div>
-                    `).join('');
+                        ${listing.view_url ? `
+                            <a href="${listing.view_url}" target="_blank" class="text-blue-600 hover:text-blue-800 text-xs font-medium hover-lift">
+                                View →
+                            </a>
+                        ` : ''}
+                    </div>
+                `).join('');
                 } else {
                     container.innerHTML = '<div class="text-center text-gray-500 py-8">No listings found</div>';
                 }
@@ -846,28 +763,28 @@
                     }
                     if (data.listings.length > 0) {
                         container.innerHTML += data.listings.map(listing => `
-                            <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl hover-lift">
-                                <div class="flex-1">
-                                    <h5 class="font-medium text-gray-900 text-sm">${listing.title}</h5>
-                                    <p class="text-xs text-gray-500 mt-1">
-                                        ${listing.category_name || 'Unknown Category'} • 
-                                        £${listing.price_value} • 
-                                        Qty: ${listing.quantity} •
-                                        ${new Date(listing.created_at).toLocaleDateString()}
-                                    </p>
-                                </div>
-                                <div class="flex items-center space-x-3">
-                                    <span class="px-3 py-1 text-xs rounded-full font-medium ${listing.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
-                                        ${listing.status}
-                                    </span>
-                                    ${listing.view_url ? `
-                                        <a href="${listing.view_url}" target="_blank" class="text-blue-600 hover:text-blue-800 text-xs font-medium hover-lift">
-                                            View →
-                                        </a>
-                                    ` : ''}
-                                </div>
+                        <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl hover-lift">
+                            <div class="flex-1">
+                                <h5 class="font-medium text-gray-900 text-sm">${listing.title}</h5>
+                                <p class="text-xs text-gray-500 mt-1">
+                                    ${listing.category_name || 'Unknown Category'} • 
+                                    £${listing.price_value} • 
+                                    Qty: ${listing.quantity} •
+                                    ${new Date(listing.created_at).toLocaleDateString()}
+                                </p>
                             </div>
-                        `).join('');
+                            <div class="flex items-center space-x-3">
+                                <span class="px-3 py-1 text-xs rounded-full font-medium ${listing.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                                    ${listing.status}
+                                </span>
+                                ${listing.view_url ? `
+                                    <a href="${listing.view_url}" target="_blank" class="text-blue-600 hover:text-blue-800 text-xs font-medium hover-lift">
+                                        View →
+                                    </a>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `).join('');
                     } else if (page === 1) {
                         container.innerHTML = '<div class="text-center text-gray-500 py-8">No listings found</div>';
                     }
@@ -884,10 +801,30 @@
                 console.error('Error loading listings:', error);
             }
         }
-
         document.getElementById('load-more-listings').addEventListener('click', () => {
             loadAllListings(currentListingsPage + 1);
         });
+        document.getElementById('disconnect-ebay-btn').addEventListener('click', async () => {
+    if (!confirm('Are you sure you want to disconnect your eBay account? You will need to reauthenticate to continue listing items.')) {
+        return;
+    }
+    try {
+        const response = await fetch('/delete-ebay-tokens', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await response.json();
+        if (response.ok) {
+            alert('eBay account disconnected. Please reconnect your eBay account.');
+            window.location.href = '/auth/ebay';
+        } else {
+            alert(data.error || 'Failed to disconnect eBay account.');
+        }
+    } catch (error) {
+        console.error('Error disconnecting eBay account:', error);
+        alert('Network error. Please try again.');
+    }
+});
     </script>
 </body>
 </html>
