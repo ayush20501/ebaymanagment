@@ -2564,62 +2564,24 @@ def cleanup_expired_otps():
     for email in expired_emails:
         del otp_store[email]
 
-@app.route("/delete-ebay-auth", methods=["POST"])
-def delete_ebay_auth():
+@app.route("/delete-ebay-tokens", methods=["POST"])
+def delete_ebay_tokens():
     if "user_id" not in session:
         return jsonify({"error": "Please log in first"}), 401
     if not is_user_active(session["user_id"]):
         return jsonify({"error": "Account is inactive"}), 403
 
-    # Delete tokens from ebay_tokens table
     conn = get_db_connection()
     try:
         with conn.cursor() as c:
             c.execute("DELETE FROM ebay_tokens WHERE user_id = %s", (session["user_id"],))
             conn.commit()
+            return jsonify({"status": "success", "message": "eBay credentials removed successfully"})
     except psycopg2.Error as e:
         conn.rollback()
-        return jsonify({"error": "Failed to delete eBay credentials"}), 500
+        return jsonify({"error": "Failed to remove eBay credentials"}), 500
     finally:
         close_db_connection(conn)
-
-    # Delete existing inventory locations
-    try:
-        access = ensure_access_token(session["user_id"])
-    except RuntimeError:
-        access = None
-
-    if access:
-        try:
-            headers = {
-                "Authorization": f"Bearer {access}",
-                "Accept-Language": LANG,
-                "Content-Language": LANG,
-                "X-EBAY-C-MARKETPLACE-ID": MARKETPLACE_ID,
-            }
-            r = requests.get(f"{BASE}/sell/inventory/v1/location", headers=headers, timeout=30)
-            r.raise_for_status()
-            locs = r.json().get("locations", [])
-            for loc in locs:
-                loc_key = loc["merchantLocationKey"]
-                delete_url = f"{BASE}/sell/inventory/v1/location/{loc_key}"
-                requests.delete(delete_url, headers=headers, timeout=30)
-        except requests.exceptions.RequestException as e:
-            print(f"Failed to delete inventory locations: {e}")
-
-    # Archive existing listings
-    conn = get_db_connection()
-    try:
-        with conn.cursor() as c:
-            c.execute("UPDATE user_listings SET status = 'ARCHIVED' WHERE user_id = %s", (session["user_id"],))
-            conn.commit()
-    except psycopg2.Error as e:
-        conn.rollback()
-        print(f"Failed to archive listings: {e}")
-    finally:
-        close_db_connection(conn)
-
-    return jsonify({"status": "success", "message": "eBay credentials deleted successfully"})
     
 if __name__ == "__main__":
     if not all([CLIENT_ID, CLIENT_SECRET, RU_NAME, DB_URL]):
