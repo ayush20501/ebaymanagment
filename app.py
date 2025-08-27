@@ -2575,8 +2575,13 @@ def delete_ebay_tokens():
     try:
         with conn.cursor() as c:
             c.execute("DELETE FROM ebay_tokens WHERE user_id = %s", (session["user_id"],))
+            c.execute("DELETE FROM ebay_locations WHERE user_id = %s", (session["user_id"],))  # Clear locations
             conn.commit()
-            return jsonify({"status": "success", "message": "eBay credentials removed successfully"})
+            return jsonify({
+                "status": "success",
+                "message": "eBay credentials removed successfully",
+                "redirect": "/auth/ebay"
+            })
     except psycopg2.Error as e:
         conn.rollback()
         return jsonify({"error": "Failed to remove eBay credentials"}), 500
