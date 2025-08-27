@@ -2564,8 +2564,8 @@ def cleanup_expired_otps():
     for email in expired_emails:
         del otp_store[email]
 
-@app.route("/delete-ebay-tokens", methods=["POST"])
-def delete_ebay_tokens():
+@app.route("/revoke-ebay-auth", methods=["POST"])
+def revoke_ebay_auth():
     if "user_id" not in session:
         return jsonify({"error": "Please log in first"}), 401
     if not is_user_active(session["user_id"]):
@@ -2575,18 +2575,14 @@ def delete_ebay_tokens():
     try:
         with conn.cursor() as c:
             c.execute("DELETE FROM ebay_tokens WHERE user_id = %s", (session["user_id"],))
-            c.execute("DELETE FROM ebay_locations WHERE user_id = %s", (session["user_id"],))  # Clear locations
             conn.commit()
-            return jsonify({
-                "status": "success",
-                "message": "eBay credentials removed successfully",
-                "redirect": "/auth/ebay"
-            })
+        return jsonify({"status": "success", "message": "eBay authentication revoked"})
     except psycopg2.Error as e:
         conn.rollback()
-        return jsonify({"error": "Failed to remove eBay credentials"}), 500
+        return jsonify({"error": "Failed to revoke eBay authentication"}), 500
     finally:
         close_db_connection(conn)
+
     
 if __name__ == "__main__":
     if not all([CLIENT_ID, CLIENT_SECRET, RU_NAME, DB_URL]):
