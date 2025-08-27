@@ -94,6 +94,10 @@
                     <div class="bg-gray-50 p-6 rounded-2xl">
                         <h4 class="font-semibold text-gray-900 mb-4">Account Information</h4>
                         <p class="text-gray-600">Email: <span id="profile-email" class="font-medium text-gray-900"></span></p>
+                        <p class="text-gray-600 mt-2">eBay Account: <span id="ebay-status" class="font-medium text-gray-900">Checking...</span></p>
+                        <button id="delete-ebay-account" class="hidden mt-4 bg-red-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-red-700 transition-colors hover-lift">
+                            Disconnect eBay Account
+                        </button>
                     </div>
 
                     <!-- Change Password Section -->
@@ -801,6 +805,69 @@
         document.getElementById('load-more-listings').addEventListener('click', () => {
             loadAllListings(currentListingsPage + 1);
         });
+
+        // eBay Account Management
+        async function checkEbayAuth() {
+            try {
+                const response = await fetch('/check-ebay-auth');
+                const data = await response.json();
+                const ebayStatus = document.getElementById('ebay-status');
+                const disconnectButton = document.getElementById('delete-ebay-account');
+                if (data.has_ebay_auth) {
+                    ebayStatus.textContent = 'Connected';
+                    disconnectButton.classList.remove('hidden');
+                } else {
+                    ebayStatus.textContent = 'Not Connected';
+                    disconnectButton.classList.add('hidden');
+                }
+            } catch (error) {
+                console.error('Error checking eBay auth:', error);
+                document.getElementById('ebay-status').textContent = 'Error checking status';
+            }
+        }
+        
+        document.getElementById('delete-ebay-account').addEventListener('click', async () => {
+            if (!confirm('Are you sure you want to disconnect your eBay account? You will need to reauthenticate to continue listing items.')) {
+                return;
+            }
+            try {
+                const response = await fetch('/delete-ebay-auth', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    showProfilePicMessage('eBay account disconnected successfully. You will be redirected to reconnect.', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/ebay-login';
+                    }, 1500);
+                } else {
+                    showProfilePicMessage('Failed to disconnect eBay account: ' + data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting eBay auth:', error);
+                showProfilePicMessage('Failed to disconnect eBay account.', 'error');
+            }
+        });
+        
+        // Call checkEbayAuth when loading profile data
+        async function loadProfileData() {
+            try {
+                const statsResponse = await fetch('/user-stats');
+                const statsData = await statsResponse.json();
+                if (statsResponse.ok) {
+                    document.getElementById('total-listings-stat').textContent = statsData.total_listings;
+                    document.getElementById('active-listings-stat').textContent = statsData.active_listings;
+                    document.getElementById('inventory-value-stat').textContent = `£${statsData.total_inventory_value.toFixed(2)}`;
+                    document.getElementById('profile-email').textContent = statsData.email;
+                }
+                await loadUserProfile();
+                await loadRecentListings();
+                await checkEbayAuth(); // Add this line to check eBay auth status
+            } catch (error) {
+                console.error('Error loading profile data:', error);
+            }
+        }
     </script>
 </body>
 </html>
