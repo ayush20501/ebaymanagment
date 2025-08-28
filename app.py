@@ -1137,7 +1137,10 @@ def ebay_login():
     from urllib.parse import quote
     scope_enc = quote(SCOPES, safe="")
     ru_enc = quote(RU_NAME, safe="")
-    url = f"{AUTH}/oauth2/authorize?client_id={CLIENT_ID}&response_type=code&redirect_uri={ru_enc}&scope={scope_enc}&state=xyz123"
+    if session.get("force_ebay_login"):
+        url = f"{AUTH}/oauth2/authorize?client_id={CLIENT_ID}&response_type=code&redirect_uri={ru_enc}&scope={scope_enc}&state=xyz123&prompt=login"
+    else:
+        url = f"{AUTH}/oauth2/authorize?client_id={CLIENT_ID}&response_type=code&redirect_uri={ru_enc}&scope={scope_enc}&state=xyz123"
     return redirect(url)
 
 @app.route("/callback")
@@ -2576,6 +2579,7 @@ def revoke_ebay_auth():
         with conn.cursor() as c:
             c.execute("DELETE FROM ebay_tokens WHERE user_id = %s", (session["user_id"],))
             conn.commit()
+            session["force_ebay_login"] = True
         return jsonify({"status": "success", "message": "eBay authentication revoked"})
     except psycopg2.Error as e:
         conn.rollback()
