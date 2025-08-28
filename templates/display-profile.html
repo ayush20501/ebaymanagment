@@ -8,27 +8,56 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f9fafb; }
-        .hover-lift { transition: transform 0.3s ease, box-shadow 0.3s ease; }
-        .hover-lift:hover { transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
-        .input-field { transition: all 0.3s ease; border: 2px solid #e5e7eb; }
-        .input-field:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59,130,246,0.1);}
-        .bg-gradient-to-br { background-image: linear-gradient(135deg, #f093fb 0%, #764ba2 100%); }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+
+        .hover-lift {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-field {
+            transition: all 0.3s ease;
+            border: 2px solid #e5e7eb;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .bg-gradient-to-br {
+            background-image: linear-gradient(135deg, #f093fb 0%, #764ba2 100%);
+        }
+
         .hero-gradient {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
             background-size: 200% 200%;
             animation: gradientShift 8s ease-in-out infinite;
         }
+
         @keyframes gradientShift {
-            0%, 100% {
+
+            0%,
+            100% {
                 background-position: 0% 50%;
             }
+
             50% {
                 background-position: 100% 50%;
             }
         }
     </style>
 </head>
+
 <body class="min-h-screen bg-gray-50">
     <!-- Header -->
     <nav class="bg-white border-b border-gray-200">
@@ -86,19 +115,36 @@
                     <div class="text-purple-100 text-sm font-medium">Inventory Value</div>
                 </div>
             </div>
-            
+
             <div class="grid lg:grid-cols-2 gap-8">
                 <!-- Left Column -->
                 <div class="space-y-6">
                     <!-- Account Info -->
                     <div class="bg-gray-50 p-6 rounded-2xl">
                         <h4 class="font-semibold text-gray-900 mb-4">Account Information</h4>
-                        <p class="text-gray-600">Email: <span id="profile-email" class="font-medium text-gray-900"></span></p>
-                       <button id="reauthenticate-ebay-btn"
-                            class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 font-medium hover-lift">
-                            Reauthenticate with eBay
-                        </button>
+                        <div class="space-y-4">
+                            <p class="text-gray-600">Email: <span id="profile-email"
+                                    class="font-medium text-gray-900"></span></p>
 
+                            <div class="border-t border-gray-200 pt-4">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h5 class="font-medium text-gray-900">eBay Account</h5>
+                                        <p class="text-sm text-gray-600">Switch to a different eBay account</p>
+                                    </div>
+                                    <button id="reauthenticate-ebay-btn"
+                                        class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 font-medium hover-lift transition-all duration-300 shadow-lg hover:shadow-xl">
+                                        <svg class="inline w-4 h-4 mr-2" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                                            </path>
+                                        </svg>
+                                        Change eBay Account
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Change Password Section -->
@@ -111,15 +157,17 @@
                             </button>
                         </div>
                         <div id="password-display">
-                            <p class="text-gray-600">Password: <span class="font-medium text-gray-900">••••••••</span></p>
+                            <p class="text-gray-600">Password: <span class="font-medium text-gray-900">••••••••</span>
+                            </p>
                         </div>
-                        
+
                         <!-- Change Password Form -->
                         <div id="password-change-form" class="hidden">
                             <!-- Step 1: Request OTP -->
                             <div id="request-otp-step">
                                 <div class="mb-4">
-                                    <p class="text-sm text-gray-600 mb-4">To change your password, we'll send a verification code to your email address.</p>
+                                    <p class="text-sm text-gray-600 mb-4">To change your password, we'll send a
+                                        verification code to your email address.</p>
                                 </div>
                                 <div class="flex space-x-3">
                                     <button type="button" id="send-otp-btn"
@@ -137,18 +185,23 @@
                             <div id="verify-otp-step" class="hidden">
                                 <form id="password-change-final-form" class="space-y-4">
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Verification Code *</label>
-                                        <input type="text" id="otp-input" required maxlength="6" placeholder="Enter 6-digit code"
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Verification Code
+                                            *</label>
+                                        <input type="text" id="otp-input" required maxlength="6"
+                                            placeholder="Enter 6-digit code"
                                             class="input-field w-full px-4 py-3 rounded-lg text-center text-lg font-mono">
-                                        <p class="text-xs text-gray-500 mt-1">Check your email for the verification code</p>
+                                        <p class="text-xs text-gray-500 mt-1">Check your email for the verification code
+                                        </p>
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">New Password *</label>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">New Password
+                                            *</label>
                                         <input type="password" id="new-password" required minlength="6"
                                             class="input-field w-full px-4 py-3 rounded-lg">
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Confirm New Password *</label>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Confirm New Password
+                                            *</label>
                                         <input type="password" id="confirm-password" required minlength="6"
                                             class="input-field w-full px-4 py-3 rounded-lg">
                                     </div>
@@ -173,8 +226,8 @@
                         <div class="flex items-center justify-between mb-4">
                             <h4 class="font-semibold text-gray-900">Store Logo</h4>
                             <button id="edit-profile-pic-btn"
-                                    class="text-blue-600 hover:text-blue-800 font-medium hover-lift">
-                                    Change Picture
+                                class="text-blue-600 hover:text-blue-800 font-medium hover-lift">
+                                Change Picture
                             </button>
                         </div>
                         <div id="profile-pic-display" class="flex items-center space-x-4">
@@ -187,14 +240,14 @@
                         <div id="profile-pic-edit-form" class="hidden">
                             <form id="profile-pic-form" class="space-y-4" enctype="multipart/form-data">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Upload Store Logo</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Upload Store
+                                        Logo</label>
                                     <div class="flex items-center justify-center w-full">
                                         <label for="profile-pic-file"
                                             class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 hover:border-gray-400 transition-colors">
                                             <div class="flex flex-col items-center justify-center pt-5 pb-6">
                                                 <svg class="w-8 h-8 mb-4 text-gray-500" aria-hidden="true"
-                                                    xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                    viewBox="0 0 20 16">
+                                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
                                                     <path stroke="currentColor" stroke-linecap="round"
                                                         stroke-linejoin="round" stroke-width="2"
                                                         d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
@@ -213,11 +266,12 @@
                                         <img id="preview-img" src="" alt="Preview"
                                             class="w-20 h-20 rounded-full border-2 border-gray-200 object-cover">
                                     </div>
-                                    <p class="text-xs text-gray-500 mt-1">Upload a store logo (JPEG, PNG, GIF format supported)</p>
+                                    <p class="text-xs text-gray-500 mt-1">Upload a store logo (JPEG, PNG, GIF format
+                                        supported)</p>
                                 </div>
                                 <div class="flex space-x-3 pt-2">
                                     <button type="submit"
-                                    class="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-400 hover-lift">
+                                        class="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-400 hover-lift">
                                         Save Picture
                                     </button>
                                     <button type="button" id="cancel-profile-pic-edit"
@@ -229,7 +283,7 @@
                             <div id="profile-pic-update-message" class="hidden mt-4 text-sm"></div>
                         </div>
                     </div>
-                    
+
                     <!-- Address Info -->
                     <div class="bg-gray-50 p-6 rounded-2xl">
                         <div class="flex items-center justify-between mb-4">
@@ -260,7 +314,8 @@
                                             class="input-field w-full px-4 py-3 rounded-lg">
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Postal Code *</label>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Postal Code
+                                            *</label>
                                         <input type="text" id="edit-postal-code" required
                                             class="input-field w-full px-4 py-3 rounded-lg">
                                     </div>
@@ -300,7 +355,8 @@
                         </div>
                         <div id="recent-listings" class="space-y-3 max-h-80 overflow-y-auto">
                             <div class="text-center text-gray-500 py-8">
-                                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3"></div>
+                                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3">
+                                </div>
                                 Loading listings...
                             </div>
                         </div>
@@ -325,12 +381,12 @@
             </div>
         </div>
     </div>
-    
+
     <script>
         let currentUserProfile = null;
         let currentListingsPage = 1;
         let hasMoreListings = false;
-        
+
         window.addEventListener('load', async () => {
             try {
                 const response = await fetch('/auth-status');
@@ -432,17 +488,17 @@
             document.getElementById('password-change-form').classList.add('hidden');
             document.getElementById('password-display').classList.remove('hidden');
             document.getElementById('change-password-btn').classList.remove('hidden');
-            
+
             // Clear form fields
             document.getElementById('otp-input').value = '';
             document.getElementById('new-password').value = '';
             document.getElementById('confirm-password').value = '';
-            
+
             // Hide message
             const messageEl = document.getElementById('password-change-message');
             messageEl.classList.add('hidden');
             messageEl.textContent = '';
-            
+
             showOtpRequestStep();
         }
 
@@ -466,11 +522,11 @@
             try {
                 const response = await fetch('/send-password-change-otp', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'}
+                    headers: { 'Content-Type': 'application/json' }
                 });
 
                 const data = await response.json();
-                
+
                 if (response.ok) {
                     showPasswordChangeMessage('Verification code sent to your email. Please check your inbox.', 'success');
                     showVerifyOtpStep();
@@ -517,7 +573,7 @@
             try {
                 const response = await fetch('/change-password', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         otp: otp,
                         new_password: newPassword
@@ -525,7 +581,7 @@
                 });
 
                 const data = await response.json();
-                
+
                 if (response.ok) {
                     showPasswordChangeMessage('Password updated successfully!', 'success');
                     setTimeout(() => {
@@ -552,7 +608,7 @@
         // Address Functions
         document.getElementById('edit-address-btn').addEventListener('click', () => { showAddressEditForm(); });
         document.getElementById('cancel-address-edit').addEventListener('click', () => { resetAddressForm(); });
-        
+
         function showAddressEditForm() {
             if (currentUserProfile) {
                 document.getElementById('edit-address-line1').value = currentUserProfile.address_line1 || '';
@@ -564,7 +620,7 @@
             document.getElementById('address-edit-form').classList.remove('hidden');
             document.getElementById('edit-address-btn').classList.add('hidden');
         }
-        
+
         function resetAddressForm() {
             document.getElementById('address-edit-form').classList.add('hidden');
             document.getElementById('address-display').classList.remove('hidden');
@@ -573,7 +629,7 @@
             messageEl.classList.add('hidden');
             messageEl.textContent = '';
         }
-        
+
         document.getElementById('address-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = {
@@ -588,7 +644,7 @@
             try {
                 const response = await fetch('/profile', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json',},
+                    headers: { 'Content-Type': 'application/json', },
                     body: JSON.stringify(formData),
                 });
                 const data = await response.json();
@@ -604,7 +660,7 @@
                 showAddressMessage('Network error. Please try again.', 'error');
             }
         });
-        
+
         function showAddressMessage(message, type) {
             const messageEl = document.getElementById('address-update-message');
             messageEl.textContent = message;
@@ -678,7 +734,7 @@
                 if (response.ok && data.status === 'success') {
                     const profileResponse = await fetch('/profile', {
                         method: 'POST',
-                        headers: {'Content-Type': 'application/json',},
+                        headers: { 'Content-Type': 'application/json', },
                         body: JSON.stringify({
                             ...currentUserProfile,
                             profile_pic_url: data.image_url
@@ -807,19 +863,57 @@
             loadAllListings(currentListingsPage + 1);
         });
         document.getElementById('reauthenticate-ebay-btn').addEventListener('click', async () => {
-    try {
-        const response = await fetch('/revoke-ebay-auth', { method: 'POST' });
-        const data = await response.json();
-        if (response.ok) {
-            window.location.href = '/ebay-auth.html';
-        } else {
-            alert(data.error || 'Failed to revoke eBay authentication');
-        }
-    } catch (error) {
-        console.error('Error revoking eBay auth:', error);
-    }
-});
+            const button = document.getElementById('reauthenticate-ebay-btn');
+            const originalText = button.innerHTML;
 
+            // Show loading state
+            button.innerHTML = `
+        <svg class="inline w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Switching Account...
+    `;
+            button.disabled = true;
+
+            try {
+                const response = await fetch('/revoke-ebay-auth', { method: 'POST' });
+                const data = await response.json();
+                if (response.ok) {
+                    // Show success message briefly
+                    button.innerHTML = `
+                <svg class="inline w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                Redirecting...
+            `;
+                    setTimeout(() => {
+                        window.location.href = '/ebay-auth.html';
+                    }, 1000);
+                } else {
+                    throw new Error(data.error || 'Failed to switch eBay account');
+                }
+            } catch (error) {
+                console.error('Error switching eBay account:', error);
+                // Show error state
+                button.innerHTML = `
+            <svg class="inline w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+            Error - Try Again
+        `;
+                button.classList.add('from-red-600', 'to-red-700', 'hover:from-red-700', 'hover:to-red-800');
+                button.classList.remove('from-blue-600', 'to-purple-600', 'hover:from-blue-700', 'hover:to-purple-700');
+
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                    button.classList.remove('from-red-600', 'to-red-700', 'hover:from-red-700', 'hover:to-red-800');
+                    button.classList.add('from-blue-600', 'to-purple-600', 'hover:from-blue-700', 'hover:to-purple-700');
+                }, 3000);
+            }
+        });
     </script>
 </body>
+
 </html>
