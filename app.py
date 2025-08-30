@@ -2245,6 +2245,7 @@ def cleanup_expired_otps():
     
     for email in expired_emails:
         del otp_store[email]
+		
 @app.route("/revoke-ebay-auth", methods=["POST"])
 def revoke_ebay_auth():
     if "user_id" not in session:
@@ -2263,7 +2264,30 @@ def revoke_ebay_auth():
         return jsonify({"error": "Failed to revoke eBay authentication"}), 500
     finally:
         close_db_connection(conn)
-    
+
+@app.route('/format-description', methods=['POST'])
+def format_description():
+    data = request.get_json()
+    plain_text = data.get('text', '').strip()
+
+    if not plain_text:
+        return jsonify({"error": "No text provided"}), 400
+
+    try:
+        prompt = (
+            "Convert the following plain text into clean, well-structured HTML. "
+            "Use ONLY these tags: <p>, <ul>, <li>, <strong>, <em>, <br>. "
+            "Do not include headings (h1-h6), tables, or scripts. "
+            "Preserve line breaks and lists. "
+            f"Plain text: {plain_text}"
+        )
+        html_description = call_llm_text_simple(prompt, system_prompt="Return only HTML. No prose.")
+        return jsonify({"html": html_description})
+    except Exception as e:
+        return jsonify({"error": f"Failed to format description: {str(e)}"}), 500
+
+
+
 if __name__ == "__main__":
     if not all([CLIENT_ID, CLIENT_SECRET, RU_NAME, DB_URL]):
         print("Missing required environment variables (CLIENT_ID, CLIENT_SECRET, RU_NAME, or DB_URL)")
