@@ -151,13 +151,6 @@
                     </div>
                     <div>
                         <label class="block text-lg font-semibold text-gray-900 mb-3">Description</label>
-                        <div class="mb-3">
-                            <div class="bg-gray-50 p-4 rounded-lg border">
-                                <div class="text-sm font-medium text-gray-600 mb-2">Formatted Preview:</div>
-                                <div id="preview-description-formatted" class="prose prose-sm max-w-none text-gray-800">
-                                </div>
-                            </div>
-                        </div>
                         <textarea id="preview-description" rows="6" class="input-field w-full px-4 py-4 rounded-xl text-base resize-none" placeholder="Enter description text here..."></textarea>
                         <p class="text-sm text-gray-500 mt-2">Edit the generated description if needed. HTML tags will be preserved in the final listing.</p>
                     </div>
@@ -207,12 +200,10 @@
     </div>
     <div id="image-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
         <div class="relative max-w-4xl max-h-full">
-            <img id="modal-image" src="" alt="Full size preview" class="max-w-full max-h-full object-contain
-            rounded-lg">
+            <img id="modal-image" src="" alt="Full size preview" class="max-w-full max-h-full object-contain rounded-lg">
             <button onclick="closeImageModal()" class="absolute top-4 right-4 text-white hover:text-gray-300 bg-black bg-opacity-50 rounded-full p-2">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                    </path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
             </button>
         </div>
@@ -612,26 +603,7 @@
         }
         function displayPreview(data) {
             document.getElementById('preview-title').value = data.title || '';
-            const descriptionText = data.description.text || '';
-            document.getElementById('preview-description').value = descriptionText;
-            const formattedPreview = document.getElementById('preview-description-formatted');
-            formattedPreview.innerHTML = data.description.html || '<p class="text-gray-400 italic">No description provided</p>';
-            const descriptionTextarea = document.getElementById('preview-description');
-            descriptionTextarea.removeEventListener('input', updatePreviewDescription);
-            descriptionTextarea.addEventListener('input', updatePreviewDescription);
-            function updatePreviewDescription() {
-                const text = descriptionTextarea.value;
-                if (text.trim()) {
-                    const formatted = text
-                        .split('\n\n')
-                        .filter(p => p.trim())
-                        .map(p => `<p>${p.trim().replace(/\n/g, '<br>')}</p>`)
-                        .join('');
-                    formattedPreview.innerHTML = formatted;
-                } else {
-                    formattedPreview.innerHTML = '<p class="text-gray-400 italic">No description provided</p>';
-                }
-            }
+            document.getElementById('preview-description').value = data.description.text || '';
             const aspectsContainer = document.getElementById('preview-aspects');
             aspectsContainer.innerHTML = '';
             Object.entries(data.aspects || {}).forEach(([key, values]) => {
