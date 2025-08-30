@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,50 +8,65 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
         body {
             font-family: 'Inter', sans-serif;
         }
+
         .hero-gradient {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
             background-size: 200% 200%;
             animation: gradientShift 8s ease-in-out infinite;
         }
+
         @keyframes gradientShift {
-            0%, 100% {    
+
+            0%,
+            100% {
                 background-position: 0% 50%;
             }
+
             50% {
                 background-position: 100% 50%;
             }
         }
+
         .hover-lift {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
+
         .hover-lift:hover {
             transform: translateY(-4px);
             box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
         }
+
         .service-card {
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
             border: 2px solid transparent;
         }
+
         .service-card:hover {
             border: 2px solid #3b82f6;
             background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%);
         }
+
         .image-enhance-gradient {
             background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
         }
+
         .single-listing-gradient {
             background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
         }
+
         .multipack-gradient {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         }
+
         .bundle-gradient {
             background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         }
+
         .feature-icon {
             width: 2.5rem;
             height: 2.5rem;
@@ -61,40 +77,57 @@
             justify-content: center;
             font-size: 1.25rem;
         }
+
         .pulse-animation {
             animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
+
         @keyframes pulse {
-            0%, 100% {
+
+            0%,
+            100% {
                 opacity: 1;
             }
+
             50% {
                 opacity: .8;
             }
         }
+
         .floating-animation {
             animation: floating 3s ease-in-out infinite;
         }
+
         @keyframes floating {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: translateY(0px);
             }
+
             50% {
                 transform: translateY(-10px);
             }
         }
+
         /* New styles for full-width Why Choose Us section */
         .full-width-section {
             width: 100%;
-            background: #f8fafc; /* Matches the subtle gradient background */
+            background: #f8fafc;
+            /* Matches the subtle gradient background */
         }
+
         .full-width-section .content {
-            max-width: 84rem; /* Matches max-w-7xl (7xl = 80rem + padding) */
+            max-width: 84rem;
+            /* Matches max-w-7xl (7xl = 80rem + padding) */
             margin-left: auto;
             margin-right: auto;
-            padding-left: 1.5rem; /* Matches px-6 */
-            padding-right: 1.5rem; /* Matches px-12 on lg */
+            padding-left: 1.5rem;
+            /* Matches px-6 */
+            padding-right: 1.5rem;
+            /* Matches px-12 on lg */
         }
+
         @media (min-width: 1024px) {
             .full-width-section .content {
                 padding-left: 3rem;
@@ -103,6 +136,7 @@
         }
     </style>
 </head>
+
 <body class="min-h-screen bg-gray-50">
     <!-- Navigation -->
     <nav class="bg-white border-b border-gray-200">
@@ -115,15 +149,19 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-6">
-                    <a href="dashboard.html" class="text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg transition-colors hover-lift">
+                    <a href="dashboard.html"
+                        class="text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg transition-colors hover-lift">
                         <span class="font-medium">Dashboard</span>
                     </a>
-                    <a href="display-profile.html" id="profile-btn" class="flex items-center space-x-2 text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg transition-colors hover-lift">
-                        <img id="user-profile-pic" src="https://via.placeholder.com/32" alt="Profile" class="w-8 h-8 rounded-full border-2 border-gray-200 object-cover">
+                    <a href="display-profile.html" id="profile-btn"
+                        class="flex items-center space-x-2 text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg transition-colors hover-lift">
+                        <img id="user-profile-pic" src="https://via.placeholder.com/32" alt="Profile"
+                            class="w-8 h-8 rounded-full border-2 border-gray-200 object-cover">
                         <span class="font-medium">Profile</span>
                     </a>
                     <span id="user-email" class="text-gray-600 text-sm"></span>
-                    <button id="logout-btn" class="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors font-medium hover-lift">
+                    <button id="logout-btn"
+                        class="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors font-medium hover-lift">
                         Logout
                     </button>
                 </div>
@@ -164,7 +202,7 @@
                     <h3 class="text-2xl font-bold mb-2">Image Enhancement</h3>
                     <p class="text-purple-100 text-sm">Professional image editing for your products</p>
                 </div>
-                
+
                 <div class="space-y-4 mb-8">
                     <div class="flex items-start space-x-3">
                         <div class="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
@@ -185,7 +223,8 @@
                 </div>
 
                 <div class="flex items-center justify-between">
-                    <button class="image-enhance-gradient text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity hover-lift">
+                    <button
+                        class="image-enhance-gradient text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity hover-lift">
                         Get Started
                     </button>
                 </div>
@@ -205,7 +244,7 @@
                     <h3 class="text-2xl font-bold mb-2">Single Item Listing</h3>
                     <p class="text-blue-100 text-sm">Perfect for individual product listings</p>
                 </div>
-                
+
                 <div class="space-y-4 mb-8">
                     <div class="flex items-start space-x-3">
                         <div class="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
@@ -226,7 +265,8 @@
                 </div>
 
                 <div class="flex items-center justify-between">
-                    <button id="single-item-listing-btn" class="single-listing-gradient text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity hover-lift pulse-animation">
+                    <button id="single-item-listing-btn"
+                        class="single-listing-gradient text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity hover-lift pulse-animation">
                         Create Listing
                     </button>
                 </div>
@@ -246,7 +286,7 @@
                     <h3 class="text-2xl font-bold mb-2">Multipack Listing</h3>
                     <p class="text-green-100 text-sm">List multiple quantities of a single item</p>
                 </div>
-                
+
                 <div class="space-y-4 mb-8">
                     <div class="flex items-start space-x-3">
                         <div class="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
@@ -267,14 +307,16 @@
                 </div>
 
                 <div class="flex items-center justify-between">
-                    <button class="multipack-gradient text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity hover-lift">
+                    <button
+                        class="multipack-gradient text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity hover-lift">
                         List Multipack
                     </button>
                 </div>
             </div>
 
             <!-- Bundle Listing -->
-            <div class="service-card rounded-2xl shadow-lg p-8 hover-lift floating-animation" style="animation-delay: 1s;">
+            <div class="service-card rounded-2xl shadow-lg p-8 hover-lift floating-animation"
+                style="animation-delay: 1s;">
                 <div class="bundle-gradient text-white p-6 rounded-xl mb-6">
                     <div class="flex items-center justify-between mb-4">
                         <div class="feature-icon">
@@ -287,7 +329,7 @@
                     <h3 class="text-2xl font-bold mb-2">Bundle Listing</h3>
                     <p class="text-orange-100 text-sm">List multiple different items as one package</p>
                 </div>
-                
+
                 <div class="space-y-4 mb-8">
                     <div class="flex items-start space-x-3">
                         <div class="w-2 h-2 bg-orange-500 rounded-full mt-2"></div>
@@ -308,7 +350,8 @@
                 </div>
 
                 <div class="flex items-center justify-between">
-                    <button class="bundle-gradient text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity hover-lift">
+                    <button
+                        class="bundle-gradient text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity hover-lift">
                         Create Bundle
                     </button>
                 </div>
@@ -317,60 +360,70 @@
     </div>
 
     <!-- Expanded Why Choose Us Section -->
-    <div class="full-width-section py-16">
+    <!-- <div class="full-width-section py-16">
         <div class="content">
             <div class="bg-white rounded-2xl shadow-lg p-8">
                 <h3 class="text-2xl font-bold text-gray-900 mb-6">Why Choose Our Services?</h3>
                 <div class="space-y-4">
                     <div class="flex items-start space-x-4">
-                        <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-sm">
+                        <div
+                            class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-sm">
                             AI
                         </div>
                         <div>
                             <h4 class="font-semibold text-gray-900">AI-Powered Optimization</h4>
-                            <p class="text-gray-600 text-sm">Advanced algorithms ensure your listings rank higher in search results, driving more traffic to your products.</p>
+                            <p class="text-gray-600 text-sm">Advanced algorithms ensure your listings rank higher in
+                                search results, driving more traffic to your products.</p>
                         </div>
                     </div>
                     <div class="flex items-start space-x-4">
-                        <div class="w-8 h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center font-bold text-sm">
+                        <div
+                            class="w-8 h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center font-bold text-sm">
                             24h
                         </div>
                         <div>
                             <h4 class="font-semibold text-gray-900">Quick Turnaround</h4>
-                            <p class="text-gray-600 text-sm">Most services are completed within 24 hours or less, getting your listings live faster.</p>
+                            <p class="text-gray-600 text-sm">Most services are completed within 24 hours or less,
+                                getting your listings live faster.</p>
                         </div>
                     </div>
                     <div class="flex items-start space-x-4">
-                        <div class="w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center font-bold text-sm">
+                        <div
+                            class="w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center font-bold text-sm">
                             ★
                         </div>
                         <div>
                             <h4 class="font-semibold text-gray-900">Proven Results</h4>
-                            <p class="text-gray-600 text-sm">Our listings typically see 40% higher engagement rates, leading to increased sales.</p>
+                            <p class="text-gray-600 text-sm">Our listings typically see 40% higher engagement rates,
+                                leading to increased sales.</p>
                         </div>
                     </div>
                     <div class="flex items-start space-x-4">
-                        <div class="w-8 h-8 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center font-bold text-sm">
+                        <div
+                            class="w-8 h-8 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center font-bold text-sm">
                             🔧
                         </div>
                         <div>
                             <h4 class="font-semibold text-gray-900">Customizable Options</h4>
-                            <p class="text-gray-600 text-sm">Tailor your listings with flexible tools to match your brand and product needs.</p>
+                            <p class="text-gray-600 text-sm">Tailor your listings with flexible tools to match your
+                                brand and product needs.</p>
                         </div>
                     </div>
                     <div class="flex items-start space-x-4">
-                        <div class="w-8 h-8 bg-red-100 text-red-600 rounded-full flex items-center justify-center font-bold text-sm">
+                        <div
+                            class="w-8 h-8 bg-red-100 text-red-600 rounded-full flex items-center justify-center font-bold text-sm">
                             📈
                         </div>
                         <div>
                             <h4 class="font-semibold text-gray-900">Analytics Integration</h4>
-                            <p class="text-gray-600 text-sm">Track listing performance with built-in analytics to optimize future sales.</p>
+                            <p class="text-gray-600 text-sm">Track listing performance with built-in analytics to
+                                optimize future sales.</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <script>
         // Authentication check and user info display
@@ -378,14 +431,14 @@
             try {
                 const response = await fetch('/auth-status');
                 const data = await response.json();
-                
+
                 if (!data.is_logged_in) {
                     window.location.href = 'login.html';
                     return;
                 }
-                
+
                 document.getElementById('user-email').textContent = data.email;
-                
+
                 // Load profile image
                 try {
                     const profileResponse = await fetch('/profile');
@@ -419,8 +472,8 @@
                     window.location.href = 'single-item-listing.html'; // Replace with your desired URL
                 });
             } else if (
-                button.textContent.includes('Get Started') || 
-                button.textContent.includes('List Multipack') || 
+                button.textContent.includes('Get Started') ||
+                button.textContent.includes('List Multipack') ||
                 button.textContent.includes('Create Bundle')
             ) {
                 // Show alert for other services
@@ -432,4 +485,5 @@
         });
     </script>
 </body>
+
 </html>
