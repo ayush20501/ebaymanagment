@@ -1599,6 +1599,7 @@ def not_found(error):
 @app.errorhandler(500)
 def internal_error(error):
     return jsonify({"error": "Internal server error"}), 500
+	
 @app.route("/preview-item", methods=["POST"])
 def preview_item():
     if "user_id" not in session:
@@ -1619,44 +1620,38 @@ def preview_item():
     
     raw_text_in = _clean_text(body.get("raw_text"), limit=8000)
     images = _https_only(body.get("images"))
-    marketplaceId = MARKETPLACE_ID
+    marketplace_id = MARKETPLACE_ID
     price = body.get("price")
     quantity = int(body.get("quantity", 1))
     condition = (body.get("condition") or "NEW").upper()
-    include_debug = bool(body.get("include_debug", False))
-    use_simple_prompt = bool(body.get("use_simple_prompt_description", True))
-    want_html = bool(body.get("use_html_description", True))
     
     if not raw_text_in and not images:
         return jsonify({"error": "Raw text or images required"}), 400
     
     try:
-        # —— Step 1: AI Extract Keywords & Metadata ——
         if not OPENAI_API_KEY:
             normalized_title = smart_titlecase(raw_text_in[:80]) or _fallback_title(raw_text_in)
             category_keywords = []
             brand = None
         else:
             system_prompt = (
-                "You extract concise keywords for eBay category selection and search. "
-                "Return STRICT JSON per the schema. Use ONLY facts present in the input. "
-                "Do NOT invent identifiers; if absent, omit the field. "
-                "Lowercase all keywords. No punctuation, no duplicates. "
-                "search_keywords must be ≤ 30 characters"
+                "Extract concise keywords for eBay category selection and search. "
+                "Return STRICT JSON per the schema. Use ONLY facts from input. "
+                "Do NOT invent identifiers; omit if absent. "
+                "Lowercase all keywords, no punctuation, no duplicates. "
+                "search_keywords must be ≤ 30 characters."
             )
-            user_prompt = f"""MARKETPLACE: {marketplaceId}
+            user_prompt = f"""MARKETPLACE: {marketplace_id}
 RAW_TEXT:
 {raw_text_in}
-IMAGE_URLS (for context only, do not copy text from them):
+IMAGE_URLS (context only, do not copy text):
 {chr(10).join(images) if images else "(none)"}
 OUTPUT RULES:
-- category_keywords: 1–5 short phrases (2–3 words) that best describe the product category.
-- search_keywords: 3–12 search terms buyers would type (mix of unigrams/bigrams/trigrams), all lowercase.
-- All search_keywords must be ≤ 30 characters.
+- category_keywords: 1–5 short phrases (2–3 words) for product category.
+- search_keywords: 3–12 search terms buyers would type (mix of unigrams/bigrams/trigrams), lowercase.
 - normalized_title: <=80 chars, clean and factual (no emojis/promo).
-- brand: only if explicitly present in RAW_TEXT.
+- brand: only if explicitly in RAW_TEXT.
 - identifiers: only if explicitly present (isbn/ean/gtin/mpn)."""
-            
             try:
                 s1 = call_llm_json(system_prompt, user_prompt)
                 validate(instance=s1, schema=KEYWORDS_SCHEMA)
@@ -1669,7 +1664,7 @@ OUTPUT RULES:
                 normalized_title = smart_titlecase(raw_text_in[:80]) or _fallback_title(raw_text_in)
                 category_keywords = []
                 brand = None
-        # —— Step 2: Find eBay Category ——
+
         tree_id = get_category_tree_id()
         query = (" ".join(category_keywords)).strip() or normalized_title
         try:
@@ -1677,24 +1672,22 @@ OUTPUT RULES:
         except Exception:
             cat_id, cat_name = browse_majority_category(query)
             if not cat_id:
-                return jsonify({"error": "No category found from taxonomy or browse", "query": query}), 404
-        # —— Step 3: Get Required/Recommended Aspects ——
+                return jsonify({"error": "No category found", "query": query}), 404
+
         aspects_info = get_required_and_recommended_aspects(tree_id, cat_id)
-        req_in = aspects_info.get("required", [])
-        rec_in = aspects_info.get("recommended", [])
-        req_names = [n for n in (_aspect_name(x) for x in req_in) if n]
-        rec_names = [n for n in (_aspect_name(x) for x in rec_in) if n]
-        # —— Step 4: AI Fill Aspects ——
-        filled_aspects = {}
+        req_names = [n for n in (_aspect_name(x) for x in aspects_info.get("required", [])) if n]
+        rec_names = [n for n in (_aspect_name(x) for x in aspects_info.get("recommended", [])) if n]
+
+        filled_aspects = {name: ["Unknown"] for name in req_names}
         if OPENAI_API_KEY and (req_names or rec_names):
             system_prompt2 = (
-                "You fill eBay item aspects from provided text/images. NEVER leave required aspects empty; "
-                "extract when explicit, infer when reasonable, otherwise use 'Does not apply'/'Unknown' where acceptable."
+                "Fill eBay item aspects from provided text/images. NEVER leave required aspects empty; "
+                "extract when explicit, infer when reasonable, otherwise use 'Does not apply'/'Unknown'."
             )
             user_prompt2 = f"""
 INPUT TEXT:
 {normalized_title}
-IMAGE URLS (context only, do not OCR):
+IMAGE_URLS (context only, do not OCR):
 {chr(10).join(images) if images else "(none)"}
 ASPECTS:
 - REQUIRED: {req_names}
@@ -1709,45 +1702,31 @@ OUTPUT RULES:
             try:
                 s3 = call_llm_json(system_prompt2, user_prompt2)
                 validate(instance=s3, schema=ASPECTS_FILL_SCHEMA)
-                
                 allowed = set(req_names + rec_names)
                 for k, vals in (s3.get("filled") or {}).items():
                     if k in allowed and isinstance(vals, list):
                         clean_vals = list(dict.fromkeys([str(v).strip() for v in vals if str(v).strip()]))
                         if clean_vals:
                             filled_aspects[k] = clean_vals
-                
                 filled_aspects = apply_aspect_constraints(filled_aspects, aspects_info.get("raw"))
                 if "Book Title" in filled_aspects:
                     filled_aspects["Book Title"] = [v[:65] for v in filled_aspects["Book Title"]]
-                    
             except Exception as e:
                 print(f"[AI Aspects Error] {e}")
-                filled_aspects = {name: ["Unknown"] for name in req_names}
-        else:
-            filled_aspects = {name: ["Unknown"] for name in req_names}
-        # —— Step 5: AI Generate Description ——
-        if OPENAI_API_KEY and use_simple_prompt:
-            try:
-                desc_bundle = build_description_simple_from_raw(raw_text_in, html_mode=want_html)
-                description_text = desc_bundle["text"]
-                description_html = desc_bundle["html"] if want_html else description_text
-            except Exception as e:
-                print(f"[AI Description Error] {e}")
-                description_text = raw_text_in[:2000]
-                description_html = f"<p>{description_text}</p>" if want_html else description_text
-        else:
-            description_text = raw_text_in[:2000] 
-            description_html = f"<p>{description_text}</p>" if want_html else description_text
-        # —— Step 6: Prepare Preview Data ——
+
+        try:
+            desc_bundle = build_description_simple_from_raw(raw_text_in, html_mode=True)
+            description_text = desc_bundle["text"]
+            description_html = desc_bundle["html"]
+        except Exception as e:
+            print(f"[AI Description Error] {e}")
+            description_text = raw_text_in[:2000]
+            description_html = f"<p>{description_text}</p>"
+
         title = smart_titlecase(normalized_title)[:80]
-        result = {
+        return jsonify({
             "title": title,
-            "description": {
-                "text": description_text,
-                "html": description_html,
-                "used_html": want_html
-            },
+            "description": {"text": description_text, "html": description_html, "used_html": True},
             "aspects": filled_aspects,
             "sku": _gen_sku("RAW"),
             "price": price,
@@ -1755,40 +1734,16 @@ OUTPUT RULES:
             "condition": condition,
             "category_id": cat_id,
             "category_name": cat_name,
-            "marketplace_id": marketplaceId,
+            "marketplace_id": marketplace_id,
             "images": images
-        }
-        if include_debug:
-            result["debug"] = {
-                "step1_extract_keywords": {
-                    "normalized_title": normalized_title,
-                    "category_keywords": category_keywords,
-                    "brand": brand
-                },
-                "step2_category": {
-                    "queryUsed": query,
-                    "categoryTreeId": tree_id,
-                    "categoryId": cat_id,
-                    "categoryName": cat_name
-                },
-                "step3_aspects": {
-                    "requiredAspects": req_names,
-                    "recommendedAspects": rec_names,
-                    "filled": filled_aspects
-                },
-                "description": {
-                    "text": description_text,
-                    "html": description_html,
-                    "used_html": want_html
-                }
-            }
-        return jsonify(result)
+        })
     except requests.exceptions.RequestException as e:
-        return jsonify({"error": f"Network error while communicating with eBay: {str(e)}"}), 500
+        return jsonify({"error": f"Network error with eBay: {str(e)}"}), 500
     except RuntimeError as e:
         return jsonify({"error": str(e)}), 400
     except Exception as e:
-        return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
+        return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
+
 @app.route("/publish-item-from-preview", methods=["POST"])
 def publish_item_from_preview():
     if "user_id" not in session:
@@ -1820,7 +1775,6 @@ def publish_item_from_preview():
     if not title or not description_text or not images:
         return jsonify({"error": "Title, description, and at least one image URL are required"}), 400
     try:
-        # —— Step 1: Create eBay Listing ——
         access = ensure_access_token(session["user_id"])
         lang = "en-GB" if marketplace_id == "EBAY_GB" else "en-US"
         headers = {
@@ -1830,7 +1784,6 @@ def publish_item_from_preview():
             "Accept-Language": lang,
             "X-EBAY-C-MARKETPLACE-ID": marketplace_id,
         }
-        # Create inventory item
         inv_url = f"{BASE}/sell/inventory/v1/inventory_item/{sku}"
         inv_payload = {
             "product": {
@@ -1844,18 +1797,14 @@ def publish_item_from_preview():
         }
         r = requests.put(inv_url, headers=headers, json=inv_payload, timeout=30)
         if r.status_code not in (200, 201, 204):
-            error_msg = parse_ebay_error(r.text)
-            return jsonify({"error": error_msg, "step": "inventory_item"}), 400
-        # Get policies
+            return jsonify({"error": parse_ebay_error(r.text), "step": "inventory_item"}), 400
         try:
             fulfillment_policy_id = get_first_policy_id("fulfillment", access, marketplace_id)
             payment_policy_id = get_first_policy_id("payment", access, marketplace_id)
             return_policy_id = get_first_policy_id("return", access, marketplace_id)
         except RuntimeError as e:
-            return jsonify({"error": f"Missing eBay policies: {str(e)}. Please set up your selling policies in your eBay account."}), 400
-        
+            return jsonify({"error": f"Missing eBay policies: {str(e)}. Please set up your selling policies."}), 400
         merchant_location_key = get_or_create_location(access, marketplace_id, profile)
-        # Create offer
         offer_payload = {
             "sku": sku,
             "marketplaceId": marketplace_id,
@@ -1874,38 +1823,32 @@ def publish_item_from_preview():
         offer_url = f"{BASE}/sell/inventory/v1/offer"
         r = requests.post(offer_url, headers=headers, json=offer_payload, timeout=30)
         if r.status_code not in (200, 201):
-            error_msg = parse_ebay_error(r.text)
-            return jsonify({"error": error_msg, "step": "create_offer"}), 400
+            return jsonify({"error": parse_ebay_error(r.text), "step": "create_offer"}), 400
         offer_id = r.json().get("offerId")
-        
-        # Publish listing
         pub_url = f"{BASE}/sell/inventory/v1/offer/{offer_id}/publish"
         r = requests.post(pub_url, headers=headers, timeout=30)
         if r.status_code not in (200, 201):
-            error_msg = parse_ebay_error(r.text)
-            return jsonify({"error": error_msg, "step": "publish"}), 400
+            return jsonify({"error": parse_ebay_error(r.text), "step": "publish"}), 400
         pub = r.json()
         listing_id = pub.get("listingId") or (pub.get("listingIds") or [None])[0]
         view_url = f"https://www.ebay.co.uk/itm/{listing_id}" if marketplace_id == "EBAY_GB" else None
-        
         update_listing_count()
         listing_data = {
-            'listing_id': listing_id,
-            'offer_id': offer_id,
-            'sku': sku,
-            'title': title,
-            'price_value': price['value'],
-            'price_currency': price['currency'],
-            'quantity': quantity,
-            'condition': condition,
-            'category_id': category_id,
-            'category_name': body.get("category_name"),
-            'marketplace_id': marketplace_id,
-            'view_url': view_url
+            "listing_id": listing_id,
+            "offer_id": offer_id,
+            "sku": sku,
+            "title": title,
+            "price_value": price["value"],
+            "price_currency": price["currency"],
+            "quantity": quantity,
+            "condition": condition,
+            "category_id": category_id,
+            "category_name": body.get("category_name"),
+            "marketplace_id": marketplace_id,
+            "view_url": view_url
         }
         save_user_listing(session["user_id"], listing_data)
-        
-        result = {
+        return jsonify({
             "status": "published",
             "offerId": offer_id,
             "listingId": listing_id,
@@ -1916,14 +1859,15 @@ def publish_item_from_preview():
             "categoryName": body.get("category_name"),
             "title": title,
             "aspects": aspects
-        }
-        return jsonify(result)
+        })
     except requests.exceptions.RequestException as e:
-        return jsonify({"error": f"Network error while communicating with eBay: {str(e)}"}), 500
+        return jsonify({"error": f"Network error with eBay: {str(e)}"}), 500
     except RuntimeError as e:
         return jsonify({"error": str(e)}), 400
     except Exception as e:
-        return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
+        return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
+
+
 # ------------------------------------------------------------------------------------------------------------
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 MAX_FILE_SIZE = 5 * 1024 * 1024
