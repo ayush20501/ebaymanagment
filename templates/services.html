@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services - ListFast.ai</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .hero-gradient {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 8s ease-in-out infinite;
+        }
+        @keyframes gradientShift {
+            0%, 100% {    
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+        .hover-lift {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
+        }
+        .service-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 2px solid transparent;
+        }
+        .service-card:hover {
+            border: 2px solid #3b82f6;
+            background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%);
+        }
+        .image-enhance-gradient {
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+        }
+        .single-listing-gradient {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        }
+        .multipack-gradient {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        .bundle-gradient {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+        .feature-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        .pulse-animation {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .8;
+            }
+        }
+        .floating-animation {
+            animation: floating 3s ease-in-out infinite;
+        }
+        @keyframes floating {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
+            <div class="flex justify-between h-20">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-gray-900">ListFast.ai</h1>
+                    <div class="ml-8 text-sm text-gray-500">
+                        Our Services
+                    </div>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <a href="dashboard.html" class="text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg transition-colors hover-lift">
+                        <span class="font-medium">Dashboard</span>
+                    </a>
+                    <a href="display-profile.html" id="profile-btn" class="flex items-center space-x-2 text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg transition-colors hover-lift">
+                        <img id="user-profile-pic" src="https://via.placeholder.com/32" alt="Profile" class="w-8 h-8 rounded-full border-2 border-gray-200 object-cover">
+                        <span class="font-medium">Profile</span>
+                    </a>
+                    <span id="user-email" class="text-gray-600 text-sm"></span>
+                    <button id="logout-btn" class="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors font-medium hover-lift">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="max-w-7xl mx-auto px-6 lg:px-12 py-16">
+        <div class="text-center mb-16">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+                    Choose Your
+                    <span class="hero-gradient bg-clip-text text-transparent">
+                        Service
+                    </span>
+                </h2>
+                <p class="text-xl text-gray-600 leading-relaxed">
+                    From image enhancement to complex bundles, we have the perfect solution for your eBay listing needs.
+                    Select the service that matches your requirements.
+                </p>
+            </div>
+        </div>
+
+        <!-- Services Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 mb-16">
+            <!-- Image Enhancement Service -->
+            <div class="service-card rounded-2xl shadow-lg p-8 hover-lift floating-animation">
+                <div class="image-enhance-gradient text-white p-6 rounded-xl mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="feature-icon">
+                            🎨
+                        </div>
+                        <div class="text-right">
+                            <div class="text-3xl font-bold">01</div>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">Image Enhancement</h3>
+                    <p class="text-purple-100 text-sm">Professional image editing for your products</p>
+                </div>
+                
+                <div class="space-y-4 mb-8">
+                    <div class="flex items-start space-x-3">
+                        <div class="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
+                        <span class="text-gray-700">Remove backgrounds automatically</span>
+                    </div>
+                    <div class="flex items-start space-x-3">
+                        <div class="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
+                        <span class="text-gray-700">Add professional titles and watermarks</span>
+                    </div>
+                    <div class="flex items-start space-x-3">
+                        <div class="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
+                        <span class="text-gray-700">Brand logo integration</span>
+                    </div>
+                    <div class="flex items-start space-x-3">
+                        <div class="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
+                        <span class="text-gray-700">High-quality image optimization</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-2xl font-bold text-gray-900">£2.99</div>
+                        <div class="text-sm text-gray-500">per image</div>
+                    </div>
+                    <button class="image-enhance-gradient text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity hover-lift">
+                        Get Started
+                    </button>
+                </div>
+            </div>
+
+            <!-- Single Item Listing -->
+            <div class="service-card rounded-2xl shadow-lg p-8 hover-lift">
+                <div class="single-listing-gradient text-white p-6 rounded-xl mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="feature-icon">
+                            📦
+                        </div>
+                        <div class="text-right">
+                            <div class="text-3xl font-bold">02</div>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">Single Item Listing</h3>
+                    <p class="text-blue-100 text-sm">Perfect for individual product listings</p>
+                </div>
+                
+                <div class="space-y-4 mb-8">
+                    <div class="flex items-start space-x-3">
+                        <div class="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                        <span class="text-gray-700">AI-powered title optimization</span>
+                    </div>
+                    <div class="flex items-start space-x-3">
+                        <div class="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                        <span class="text-gray-700">Professional product descriptions</span>
+                    </div>
+                    <div class="flex items-start space-x-3">
+                        <div class="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                        <span class="text-gray-700">Automatic category detection</span>
+                    </div>
+                    <div class="flex items-start space-x-3">
+                        <div class="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                        <span class="text-gray-700">SEO keyword integration</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-2xl font-bold text-gray-900">£4.99</div>
+                        <div class="text-sm text-gray-500">per listing</div>
+                    </div>
+                    <button class="single-listing-gradient text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity hover-lift pulse-animation">
+                        Create Listing
+                    </button>
+                </div>
+            </div>
+
+            <!-- Multipack Listing -->
+            <div class="service-card rounded-2xl shadow-lg p-8 hover-lift">
+                <div class="multipack-gradient text-white p-6 rounded-xl mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="feature-icon">
+                            📋
+                        </div>
+                        <div class="text-right">
+                            <div class="text-3xl font-bold">03</div>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">Multipack Listing</h3>
+                    <p class="text-green-100 text-sm">Multiple quantities of the same item</p>
+                </div>
+                
+                <div class="space-y-4 mb-8">
+                    <div class="flex items-start space-x-3">
+                        <div class="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+                        <span class="text-gray-700">Bulk quantity optimization</span>
+                    </div>
+                    <div class="flex items-start space-x-3">
+                        <div class="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+                        <span class="text-gray-700">Volume discount pricing</span>
+                    </div>
+                    <div class="flex items-start space-x-3">
+                        <div class="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+                        <span class="text-gray-700">Inventory management features</span>
+                    </div>
+                    <div class="flex items-start space-x-3">
+                        <div class="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+                        <span class="text-gray-700">Wholesale buyer targeting</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-2xl font-bold text-gray-900">£7.99</div>
+                        <div class="text-sm text-gray-500">per listing</div>
+                    </div>
+                    <button class="multipack-gradient text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity hover-lift">
+                        List Multipack
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bundle Listing -->
+            <div class="service-card rounded-2xl shadow-lg p-8 hover-lift floating-animation" style="animation-delay: 1s;">
+                <div class="bundle-gradient text-white p-6 rounded-xl mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="feature-icon">
+                            🎁
+                        </div>
+                        <div class="text-right">
+                            <div class="text-3xl font-bold">04</div>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">Bundle Listing</h3>
+                    <p class="text-orange-100 text-sm">Multiple different items as one package</p>
+                </div>
+                
+                <div class="space-y-4 mb-8">
+                    <div class="flex items-start space-x-3">
+                        <div class="w-2 h-2 bg-orange-500 rounded-full mt-2"></div>
+                        <span class="text-gray-700">Smart bundle recommendations</span>
+                    </div>
+                    <div class="flex items-start space-x-3">
+                        <div class="w-2 h-2 bg-orange-500 rounded-full mt-2"></div>
+                        <span class="text-gray-700">Cross-sell optimization</span>
+                    </div>
+                    <div class="flex items-start space-x-3">
+                        <div class="w-2 h-2 bg-orange-500 rounded-full mt-2"></div>
+                        <span class="text-gray-700">Value proposition highlights</span>
+                    </div>
+                    <div class="flex items-start space-x-3">
+                        <div class="w-2 h-2 bg-orange-500 rounded-full mt-2"></div>
+                        <span class="text-gray-700">Combined shipping benefits</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-2xl font-bold text-gray-900">£12.99</div>
+                        <div class="text-sm text-gray-500">per bundle</div>
+                    </div>
+                    <button class="bundle-gradient text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity hover-lift">
+                        Create Bundle
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Info Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Why Choose Us -->
+            <div class="bg-white rounded-2xl shadow-lg p-8">
+                <h3 class="text-2xl font-bold text-gray-900 mb-6">Why Choose Our Services?</h3>
+                <div class="space-y-4">
+                    <div class="flex items-start space-x-4">
+                        <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-sm">
+                            AI
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">AI-Powered Optimization</h4>
+                            <p class="text-gray-600 text-sm">Advanced algorithms ensure your listings rank higher in search results</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-4">
+                        <div class="w-8 h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center font-bold text-sm">
+                            24h
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">Quick Turnaround</h4>
+                            <p class="text-gray-600 text-sm">Most services completed within 24 hours or less</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-4">
+                        <div class="w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center font-bold text-sm">
+                            ★
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-900">Proven Results</h4>
+                            <p class="text-gray-600 text-sm">Our listings typically see 40% higher engagement rates</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Support -->
+            <div class="bg-gradient-to-br from-gray-900 to-gray-800 text-white rounded-2xl shadow-lg p-8">
+                <h3 class="text-2xl font-bold mb-4">Need Help Choosing?</h3>
+                <p class="text-gray-300 mb-6">Our team is here to help you select the perfect service for your needs. Get personalized recommendations based on your products.</p>
+                <div class="space-y-3">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-2 h-2 bg-blue-400 rounded-full"></div>
+                        <span class="text-gray-300">Free consultation available</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <div class="w-2 h-2 bg-blue-400 rounded-full"></div>
+                        <span class="text-gray-300">Custom solutions for bulk orders</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <div class="w-2 h-2 bg-blue-400 rounded-full"></div>
+                        <span class="text-gray-300">Money-back guarantee</span>
+                    </div>
+                </div>
+                <button class="bg-white text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors mt-6 hover-lift">
+                    Contact Support
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Authentication check and user info display
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch('/auth-status');
+                const data = await response.json();
+                
+                if (!data.is_logged_in) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                document.getElementById('user-email').textContent = data.email;
+                
+                // Load profile image
+                try {
+                    const profileResponse = await fetch('/profile');
+                    const profileData = await profileResponse.json();
+                    if (profileResponse.ok && profileData.profile && profileData.profile.profile_pic_url) {
+                        document.getElementById('user-profile-pic').src = profileData.profile.profile_pic_url;
+                    }
+                } catch (error) {
+                    console.error('Error loading profile image:', error);
+                }
+            } catch (error) {
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Logout functionality
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            try {
+                await fetch('/logout', { method: 'POST' });
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('Logout failed:', error);
+            }
+        });
+
+        // Service button interactions
+        document.querySelectorAll('button').forEach(button => {
+            if (button.textContent.includes('Get Started') || 
+                button.textContent.includes('Create Listing') || 
+                button.textContent.includes('List Multipack') || 
+                button.textContent.includes('Create Bundle')) {
+                
+                button.addEventListener('click', () => {
+                    const serviceName = button.textContent;
+                    alert(`${serviceName} service will be available soon! We're working hard to bring you this feature.`);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
