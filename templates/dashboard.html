@@ -7,17 +7,14 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
         body {
             font-family: 'Inter', sans-serif;
         }
-
         .hero-gradient {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
             background-size: 200% 200%;
             animation: gradientShift 8s ease-in-out infinite;
         }
-
         @keyframes gradientShift {
             0%, 100% {
                 background-position: 0% 50%;
@@ -26,43 +23,34 @@
                 background-position: 100% 50%;
             }
         }
-
         .hover-lift {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-
         .hover-lift:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
         }
-
         .card-gradient {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
-
         .success-gradient {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         }
-
         .modal-backdrop {
             backdrop-filter: blur(8px);
         }
-
         .input-field {
             transition: all 0.3s ease;
             border: 2px solid #e5e7eb;
         }
-
         .input-field:focus {
             outline: none;
             border-color: #3b82f6;
             box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
         }
-
         .pulse-animation {
             animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
-
         @keyframes pulse {
             0%, 100% {
                 opacity: 1;
@@ -71,36 +59,28 @@
                 opacity: .8;
             }
         }
-
         .prose {
             line-height: 1.6;
         }
-
         .prose p {
             margin-bottom: 1em;
         }
-
         .prose p:last-child {
             margin-bottom: 0;
         }
-
         .prose strong {
             font-weight: 600;
         }
-
         .prose em {
             font-style: italic;
         }
-
         .prose ul, .prose ol {
             margin: 1em 0;
             padding-left: 1.5em;
         }
-
         .prose li {
             margin-bottom: 0.5em;
         }
-
         .image-input {
             border-radius: 8px;
         }
@@ -625,7 +605,7 @@
                 const imgDiv = document.createElement('div');
                 imgDiv.className = 'relative group';
                 imgDiv.innerHTML = `
-                    <img src="${url}" alt="Listing Image ${index + 1}" 
+                    <img src="${url}" alt="Listing Image ${index + 1}"
                          class="w-full h-32 object-cover rounded-lg border-2 border-gray-200 hover:border-blue-400 transition-colors cursor-pointer"
                          onclick="openImageModal('${url}')"
                          onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xMiA5VjEzTTEyIDE3SDE2TTggMTdIMTJNOCAxM0gxMk04IDlIMTZNNCAxN1Y3QTIgMiAwIDAgMSA2IDVIMThBMiAyIDAgMCExIDIwIDdWMTdBMiAyIDAgMCExIDE4IDE5SDZBMiAyIDAgMCExIDQgMTdaIiBzdHJva2U9IiM2QjczODAiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjwvc3ZnPgo='; this.className += ' opacity-50'">
@@ -685,6 +665,7 @@
             const button = document.getElementById('preview-btn');
             await generatePreview(formData, button);
         });
+        // Modified preview form submission to format description with LLM
         document.getElementById('preview-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const previewData = JSON.parse(document.getElementById('preview-form').dataset.preview || '{}');
@@ -693,16 +674,23 @@
             button.textContent = 'Publishing...';
             previewData.title = document.getElementById('preview-title').value.trim();
             previewData.description.text = document.getElementById('preview-description').value.trim();
-            const editedText = previewData.description.text;
-            if (editedText.trim()) {
-                const paragraphs = editedText
+            // Call LLM to format the edited description
+            try {
+                const formattedDescription = await formatDescriptionWithLLM(previewData.description.text);
+                previewData.description.html = formattedDescription.html;
+                previewData.description.used_html = true;
+            } catch (error) {
+                console.error("Failed to format description:", error);
+                // Fallback: Use simple HTML reconstruction
+                const editedText = previewData.description.text;
+                previewData.description.html = editedText
                     .split('\n\n')
                     .filter(p => p.trim())
-                    .map(p => `<p>${p.trim().replace(/\n/g, '<br>')}</p>`);
-                previewData.description.html = paragraphs.join('');
-            } else {
-                previewData.description.html = '<p>No description provided</p>';
+                    .map(p => `<p>${p.trim().replace(/\n/g, '<br>')}</p>`)
+                    .join('');
+                previewData.description.used_html = true;
             }
+            // Update aspects
             const aspectInputs = document.getElementById('preview-aspects').querySelectorAll('input[data-aspect]');
             const editedAspects = {};
             aspectInputs.forEach(input => {
@@ -751,6 +739,20 @@
             button.disabled = false;
             button.textContent = 'Publish to eBay';
         });
+        // New function to format description with LLM
+        async function formatDescriptionWithLLM(plainText) {
+            const response = await fetch('/format-description', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ text: plainText }),
+            });
+            if (!response.ok) {
+                throw new Error('Failed to format description');
+            }
+            return await response.json();
+        }
         document.getElementById('close-preview').addEventListener('click', () => {
             document.getElementById('preview-modal').classList.add('hidden');
         });
