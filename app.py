@@ -999,7 +999,7 @@ def login():
                     return jsonify({
                         "status": "success", 
                         "message": "Logged in successfully",
-                        "redirect": "/dashboard.html",
+                        "redirect": "/services.html",
                         "is_admin": False
                     })
             return jsonify({"error": "Invalid email or password"}), 401
