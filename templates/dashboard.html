@@ -104,6 +104,18 @@
         .image-input {
             border-radius: 8px;
         }
+
+        .error-message {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #991b1b;
+            background-color: #fef2f2;
+            border: 2px solid #f87171;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 <body class="min-h-screen bg-gray-50">
@@ -189,7 +201,7 @@
                         <div id="preview-images" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
                         </div>
                     </div>
-                    <div id="preview-error" class="hidden bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-xl font-medium">
+                    <div id="preview-error" class="hidden error-message">
                     </div>
                     <div id="preview-success" class="hidden bg-green-50 border border-green-200 text-green-800 px-6 py-4 rounded-xl font-medium">
                     </div>
@@ -207,12 +219,10 @@
     </div>
     <div id="image-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
         <div class="relative max-w-4xl max-h-full">
-            <img id="modal-image" src="" alt="Full size preview" class="max-w-full max-h-full object-contain
-            rounded-lg">
+            <img id="modal-image" src="" alt="Full size preview" class="max-w-full max-h-full object-contain rounded-lg">
             <button onclick="closeImageModal()" class="absolute top-4 right-4 text-white hover:text-gray-300 bg-black bg-opacity-50 rounded-full p-2">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                    </path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
             </button>
         </div>
@@ -232,7 +242,7 @@
                 </p>
             </div>
         </div>
-        <div id="error-message" class="hidden bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-xl mb-8 font-medium">
+        <div id="error-message" class="hidden error-message">
         </div>
         <div id="success-message" class="hidden bg-green-50 border border-green-200 text-green-800 px-6 py-4 rounded-xl mb-8 font-medium">
         </div>
@@ -252,7 +262,7 @@
                         <div>
                             <label class="block text-lg font-semibold text-gray-900 mb-3">Product Description *</label>
                             <textarea id="raw_text" required rows="5" placeholder="Describe your product in detail - include brand, model, features, condition details, etc." class="input-field w-full px-4 py-4 rounded-xl text-base resize-none"></textarea>
-                            <p class="text-sm text-gray-500 mt-3">💡 The more detail you provide, the better our AI can optimize your listing for search and sales</p>
+                            <p class="text-sm text-gray-500 mt-3">💡 For electronics, include details like Device Charging Range (e.g., 7.4-8.4 volts) for better AI optimization.</p>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
@@ -558,7 +568,13 @@
                     }, 1000);
                 } else {
                     hideAIStatus();
-                    document.getElementById('error-message').textContent = data.error || 'Failed to publish listing';
+                    let errorMessage = 'Failed to publish listing. Please check your inputs and try again.';
+                    if (data.errors && data.errors[0]?.errorId === 25002 && data.errors[0]?.parameters?.some(p => p.name === '2' && p.value === 'Device Charging Range')) {
+                        errorMessage = 'Please enter a valid Device Charging Range (e.g., 7.4-8.4 volts) in the description or preview form.';
+                    } else if (data.errors && data.errors[0]?.message) {
+                        errorMessage = `Listing error: ${data.errors[0].message}. Please update your listing details.`;
+                    }
+                    document.getElementById('error-message').textContent = errorMessage;
                     document.getElementById('error-message').classList.remove('hidden');
                 }
             } catch (error) {
@@ -599,7 +615,11 @@
                     }, 1000);
                 } else {
                     hideAIStatus();
-                    document.getElementById('error-message').textContent = data.error || 'Failed to generate preview';
+                    let errorMessage = 'Failed to generate preview. Please check your inputs and try again.';
+                    if (data.errors && data.errors[0]?.message) {
+                        errorMessage = `Preview error: ${data.errors[0].message}. Please update your listing details.`;
+                    }
+                    document.getElementById('error-message').textContent = errorMessage;
                     document.getElementById('error-message').classList.remove('hidden');
                 }
             } catch (error) {
@@ -635,11 +655,17 @@
             const aspectsContainer = document.getElementById('preview-aspects');
             aspectsContainer.innerHTML = '';
             Object.entries(data.aspects || {}).forEach(([key, values]) => {
+                const isDeviceChargingRange = key === "Device Charging Range";
                 const aspectDiv = document.createElement('div');
                 aspectDiv.innerHTML = `
                     <label class="block text-sm font-medium text-gray-700 mb-2">${key}</label>
-                    <input type="text" value="${values.join(', ')}" data-aspect="${key}" class="input-field w-full px-4 py-3 rounded-lg mb-2">
+                    <input type="text" value="${values.join(', ')}" data-aspect="${key}" 
+                           class="input-field w-full px-4 py-3 rounded-lg mb-2 ${isDeviceChargingRange && values[0] === 'Does not apply' ? 'border-red-500' : ''}"
+                           ${isDeviceChargingRange ? 'placeholder="e.g., 7.4-8.4"' : ''}>
                 `;
+                if (isDeviceChargingRange && values[0] === "Does not apply") {
+                    aspectDiv.innerHTML += `<p class="text-sm text-red-500 mt-1">Please enter a valid range (e.g., 7.4-8.4 volts)</p>`;
+                }
                 aspectsContainer.appendChild(aspectDiv);
             });
             const currencySymbols = { GBP: '£', USD: '$', EUR: '€' };
@@ -721,9 +747,8 @@
             button.textContent = 'Publishing...';
             previewData.title = document.getElementById('preview-title').value.trim();
             previewData.description.text = document.getElementById('preview-description').value.trim();
-            const editedText = previewData.description.text;
-            if (editedText.trim()) {
-                const paragraphs = editedText
+            if (previewData.description.text.trim()) {
+                const paragraphs = previewData.description.text
                     .split('\n\n')
                     .filter(p => p.trim())
                     .map(p => `<p>${p.trim().replace(/\n/g, '<br>')}</p>`);
@@ -733,9 +758,22 @@
             }
             const aspectInputs = document.getElementById('preview-aspects').querySelectorAll('input[data-aspect]');
             const editedAspects = {};
+            let isValid = true;
             aspectInputs.forEach(input => {
                 const aspect = input.dataset.aspect;
                 const values = input.value.split(',').map(v => v.trim()).filter(v => v);
+                if (aspect === "Device Charging Range" && values.length) {
+                    const range = values[0].split('-').map(v => parseFloat(v.trim()));
+                    if (range.length !== 2 || isNaN(range[0]) || isNaN(range[1]) || 
+                        range[0] >= range[1] || range[0].toString().replace('.', '').length > 3 || 
+                        range[1].toString().replace('.', '').length > 3 || 
+                        (range[0].toString().includes('.') && range[0].toString().split('.')[1].length > 1) || 
+                        (range[1].toString().includes('.') && range[1].toString().split('.')[1].length > 1)) {
+                        isValid = false;
+                        document.getElementById('preview-error').textContent = 'Device Charging Range must be in min-max format (e.g., 7.4-8.4 volts), up to 3 digits, 1 decimal max, with min < max.';
+                        document.getElementById('preview-error').classList.remove('hidden');
+                    }
+                }
                 if (values.length) {
                     editedAspects[aspect] = values;
                 }
@@ -745,6 +783,11 @@
                 document.getElementById('preview-error').textContent = 'Title is required.';
                 document.getElementById('preview-error').classList.remove('hidden');
                 document.getElementById('preview-success').classList.add('hidden');
+                button.disabled = false;
+                button.textContent = 'Publish to eBay';
+                return;
+            }
+            if (!isValid) {
                 button.disabled = false;
                 button.textContent = 'Publish to eBay';
                 return;
@@ -767,7 +810,13 @@
                         window.location.href = 'success.html';
                     }, 1500);
                 } else {
-                    document.getElementById('preview-error').textContent = data.error || 'Failed to publish listing';
+                    let errorMessage = 'Failed to publish listing. Please check your inputs and try again.';
+                    if (data.errors && data.errors[0]?.errorId === 25002 && data.errors[0]?.parameters?.some(p => p.name === '2' && p.value === 'Device Charging Range')) {
+                        errorMessage = 'Please enter a valid Device Charging Range (e.g., 7.4-8.4 volts) in the description or preview form.';
+                    } else if (data.errors && data.errors[0]?.message) {
+                        errorMessage = `Listing error: ${data.errors[0].message}. Please update your listing details.`;
+                    }
+                    document.getElementById('preview-error').textContent = errorMessage;
                     document.getElementById('preview-error').classList.remove('hidden');
                     document.getElementById('preview-success').classList.add('hidden');
                 }
