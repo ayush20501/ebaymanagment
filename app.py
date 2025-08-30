@@ -846,9 +846,15 @@ def ebay_auth_page():
 @app.route("/dashboard.html")
 def dashboard_page():
     return send_from_directory(app.template_folder, 'dashboard.html')
+
 @app.route("/success.html")
 def success_page():
     return send_from_directory(app.template_folder, 'success.html')
+
+@app.route("/services.html")
+def services_page():
+    return send_from_directory(app.template_folder, 'services.html')
+	
 @app.route("/admin-portal.html")
 def admin_portal_page():
     uid = session.get("user_id")
