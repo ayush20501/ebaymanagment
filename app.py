@@ -1225,8 +1225,8 @@ OUTPUT RULES:
             user_prompt2 = f"""
 INPUT TEXT:
 {normalized_title}
-IMAGE URLS (context only, do not OCR):
-{chr(10).join(images) if images else "(none)"}
+RAW TEXT:
+{raw_text_in}
 ASPECTS:
 - REQUIRED: {req_names}
 - RECOMMENDED: {rec_names}
@@ -1687,8 +1687,8 @@ OUTPUT RULES:
             user_prompt2 = f"""
 INPUT TEXT:
 {normalized_title}
-IMAGE_URLS (context only, do not OCR):
-{chr(10).join(images) if images else "(none)"}
+RAW TEXT:
+{raw_text_in}
 ASPECTS:
 - REQUIRED: {req_names}
 - RECOMMENDED: {rec_names}
