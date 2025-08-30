@@ -6,161 +6,395 @@
     <title>Dashboard - ListFast.ai</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Existing styles remain unchanged */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .hero-gradient {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 8s ease-in-out infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .hover-lift {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .success-gradient {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .modal-backdrop {
+            backdrop-filter: blur(8px);
+        }
+
+        .input-field {
+            transition: all 0.3s ease;
+            border: 2px solid #e5e7eb;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .pulse-animation {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .8;
+            }
+        }
+
+        .prose {
+            line-height: 1.6;
+        }
+
+        .prose p {
+            margin-bottom: 1em;
+        }
+
+        .prose p:last-child {
+            margin-bottom: 0;
+        }
+
+        .prose strong {
+            font-weight: 600;
+        }
+
+        .prose em {
+            font-style: italic;
+        }
+
+        .prose ul, .prose ol {
+            margin: 1em 0;
+            padding-left: 1.5em;
+        }
+
+        .prose li {
+            margin-bottom: 0.5em;
+        }
+
+        .image-input {
+            border-radius: 8px;
+        }
     </style>
 </head>
 <body class="min-h-screen bg-gray-50">
-    <!-- Header, Preview Modal, Image Modal, and Main Content (up to Form Section) remain unchanged -->
-
-    <!-- Main Form -->
-    <div class="grid lg:grid-cols-3 gap-12">
-        <!-- Form Section -->
-        <div class="lg:col-span-2">
-            <form id="listing-form" class="bg-white rounded-2xl shadow-lg p-8">
-                <!-- Quick Fill Button -->
-                <div class="mb-8 flex justify-between items-center p-4 bg-green-50 border border-green-200 rounded-xl">
-                    <button type="button" id="autofill-btn" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center hover-lift">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                        </svg>
-                        Fill Sample Data
-                    </button>
-                    <span class="text-sm text-green-700 font-medium">Click to see how it works with example data</span>
+    <nav class="bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
+            <div class="flex justify-between h-20">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-gray-900">ListFast.ai</h1>
+                    <div class="ml-8 text-sm text-gray-500">
+                        Dashboard
+                    </div>
                 </div>
-
-                <!-- Form Fields -->
-                <div class="space-y-8">
+                <div class="flex items-center space-x-6">
+                    <a href="display-profile.html" id="profile-btn" class="flex items-center space-x-2 text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg transition-colors hover-lift">
+                        <img id="user-profile-pic" src="https://via.placeholder.com/32" alt="Profile" class="w-8 h-8 rounded-full border-2 border-gray-200 object-cover">
+                        <span class="font-medium">Profile</span>
+                    </a>
+                    <span id="user-email" class="text-gray-600 text-sm"></span>
+                    <button id="logout-btn" class="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors font-medium hover-lift">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div id="preview-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 modal-backdrop overflow-y-auto h-full w-full z-50">
+        <div class="relative top-8 mx-auto p-6 border w-11/12 md:w-4/5 lg:w-3/4 xl:w-2/3 shadow-2xl rounded-2xl bg-white max-w-4xl">
+            <div class="mt-3">
+                <div class="flex items-center justify-between mb-8">
                     <div>
-                        <label class="block text-lg font-semibold text-gray-900 mb-3">Product Description *</label>
-                        <textarea id="raw_text" required rows="5" placeholder="Describe your product in detail - include brand, model, features, condition details, etc." class="input-field w-full px-4 py-4 rounded-xl text-base resize-none"></textarea>
-                        <p class="text-sm text-gray-500 mt-3">💡 The more detail you provide, the better our AI can optimize your listing for search and sales</p>
+                        <h3 class="text-2xl font-bold text-gray-900">Preview Listing</h3>
+                        <p class="text-gray-600 mt-1">Review and edit your listing before publishing to eBay</p>
                     </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-lg font-semibold text-gray-900 mb-3">Price (£) *</label>
-                            <input type="number" id="price_value" step="0.01" min="0.01" required placeholder="0.00" class="input-field w-full px-4 py-4 rounded-xl text-base">
-                        </div>
-                        <div>
-                            <label class="block text-lg font-semibold text-gray-900 mb-3">Quantity *</label>
-                            <input type="number" id="quantity" min="1" value="1" required class="input-field w-full px-4 py-4 rounded-xl text-base">
-                        </div>
-                        <div>
-                            <label class="block text-lg font-semibold text-gray-900 mb-3">Condition *</label>
-                            <select id="condition" required class="input-field w-full px-4 py-4 rounded-xl text-base">
-                                <option value="">Select condition...</option>
-                                <option value="NEW">New</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-lg font-semibold text-gray-900 mb-3">Currency *</label>
-                            <select id="currency" required class="input-field w-full px-4 py-4 rounded-xl text-base">
-                                <option value="GBP" selected>GBP (£)</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Image Input Section -->
+                    <button id="close-preview" class="text-gray-400 hover:text-gray-600 hover-lift">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <form id="preview-form" class="space-y-6">
                     <div>
-                        <label class="block text-lg font-semibold text-gray-900 mb-3">Product Images *</label>
-                        <div class="space-y-4">
-                            <div class="flex gap-2">
-                                <button type="button" id="upload-image-btn" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium hover-lift">
-                                    📷 Upload Image
-                                </button>
-                                <input type="file" id="upload-image-input" accept="image/*" class="hidden">
-                            </div>
-                            <div id="images-container" class="space-y-2">
-                                <div class="flex items-center gap-2">
-                                    <input type="text" name="image_url" placeholder="Paste an image URL or upload above" class="image-input input-field flex-1 px-4 py-3 rounded-lg text-base">
-                                    <button type="button" id="add-image-btn" class="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-bold text-lg">
-                                        +
-                                    </button>
+                        <label class="block text-lg font-semibold text-gray-900 mb-3">Title</label>
+                        <input type="text" id="preview-title" maxlength="80" class="input-field w-full px-4 py-4 rounded-xl text-base">
+                        <p class="text-sm text-gray-500 mt-2">Max 80 characters</p>
+                    </div>
+                    <div>
+                        <label class="block text-lg font-semibold text-gray-900 mb-3">Description</label>
+                        <div class="mb-3">
+                            <div class="bg-gray-50 p-4 rounded-lg border">
+                                <div class="text-sm font-medium text-gray-600 mb-2">Formatted Preview:</div>
+                                <div id="preview-description-formatted" class="prose prose-sm max-w-none text-gray-800">
                                 </div>
                             </div>
                         </div>
-                        <p class="text-sm text-gray-500 mt-3">📸 You can upload images or paste HTTPS URLs. High-quality images improve sales significantly!</p>
+                        <textarea id="preview-description" rows="6" class="input-field w-full px-4 py-4 rounded-xl text-base resize-none" placeholder="Enter description text here..."></textarea>
+                        <p class="text-sm text-gray-500 mt-2">Edit the generated description if needed. HTML tags will be preserved in the final listing.</p>
                     </div>
-
-                    <!-- Submit Button -->
-                    <div class="pt-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <button type="button" id="preview-btn" class="bg-blue-600 text-white py-4 px-8 rounded-xl text-lg font-semibold hover:bg-blue-700 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed hover-lift order-2 md:order-1">
-                                Preview, Edit & Publish
-                            </button>
-                            <button type="submit" id="publish-btn" class="bg-green-600 text-white py-4 px-8 rounded-xl text-lg font-semibold hover:bg-green-700 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed hover-lift pulse-animation order-1 md:order-2">
-                                Publish to eBay
-                            </button>
+                    <div>
+                        <label class="block text-lg font-semibold text-gray-900 mb-3">Item Aspects</label>
+                        <div id="preview-aspects" class="space-y-3">
                         </div>
-                        <p class="text-sm text-gray-500 text-center mt-3">
-                            💡 Use "Preview" to review and edit your listing before publishing, or "Publish" to go live immediately
-                        </p>
+                        <p class="text-sm text-gray-500 mt-2">Edit or add aspect values as needed (comma-separated)</p>
                     </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-lg font-semibold text-gray-900 mb-3">Price</label>
+                            <p id="preview-price-currency" class="text-base text-gray-900"></p>
+                            <p class="text-sm text-gray-500 mt-2">Price and currency (non-editable)</p>
+                        </div>
+                        <div>
+                            <label class="block text-lg font-semibold text-gray-900 mb-3">Quantity</label>
+                            <p id="preview-quantity" class="text-base text-gray-900"></p>
+                            <p class="text-sm text-gray-500 mt-2">Number of items available (non-editable)</p>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-lg font-semibold text-gray-900 mb-3">Condition</label>
+                        <p id="preview-condition" class="text-base text-gray-900"></p>
+                        <p class="text-sm text-gray-500 mt-2">Item condition (non-editable)</p>
+                    </div>
+                    <div>
+                        <label class="block text-lg font-semibold text-gray-900 mb-3">Images</label>
+                        <div id="preview-images" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
+                        </div>
+                    </div>
+                    <div id="preview-error" class="hidden bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-xl font-medium">
+                    </div>
+                    <div id="preview-success" class="hidden bg-green-50 border border-green-200 text-green-800 px-6 py-4 rounded-xl font-medium">
+                    </div>
+                    <div class="flex space-x-3 pt-2">
+                        <button type="submit" class="bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 disabled:bg-gray-400 hover-lift">
+                            Publish to eBay
+                        </button>
+                        <button type="button" id="cancel-preview" class="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 hover-lift">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="image-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
+        <div class="relative max-w-4xl max-h-full">
+            <img id="modal-image" src="" alt="Full size preview" class="max-w-full max-h-full object-contain
+            rounded-lg">
+            <button onclick="closeImageModal()" class="absolute top-4 right-4 text-white hover:text-gray-300 bg-black bg-opacity-50 rounded-full p-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
+        </div>
+    </div>
+    <div class="max-w-7xl mx-auto px-6 lg:px-12 py-12">
+        <div class="mb-12">
+            <div class="max-w-4xl">
+                <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                    Create New
+                    <span class="hero-gradient bg-clip-text text-transparent">
+                        Listing
+                    </span>
+                </h2>
+                <p class="text-xl text-gray-600 leading-relaxed">
+                    Describe your product and let our AI create the perfect eBay listing with optimized titles,
+                    descriptions, and categories.
+                </p>
+            </div>
+        </div>
+        <div id="error-message" class="hidden bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-xl mb-8 font-medium">
+        </div>
+        <div id="success-message" class="hidden bg-green-50 border border-green-200 text-green-800 px-6 py-4 rounded-xl mb-8 font-medium">
+        </div>
+        <div class="grid lg:grid-cols-3 gap-12">
+            <div class="lg:col-span-2">
+                <form id="listing-form" class="bg-white rounded-2xl shadow-lg p-8">
+                    <div class="mb-8 flex justify-between items-center p-4 bg-green-50 border border-green-200 rounded-xl">
+                        <button type="button" id="autofill-btn" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center hover-lift">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                            Fill Sample Data
+                        </button>
+                        <span class="text-sm text-green-700 font-medium">Click to see how it works with example data</span>
+                    </div>
+                    <div class="space-y-8">
+                        <div>
+                            <label class="block text-lg font-semibold text-gray-900 mb-3">Product Description *</label>
+                            <textarea id="raw_text" required rows="5" placeholder="Describe your product in detail - include brand, model, features, condition details, etc." class="input-field w-full px-4 py-4 rounded-xl text-base resize-none"></textarea>
+                            <p class="text-sm text-gray-500 mt-3">💡 The more detail you provide, the better our AI can optimize your listing for search and sales</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-lg font-semibold text-gray-900 mb-3">Price (£) *</label>
+                                <input type="number" id="price_value" step="0.01" min="0.01" required placeholder="0.00" class="input-field w-full px-4 py-4 rounded-xl text-base">
+                            </div>
+                            <div>
+                                <label class="block text-lg font-semibold text-gray-900 mb-3">Quantity *</label>
+                                <input type="number" id="quantity" min="1" value="1" required class="input-field w-full px-4 py-4 rounded-xl text-base">
+                            </div>
+                            <div>
+                                <label class="block text-lg font-semibold text-gray-900 mb-3">Condition *</label>
+                                <select id="condition" required class="input-field w-full px-4 py-4 rounded-xl text-base">
+                                    <option value="">Select condition...</option>
+                                    <option value="NEW">New</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-lg font-semibold text-gray-900 mb-3">Currency *</label>
+                                <select id="currency" required class="input-field w-full px-4 py-4 rounded-xl text-base">
+                                    <option value="GBP" selected>GBP (£)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-lg font-semibold text-gray-900 mb-3">Product Images *</label>
+                            <div class="space-y-4">
+                                <div class="flex gap-2">
+                                    <button type="button" id="upload-image-btn" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium hover-lift">
+                                        📷 Upload Image
+                                    </button>
+                                    <input type="file" id="upload-image-input" accept="image/*" class="hidden">
+                                </div>
+                                <div id="images-container" class="space-y-2">
+                                    <div class="flex items-center gap-2">
+                                        <input type="text" name="image_url" placeholder="Paste an image URL or upload above" class="image-input input-field flex-1 px-4 py-3 rounded-lg text-base">
+                                        <button type="button" id="add-image-btn" class="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-bold text-lg">
+                                            +
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-3">📸 You can upload images or paste HTTPS URLs. High-quality images improve sales significantly!</p>
+                        </div>
+                        <div class="pt-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <button type="button" id="preview-btn" class="bg-blue-600 text-white py-4 px-8 rounded-xl text-lg font-semibold hover:bg-blue-700 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed hover-lift order-2 md:order-1">
+                                    Preview, Edit & Publish
+                                </button>
+                                <button type="submit" id="publish-btn" class="bg-green-600 text-white py-4 px-8 rounded-xl text-lg font-semibold hover:bg-green-700 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed hover-lift pulse-animation order-1 md:order-2">
+                                    Publish to eBay
+                                </button>
+                            </div>
+                            <p class="text-sm text-gray-500 text-center mt-3">
+                                💡 Use "Preview" to review and edit your listing before publishing, or "Publish" to go live immediately
+                            </p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="space-y-6">
+                <div class="bg-gradient-to-br from-blue-500 to-purple-600 text-white p-6 rounded-2xl">
+                    <h3 class="text-xl font-bold mb-4">✨ AI-Powered Listing</h3>
+                    <ul class="space-y-3 text-blue-100">
+                        <li>• Automatic keyword extraction</li>
+                        <li>• SEO-optimized titles</li>
+                        <li>• Perfect category detection</li>
+                        <li>• Professional descriptions</li>
+                        <li>• eBay best practices</li>
+                    </ul>
                 </div>
-            </form>
-        </div>
-
-        <!-- Info Panel (unchanged) -->
-        <div class="space-y-6">
-            <div class="bg-gradient-to-br from-blue-500 to-purple-600 text-white p-6 rounded-2xl">
-                <h3 class="text-xl font-bold mb-4">✨ AI-Powered Listing</h3>
-                <ul class="space-y-3 text-blue-100">
-                    <li>• Automatic keyword extraction</li>
-                    <li>• SEO-optimized titles</li>
-                    <li>• Perfect category detection</li>
-                    <li>• Professional descriptions</li>
-                    <li>• eBay best practices</li>
-                </ul>
-            </div>
-            <div class="bg-white p-6 rounded-2xl shadow-lg">
-                <h3 class="text-lg font-bold text-gray-900 mb-4">📈 Tips for Better Sales</h3>
-                <ul class="space-y-3 text-sm text-gray-600">
-                    <li class="flex items-start">
-                        <span class="text-green-500 mr-2">✓</span>
-                        Use high-quality, well-lit photos
-                    </li>
-                    <li class="flex items-start">
-                        <span class="text-green-500 mr-2">✓</span>
-                        Include brand names and model numbers
-                    </li>
-                    <li class="flex items-start">
-                        <span class="text-green-500 mr-2">✓</span>
-                        Mention any defects or wear honestly
-                    </li>
-                    <li class="flex items-start">
-                        <span class="text-green-500 mr-2">✓</span>
-                        Research competitive pricing
-                    </li>
-                </ul>
+                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">📈 Tips for Better Sales</h3>
+                    <ul class="space-y-3 text-sm text-gray-600">
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-2">✓</span>
+                            Use high-quality, well-lit photos
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-2">✓</span>
+                            Include brand names and model numbers
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-2">✓</span>
+                            Mention any defects or wear honestly
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-2">✓</span>
+                            Research competitive pricing
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
-    </div>
-
-    <!-- AI Status (unchanged) -->
-    <div id="ai-status" class="hidden bg-blue-50 border-2 border-blue-200 rounded-2xl p-6 mt-8">
-        <div class="flex items-center">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-4"></div>
-            <div>
-                <h3 class="text-lg font-semibold text-blue-900">AI Processing Your Listing</h3>
-                <p id="ai-status-text" class="text-blue-700 mt-1">Analyzing your product description...</p>
+        <div id="ai-status" class="hidden bg-blue-50 border-2 border-blue-200 rounded-2xl p-6 mt-8">
+            <div class="flex items-center">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-4"></div>
+                <div>
+                    <h3 class="text-lg font-semibold text-blue-900">AI Processing Your Listing</h3>
+                    <p id="ai-status-text" class="text-blue-700 mt-1">Analyzing your product description...</p>
+                </div>
             </div>
-        </div>
-        <div class="mt-6">
-            <div class="bg-white rounded-full h-3">
-                <div id="ai-progress" class="bg-blue-600 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+            <div class="mt-6">
+                <div class="bg-white rounded-full h-3">
+                    <div id="ai-progress" class="bg-blue-600 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
             </div>
         </div>
     </div>
-
     <script>
-        // Existing functions (showAIStatus, hideAIStatus, updateAIProgress, openImageModal, closeImageModal) remain unchanged
-
-        // Window load and auth status (unchanged)
+        const aiStatusEl = document.getElementById('ai-status');
+        const aiStatusTextEl = document.getElementById('ai-status-text');
+        const aiProgressEl = document.getElementById('ai-progress');
+        function showAIStatus(message, progress = 0) {
+            aiStatusEl.classList.remove('hidden');
+            aiStatusTextEl.textContent = message;
+            aiProgressEl.style.width = `${progress}%`;
+        }
+        function hideAIStatus() {
+            aiStatusEl.classList.add('hidden');
+            aiProgressEl.style.width = '0%';
+        }
+        function updateAIProgress(message, progress) {
+            aiStatusTextEl.textContent = message;
+            aiProgressEl.style.width = `${progress}%`;
+        }
+        function openImageModal(imageUrl) {
+            document.getElementById('modal-image').src = imageUrl;
+            document.getElementById('image-modal').classList.remove('hidden');
+        }
+        function closeImageModal() {
+            document.getElementById('image-modal').classList.add('hidden');
+        }
+        document.getElementById('image-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'image-modal') {
+                closeImageModal();
+            }
+        });
         window.addEventListener('load', async () => {
             try {
                 const response = await fetch('/auth-status');
                 const data = await response.json();
-
                 if (!data.is_logged_in) {
                     window.location.href = 'login.html';
                     return;
@@ -171,9 +405,7 @@
                     window.location.href = 'ebay-auth.html';
                     return;
                 }
-
                 document.getElementById('user-email').textContent = data.email;
-
                 try {
                     const profileResponse = await fetch('/profile');
                     const profileData = await profileResponse.json();
@@ -187,21 +419,16 @@
                 window.location.href = 'login.html';
             }
         });
-
-        // Add new image input field on + click (unchanged)
         const addImageBtn = document.getElementById('add-image-btn');
         const imagesContainer = document.getElementById('images-container');
-
         addImageBtn.addEventListener('click', () => {
             const newRow = document.createElement('div');
             newRow.className = 'flex items-center gap-2';
-
             const newInput = document.createElement('input');
             newInput.type = 'text';
             newInput.name = 'image_url';
             newInput.placeholder = 'Paste an image URL or upload above';
             newInput.className = 'image-input input-field flex-1 px-4 py-3 rounded-lg text-base';
-
             const removeBtn = document.createElement('button');
             removeBtn.type = 'button';
             removeBtn.className = 'px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-bold text-lg';
@@ -209,23 +436,17 @@
             removeBtn.addEventListener('click', () => {
                 newRow.remove();
             });
-
             newRow.appendChild(newInput);
             newRow.appendChild(removeBtn);
             imagesContainer.appendChild(newRow);
         });
-
-        // Handle image upload (unchanged)
         const uploadBtn = document.getElementById('upload-image-btn');
         const uploadInput = document.getElementById('upload-image-input');
-
         uploadBtn.addEventListener('click', () => {
             uploadInput.click();
         });
-
         uploadInput.addEventListener('change', async () => {
             if (!uploadInput.files.length) return;
-
             const file = uploadInput.files[0];
             if (!file.type.startsWith('image/')) {
                 alert('Please select an image file.');
@@ -235,19 +456,15 @@
                 alert('Image file size must be less than 10MB.');
                 return;
             }
-
             uploadBtn.disabled = true;
             uploadBtn.textContent = 'Uploading...';
-
             const formData = new FormData();
             formData.append('image', file);
-
             try {
                 const response = await fetch('/upload-profile-image', {
                     method: 'POST',
                     body: formData
                 });
-
                 const data = await response.json();
                 if (response.ok && data.status === 'success') {
                     const inputs = imagesContainer.querySelectorAll('input[name="image_url"]');
@@ -258,7 +475,6 @@
                             break;
                         }
                     }
-
                     if (emptyInput) {
                         emptyInput.value = data.image_url;
                     } else {
@@ -266,7 +482,6 @@
                         const newInputs = imagesContainer.querySelectorAll('input[name="image_url"]');
                         newInputs[newInputs.length - 1].value = data.image_url;
                     }
-
                     alert('Image uploaded successfully!');
                 } else {
                     alert('Image upload failed: ' + (data.error || 'Unknown error'));
@@ -274,27 +489,21 @@
             } catch (err) {
                 alert('Error uploading image: ' + err.message);
             }
-
             uploadBtn.disabled = false;
             uploadBtn.textContent = '📷 Upload Image';
             uploadInput.value = '';
         });
-
-        // Autofill button (unchanged)
         document.getElementById('autofill-btn').addEventListener('click', () => {
             document.getElementById('raw_text').value = "Sainsbury's Mackerel Fillets in Olive Oil 125g - Premium quality mackerel fillets preserved in olive oil. Perfect for sandwiches, salads, or as a healthy snack. Rich in omega-3 fatty acids and protein. Best before date clearly marked on tin.";
             document.getElementById('price_value').value = "19.99";
             document.getElementById('quantity').value = "3";
             document.getElementById('condition').value = "NEW";
-
             const firstImageInput = imagesContainer.querySelector('input[name="image_url"]');
             if (firstImageInput) {
                 firstImageInput.value = "https://assets.sainsburys-groceries.co.uk/gol/1261448/1/640x640.jpg";
             }
-
             document.getElementById('error-message').classList.add('hidden');
             document.getElementById('success-message').classList.add('hidden');
-
             const form = document.getElementById('listing-form');
             form.style.transform = 'scale(1.01)';
             form.style.transition = 'transform 0.2s ease';
@@ -302,8 +511,6 @@
                 form.style.transform = 'scale(1)';
             }, 200);
         });
-
-        // Logout button (unchanged)
         document.getElementById('logout-btn').addEventListener('click', async () => {
             try {
                 await fetch('/logout', { method: 'POST' });
@@ -312,8 +519,6 @@
                 console.error('Logout failed:', error);
             }
         });
-
-        // Collect images from all inputs (unchanged)
         function collectImages() {
             const inputs = imagesContainer.querySelectorAll('input[name="image_url"]');
             const images = [];
@@ -325,21 +530,16 @@
             });
             return images;
         }
-
-        // Submit to publish
         async function submitToPublish(formData, button) {
             button.disabled = true;
             button.textContent = 'Publishing...';
-
             document.getElementById('error-message').classList.add('hidden');
             document.getElementById('success-message').classList.add('hidden');
-
             showAIStatus('🤖 Analyzing your product description...', 10);
             setTimeout(() => updateAIProgress('🔍 Extracting keywords and metadata...', 25), 500);
             setTimeout(() => updateAIProgress('📂 Finding optimal eBay category...', 50), 1500);
             setTimeout(() => updateAIProgress('📋 Filling product specifications...', 75), 2500);
             setTimeout(() => updateAIProgress('✍️ Generating marketing description...', 90), 3500);
-
             try {
                 const response = await fetch('/publish-item', {
                     method: 'POST',
@@ -348,9 +548,7 @@
                     },
                     body: JSON.stringify(formData),
                 });
-
                 const data = await response.json();
-
                 if (response.ok) {
                     updateAIProgress('✅ Published to eBay!', 100);
                     setTimeout(() => {
@@ -368,27 +566,21 @@
                 document.getElementById('error-message').textContent = 'Network error. Please try again.';
                 document.getElementById('error-message').classList.remove('hidden');
             }
-
             button.disabled = false;
             button.textContent = 'Publish to eBay';
         }
-
-        // Generate preview
         async function generatePreview(formData, button) {
             button.disabled = true;
             button.textContent = 'Generating Preview...';
-
             document.getElementById('error-message').classList.add('hidden');
             document.getElementById('success-message').classList.add('hidden');
             document.getElementById('preview-error').classList.add('hidden');
             document.getElementById('preview-success').classList.add('hidden');
-
             showAIStatus('🤖 Analyzing your product description...', 10);
             setTimeout(() => updateAIProgress('🔍 Extracting keywords and metadata...', 25), 500);
             setTimeout(() => updateAIProgress('📂 Finding optimal eBay category...', 50), 1500);
             setTimeout(() => updateAIProgress('📋 Filling product specifications...', 75), 2500);
             setTimeout(() => updateAIProgress('✍️ Generating marketing description...', 90), 3500);
-
             try {
                 const response = await fetch('/preview-item', {
                     method: 'POST',
@@ -397,9 +589,7 @@
                     },
                     body: JSON.stringify(formData),
                 });
-
                 const data = await response.json();
-
                 if (response.ok) {
                     updateAIProgress('✅ Preview Generated!', 100);
                     displayPreview(data);
@@ -417,25 +607,18 @@
                 document.getElementById('error-message').textContent = 'Network error. Please try again.';
                 document.getElementById('error-message').classList.remove('hidden');
             }
-
             button.disabled = false;
             button.textContent = 'Preview, Edit & Publish';
         }
-
-        // Display preview
         function displayPreview(data) {
             document.getElementById('preview-title').value = data.title || '';
-
             const descriptionText = data.description.text || '';
             document.getElementById('preview-description').value = descriptionText;
-
             const formattedPreview = document.getElementById('preview-description-formatted');
             formattedPreview.innerHTML = data.description.html || '<p class="text-gray-400 italic">No description provided</p>';
-
             const descriptionTextarea = document.getElementById('preview-description');
             descriptionTextarea.removeEventListener('input', updatePreviewDescription);
             descriptionTextarea.addEventListener('input', updatePreviewDescription);
-
             function updatePreviewDescription() {
                 const text = descriptionTextarea.value;
                 if (text.trim()) {
@@ -449,7 +632,6 @@
                     formattedPreview.innerHTML = '<p class="text-gray-400 italic">No description provided</p>';
                 }
             }
-
             const aspectsContainer = document.getElementById('preview-aspects');
             aspectsContainer.innerHTML = '';
             Object.entries(data.aspects || {}).forEach(([key, values]) => {
@@ -460,13 +642,11 @@
                 `;
                 aspectsContainer.appendChild(aspectDiv);
             });
-
             const currencySymbols = { GBP: '£', USD: '$', EUR: '€' };
             document.getElementById('preview-price-currency').textContent =
                 `${currencySymbols[data.price?.currency] || data.price?.currency || 'GBP'} ${data.price?.value || '0.00'} ${data.price?.currency || 'GBP'}`;
             document.getElementById('preview-quantity').textContent = data.quantity || 1;
             document.getElementById('preview-condition').textContent = data.condition || 'NEW';
-
             const imagesContainer = document.getElementById('preview-images');
             imagesContainer.innerHTML = '';
             (data.images || []).forEach((url, index) => {
@@ -488,23 +668,17 @@
                 `;
                 imagesContainer.appendChild(imgDiv);
             });
-
             document.getElementById('preview-form').dataset.preview = JSON.stringify(data);
         }
-
-        // Listing form submit
         document.getElementById('listing-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-
             const images = collectImages();
-
             if (images.length === 0) {
                 document.getElementById('error-message').textContent = 'At least one valid HTTPS image URL is required.';
                 document.getElementById('error-message').classList.remove('hidden');
                 document.getElementById('success-message').classList.add('hidden');
                 return;
             }
-
             const formData = {
                 raw_text: document.getElementById('raw_text').value.trim(),
                 price: {
@@ -515,22 +689,17 @@
                 condition: document.getElementById('condition').value,
                 images: images
             };
-
             const button = document.getElementById('publish-btn');
             await submitToPublish(formData, button);
         });
-
-        // Preview button
         document.getElementById('preview-btn').addEventListener('click', async () => {
             const images = collectImages();
-
             if (images.length === 0) {
                 document.getElementById('error-message').textContent = 'At least one valid HTTPS image URL is required.';
                 document.getElementById('error-message').classList.remove('hidden');
                 document.getElementById('success-message').classList.add('hidden');
                 return;
             }
-
             const formData = {
                 raw_text: document.getElementById('raw_text').value.trim(),
                 price: {
@@ -541,23 +710,17 @@
                 condition: document.getElementById('condition').value,
                 images: images
             };
-
             const button = document.getElementById('preview-btn');
             await generatePreview(formData, button);
         });
-
-        // Preview form submit
         document.getElementById('preview-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-
             const previewData = JSON.parse(document.getElementById('preview-form').dataset.preview || '{}');
             const button = document.getElementById('preview-form').querySelector('button[type="submit"]');
             button.disabled = true;
             button.textContent = 'Publishing...';
-
             previewData.title = document.getElementById('preview-title').value.trim();
             previewData.description.text = document.getElementById('preview-description').value.trim();
-
             const editedText = previewData.description.text;
             if (editedText.trim()) {
                 const paragraphs = editedText
@@ -568,7 +731,6 @@
             } else {
                 previewData.description.html = '<p>No description provided</p>';
             }
-
             const aspectInputs = document.getElementById('preview-aspects').querySelectorAll('input[data-aspect]');
             const editedAspects = {};
             aspectInputs.forEach(input => {
@@ -579,7 +741,6 @@
                 }
             });
             previewData.aspects = editedAspects;
-
             if (!previewData.title) {
                 document.getElementById('preview-error').textContent = 'Title is required.';
                 document.getElementById('preview-error').classList.remove('hidden');
@@ -588,7 +749,6 @@
                 button.textContent = 'Publish to eBay';
                 return;
             }
-
             try {
                 const response = await fetch('/publish-item-from-preview', {
                     method: 'POST',
@@ -597,14 +757,11 @@
                     },
                     body: JSON.stringify(previewData),
                 });
-
                 const data = await response.json();
-
                 if (response.ok) {
                     document.getElementById('preview-success').textContent = 'Published to eBay!';
                     document.getElementById('preview-success').classList.remove('hidden');
                     document.getElementById('preview-error').classList.add('hidden');
-
                     setTimeout(() => {
                         localStorage.setItem('listing-success', JSON.stringify(data));
                         window.location.href = 'success.html';
@@ -619,20 +776,15 @@
                 document.getElementById('preview-error').classList.remove('hidden');
                 document.getElementById('preview-success').classList.add('hidden');
             }
-
             button.disabled = false;
             button.textContent = 'Publish to eBay';
         });
-
-        // Close preview modal
         document.getElementById('close-preview').addEventListener('click', () => {
             document.getElementById('preview-modal').classList.add('hidden');
         });
-
         document.getElementById('cancel-preview').addEventListener('click', () => {
             document.getElementById('preview-modal').classList.add('hidden');
         });
-
         document.getElementById('preview-modal').addEventListener('click', (e) => {
             if (e.target.id === 'preview-modal') {
                 document.getElementById('preview-modal').classList.add('hidden');
