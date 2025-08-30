@@ -843,10 +843,14 @@ def display_profile_page():
 @app.route("/ebay-auth.html")
 def ebay_auth_page():
     return send_from_directory(app.template_folder, 'ebay-auth.html')
-@app.route("/dashboard.html")
-def dashboard_page():
-    return send_from_directory(app.template_folder, 'dashboard.html')
+# @app.route("/dashboard.html")
+# def dashboard_page():
+#     return send_from_directory(app.template_folder, 'dashboard.html')
 
+@app.route("/single-item-listing.html")
+def single_item_listing_page():
+    return send_from_directory(app.template_folder, 'single-item-listing.html')
+	
 @app.route("/success.html")
 def success_page():
     return send_from_directory(app.template_folder, 'success.html')
