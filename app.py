@@ -2301,7 +2301,152 @@ def format_description():
     except Exception as e:
         return jsonify({"error": f"Failed to format description: {str(e)}"}), 500
 
+#------------------------------------------------------------------------------------------------------------------------------------------------------------
+import io
+import random
+import textwrap
 
+import requests
+from flask import Flask, request, send_file, jsonify
+from PIL import Image, ImageDraw, ImageFont
+
+# Optional background removal
+try:
+    from rembg import remove as rembg_remove
+    HAS_REMBG = True
+except ImportError:
+    HAS_REMBG = False
+
+
+# Configuration
+DOWNLOAD_TIMEOUT = 20
+BANNER_BG = (255, 215, 0)  # Gold
+TITLE_TEXT_COLOR = (0, 0, 0)  # Black
+CANVAS_BG = (255, 255, 255)  # White
+MAX_IMAGE_SIZE = 1200
+LOGO_MAX_RATIO = 0.20
+PADDING = 24
+BANNER_MIN_HEIGHT = 120
+CANVAS_SIZE = 1600  # Final canvas size (width & height)
+FONT_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+
+@app.post("/enhance-image")
+def enhance_image():
+    """Enhance an image with a banner, optional background removal, and logo."""
+    try:
+        data = request.get_json(force=True, silent=False)
+    except Exception:
+        return jsonify({"error": "Invalid JSON"}), 400
+
+    image_url = data.get("image_url", "").strip()
+    title = data.get("title", "").strip()
+    remove_bg = bool(data.get("remove_bg", False))
+    logo_url = data.get("logo_url", "").strip() or None
+
+    if not image_url:
+        return jsonify({"error": "image_url is required"}), 400
+
+    try:
+        # Download main image
+        r = requests.get(image_url, timeout=DOWNLOAD_TIMEOUT, stream=True)
+        r.raise_for_status()
+        if not r.headers.get('content-type', '').startswith('image/'):
+            return jsonify({"error": "URL does not point to an image"}), 400
+        image = Image.open(io.BytesIO(r.content)).convert("RGBA")
+
+        # Remove background if requested
+        if remove_bg:
+            if not HAS_REMBG:
+                return jsonify({"error": "Background removal is not available"}), 400
+            image = rembg_remove(image)
+
+        # Tilt and center image
+        angle = random.uniform(-3, 3)
+        rotated = image.rotate(angle, resample=Image.BICUBIC, expand=True)
+        rw, rh = rotated.size
+        scale = min(1.0, MAX_IMAGE_SIZE / max(rw, rh))
+        if scale < 1.0:
+            rotated = rotated.resize((int(rw * scale), int(rh * scale)), Image.LANCZOS)
+            rw, rh = rotated.size
+        canvas = Image.new("RGBA", (CANVAS_SIZE, CANVAS_SIZE), CANVAS_BG + (255,))
+        x, y = (CANVAS_SIZE - rw) // 2, (CANVAS_SIZE - rh) // 2
+        canvas.paste(rotated, (x, y), rotated)
+        processed_image = canvas.convert("RGB")
+
+        # Add banner if title provided
+        if title.strip():
+            width, height = processed_image.size
+            banner_height = max(BANNER_MIN_HEIGHT, int(height * 0.14))
+            canvas = Image.new("RGB", (width, height + banner_height), CANVAS_BG)
+            draw = ImageDraw.Draw(canvas)
+            draw.rectangle([0, 0, width, banner_height], fill=BANNER_BG)
+
+            # Find best font size
+            try:
+                font = ImageFont.truetype(FONT_PATH, 12)
+            except Exception:
+                font = ImageFont.load_default()
+            font_size = 12
+            max_font_size = 120
+            step = 4
+            while font_size <= max_font_size:
+                test_font = ImageFont.truetype(FONT_PATH, font_size) if FONT_PATH else ImageFont.load_default()
+                text_bbox = draw.textbbox((0, 0), title, font=test_font)
+                text_width, text_height = text_bbox[2] - text_bbox[0], text_bbox[3] - text_bbox[1]
+                if text_width <= width - 2 * PADDING and text_height <= banner_height - 2 * PADDING:
+                    font = test_font
+                    font_size += step
+                else:
+                    break
+
+            # Wrap text
+            wrapped = textwrap.wrap(title, width=40)[:2]  # Limit to 2 lines
+            line_heights = [draw.textbbox((0, 0), line, font=font)[3] - draw.textbbox((0, 0), line, font=font)[1] for line in wrapped]
+            total_text_height = sum(line_heights) + (len(wrapped) - 1) * int(font.size * 0.25)
+            y = (banner_height - total_text_height) // 2
+
+            # Draw text
+            for line, line_height in zip(wrapped, line_heights):
+                text_bbox = draw.textbbox((0, 0), line, font=font)
+                text_width = text_bbox[2] - text_bbox[0]
+                x = (width - text_width) // 2
+                draw.text((x, y), line, font=font, fill=TITLE_TEXT_COLOR)
+                y += line_height + int(font.size * 0.25)
+
+            canvas.paste(processed_image, (0, banner_height))
+            processed_image = canvas
+
+        # Add logo if provided
+        if logo_url:
+            try:
+                r = requests.get(logo_url, timeout=DOWNLOAD_TIMEOUT, stream=True)
+                r.raise_for_status()
+                if not r.headers.get('content-type', '').startswith('image/'):
+                    return jsonify({"error": "Logo URL does not point to an image"}), 400
+                logo = Image.open(io.BytesIO(r.content)).convert("RGBA")
+                
+                width, height = processed_image.size
+                lw, lh = logo.size
+                target_width = int(CANVAS_SIZE * LOGO_MAX_RATIO)
+                scale = min(1.0, target_width / lw)
+                logo = logo.resize((max(1, int(lw * scale)), max(1, int(lh * scale))), Image.LANCZOS)
+                lw, lh = logo.size
+                canvas = processed_image.convert("RGBA")
+                canvas.paste(logo, (width - lw - PADDING, height - lh - PADDING), logo)
+                processed_image = canvas.convert("RGB")
+            except Exception as e:
+                return jsonify({"error": f"Failed to download logo: {str(e)}"}), 400
+
+        # Return PNG
+        buffer = io.BytesIO()
+        processed_image.save(buffer, format="PNG", optimize=True)
+        buffer.seek(0)
+        return send_file(buffer, mimetype="image/png", download_name="enhanced.png")
+    
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        return jsonify({"error": f"Processing error: {str(e)}"}), 500
 
 if __name__ == "__main__":
     if not all([CLIENT_ID, CLIENT_SECRET, RU_NAME, DB_URL]):
