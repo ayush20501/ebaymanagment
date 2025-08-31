@@ -7,7 +7,7 @@ import requests
 import psycopg2
 from psycopg2 import pool
 from dotenv import load_dotenv
-from flask import Flask, render_template, request, jsonify, redirect, Response, session, send_from_directory
+from flask import Flask, render_template, request, jsonify, redirect, Response, session, send_from_directory, send_file
 from werkzeug.security import generate_password_hash, check_password_hash
 from jsonschema import validate
 from typing import Optional, Dict, Any, List
@@ -22,7 +22,9 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import random
 from datetime import datetime, timedelta
-
+import tempfile
+from io import BytesIO
+from PIL import Image, ImageDraw, ImageFont
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 load_dotenv()
@@ -40,6 +42,7 @@ CLIENT_ID = os.getenv("EBAY_CLIENT_ID")
 CLIENT_SECRET = os.getenv("EBAY_CLIENT_SECRET")
 RU_NAME = os.getenv("EBAY_RU_NAME")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+REMOVE_BG_API_KEY = os.getenv("REMOVE_BG_API_KEY")
 
 KEYWORDS_SCHEMA = {
     "$schema": "http://json-schema.org/draft-07/schema#",
@@ -2302,101 +2305,89 @@ def format_description():
         return jsonify({"error": f"Failed to format description: {str(e)}"}), 500
 
 #------------------------------------------------------------------------------------------------------------------------------------------------------------
-from flask import request, jsonify, send_file
-from PIL import Image, ImageDraw, ImageFont
-from io import BytesIO
-import requests
-import random
-import os
-import tempfile
+
+def remove_bg_api(image: Image.Image) -> Image.Image:
+    if not REMOVE_BG_API_KEY:
+        raise Exception("Remove.bg API key not set.")
+    img_byte_arr = BytesIO()
+    image.save(img_byte_arr, format="PNG")
+    img_byte_arr = img_byte_arr.getvalue()
+    response = requests.post(
+        "https://api.remove.bg/v1.0/removebg",
+        files={"image_file": ("image.png", img_byte_arr, "image/png")},
+        data={"size": "auto"},
+        headers={"X-Api-Key": REMOVE_BG_API_KEY},
+        timeout=30
+    )
+    if response.status_code == 200:
+        return Image.open(BytesIO(response.content)).convert("RGBA")
+    else:
+        raise Exception(f"Remove.bg API failed: {response.status_code}, {response.text}")
 
 @app.route("/enhance-image", methods=["POST"])
 def enhance_image():
     try:
-        # Parse JSON payload
         data = request.get_json(force=True, silent=False)
     except Exception:
         return jsonify({"error": "Invalid JSON"}), 400
 
-    # Extract inputs
     image_url = data.get("image_url", "").strip()
     title = data.get("title", "").strip()
     remove_bg = bool(data.get("remove_bg", False))
     logo_url = data.get("logo_url", "").strip() or None
 
-    # Validate required inputs
     if not image_url:
         return jsonify({"error": "image_url is required"}), 400
     if not title:
         return jsonify({"error": "title is required"}), 400
 
     try:
-        # Download main image
         response = requests.get(image_url, timeout=10)
         response.raise_for_status()
-        if not response.headers.get('content-type', '').startswith('image/'):
+        if not response.headers.get("content-type", "").startswith("image/"):
             return jsonify({"error": "Invalid image URL: not an image"}), 400
         image = Image.open(BytesIO(response.content)).convert("RGBA")
-
-        # Validate image size (e.g., max 10MB)
         if len(response.content) > 10 * 1024 * 1024:
             return jsonify({"error": "Image file size exceeds 10MB limit"}), 400
 
-        # Optionally remove background
         if remove_bg:
             try:
-                from rembg import remove
-                image_no_bg = remove(image)
+                image_no_bg = remove_bg_api(image)
             except Exception as e:
-                return jsonify({"error": f"Failed to remove background: {str(e)}"}), 500
+                return jsonify({"error": f"Background removal failed: {str(e)}"}), 500
         else:
             image_no_bg = image
 
-        # Apply random tilt between -3 and 3 degrees
         tilt_angle = random.uniform(-3, 3)
         image_rotated = image_no_bg.rotate(tilt_angle, expand=True, resample=Image.BICUBIC)
 
-        # Create canvas
         canvas_width = image_rotated.width
-        canvas_height = image_rotated.height + 200  # Extra space for banner
+        canvas_height = image_rotated.height + 200
         canvas = Image.new("RGBA", (canvas_width, canvas_height), "WHITE")
 
-        # Paste rotated image, centered horizontally
         image_x = (canvas_width - image_rotated.width) // 2
-        image_y = 120  # Space for banner at top
-        canvas.paste(image_rotated, (image_x, image_y), image_rotated if image_rotated.mode == "RGBA" else None)
+        image_y = 120
+        canvas.paste(image_rotated, (image_x, image_y), image_rotated)
 
-        # Add logo if provided
         if logo_url:
             try:
                 logo_response = requests.get(logo_url, timeout=10)
                 logo_response.raise_for_status()
-                if not logo_response.headers.get('content-type', '').startswith('image/'):
+                if not logo_response.headers.get("content-type", "").startswith("image/"):
                     return jsonify({"error": "Invalid logo URL: not an image"}), 400
                 logo = Image.open(BytesIO(logo_response.content)).convert("RGBA")
-
-                # Validate logo size
                 if len(logo_response.content) > 10 * 1024 * 1024:
                     return jsonify({"error": "Logo file size exceeds 10MB limit"}), 400
-
-                # Resize logo to 1/10th of canvas width
                 logo_width = canvas_width // 10
                 logo_height = int((logo.height / logo.width) * logo_width)
                 logo = logo.resize((logo_width, logo_height), Image.LANCZOS)
-
-                # Apply 50% transparency
-                logo_data = logo.getdata()
-                new_logo_data = [(r, g, b, int(a * 0.5)) for (r, g, b, a) in logo_data]
-                logo.putdata(new_logo_data)
-
-                # Place logo at bottom right
+                logo.putalpha(int(255 * 0.5))
                 logo_x = canvas_width - logo_width - 20
                 logo_y = canvas_height - logo_height - 20
                 canvas.paste(logo, (logo_x, logo_y), logo)
             except Exception as e:
                 return jsonify({"error": f"Failed to process logo: {str(e)}"}), 500
 
-        # Add title with yellow background
         draw = ImageDraw.Draw(canvas)
         try:
             font = ImageFont.truetype("Roboto-Bold.ttf", 50)
@@ -2404,36 +2395,28 @@ def enhance_image():
             try:
                 font = ImageFont.truetype("Helvetica.ttf", 50)
             except:
-                font = ImageFont.load_default(size=50)
-
-        # Use textbbox for accurate text sizing
+                font = ImageFont.load_default()
         try:
             bbox = draw.textbbox((0, 0), title, font=font)
             text_width = bbox[2] - bbox[0]
             text_height = bbox[3] - bbox[1]
         except:
-            # Fallback for default font
             text_width, text_height = draw.textsize(title, font=font)
 
-        # Center text horizontally
         text_x = (canvas_width - text_width) // 2
         yellow_height = text_height + 30
         text_y = (yellow_height - text_height) // 2
 
-        # Draw yellow background and text
         draw.rectangle((0, 0, canvas_width, yellow_height), fill="yellow")
         draw.text((text_x, text_y), title, fill="black", font=font)
 
-        # Save image to temporary file
         with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_file:
             output_file = temp_file.name
             canvas.save(output_file, "PNG")
 
         try:
-            # Return image file
             return send_file(output_file, mimetype="image/png")
         finally:
-            # Clean up temporary file
             if os.path.exists(output_file):
                 os.remove(output_file)
 
