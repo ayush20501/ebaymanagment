@@ -2330,7 +2330,7 @@ BANNER_MIN_HEIGHT = 120
 CANVAS_SIZE = 1600  # Final canvas size (width & height)
 FONT_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 
-@app.post("/enhance-image", methods=["POST"])
+@app.route("/enhance-image", methods=["POST"])
 def enhance_image():
     """Enhance an image with a banner, optional background removal, and logo."""
     try:
