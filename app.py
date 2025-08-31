@@ -2306,23 +2306,82 @@ def format_description():
 
 #------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-def remove_bg_api(image: Image.Image) -> Image.Image:
-    if not REMOVE_BG_API_KEY:
-        raise Exception("Remove.bg API key not set.")
-    img_byte_arr = BytesIO()
-    image.save(img_byte_arr, format="PNG")
-    img_byte_arr = img_byte_arr.getvalue()
-    response = requests.post(
-        "https://api.remove.bg/v1.0/removebg",
-        files={"image_file": ("image.png", img_byte_arr, "image/png")},
-        data={"size": "auto"},
-        headers={"X-Api-Key": REMOVE_BG_API_KEY},
-        timeout=30
-    )
+
+
+def remove_background_api(image_bytes):
+    api_url = "https://api.remove.bg/v1.0/removebg"
+    files = {'image_file': image_bytes}
+    headers = {'X-Api-Key': 'NKaRQJXaoGpt247sVBqzL5yX'}
+    response = requests.post(api_url, files=files, headers=headers)
     if response.status_code == 200:
-        return Image.open(BytesIO(response.content)).convert("RGBA")
+        return response.content
     else:
-        raise Exception(f"Remove.bg API failed: {response.status_code}, {response.text}")
+        raise Exception(f"API request failed with status {response.status_code}: {response.text}")
+
+def process_image_bytes(image_url, logo_url, title, remove_bg=True, output_file="output.png"):
+    response = requests.get(image_url)
+    image = Image.open(BytesIO(response.content)).convert("RGBA")
+    
+    if remove_bg:
+        img_byte_arr = BytesIO()
+        image.save(img_byte_arr, format='PNG')
+        img_byte_arr = img_byte_arr.getvalue()
+        try:
+            no_bg_bytes = remove_background_api(img_byte_arr)
+            image_no_bg = Image.open(BytesIO(no_bg_bytes)).convert("RGBA")
+        except Exception as e:
+            image_no_bg = image
+    else:
+        image_no_bg = image
+    
+    tilt_angle = random.randint(-3, 3)
+    image_tilted = image_no_bg.rotate(
+        tilt_angle,
+        resample=Image.BICUBIC,
+        expand=True,
+        fillcolor=(0, 0, 0, 0)
+    )
+    
+    canvas_width = image_tilted.width
+    canvas_height = image_tilted.height + 200
+    canvas = Image.new("RGBA", (canvas_width, canvas_height), "WHITE")
+    canvas.paste(image_tilted, (0, 120), image_tilted)
+    
+    logo_response = requests.get(logo_url)
+    logo = Image.open(BytesIO(logo_response.content)).convert("RGBA")
+    logo_width = canvas_width // 10
+    logo_height = int((logo.height / logo.width) * logo_width)
+    logo = logo.resize((logo_width, logo_height), Image.LANCZOS)
+    
+    logo_data = logo.getdata()
+    new_logo_data = [(item[0], item[1], item[2], int(item[3] * 0.5)) for item in logo_data]
+    logo.putdata(new_logo_data)
+    
+    logo_x = canvas_width - logo_width - 20
+    logo_y = canvas_height - logo_height - 20
+    canvas.paste(logo, (logo_x, logo_y), logo)
+    
+    draw = ImageDraw.Draw(canvas)
+    try:
+        font = ImageFont.truetype("Roboto-Bold.ttf", 50)
+    except:
+        try:
+            font = ImageFont.truetype("Helvetica.ttf", 50)
+        except:
+            font = ImageFont.load_default(size=40)
+    
+    bbox = draw.textbbox((0, 0), title, font=font)
+    text_width = bbox[2] - bbox[0]
+    text_height = bbox[3] - bbox[1]
+    text_x = (canvas_width - text_width) // 2
+    yellow_height = text_height + 30
+    text_y = (yellow_height - text_height) // 2
+    
+    draw.rectangle((0, 0, canvas_width, yellow_height), fill="yellow")
+    draw.text((text_x, text_y), title, fill="black", font=font)
+    
+    canvas.save(output_file, "PNG")
+    return output_file
 
 @app.route("/enhance-image", methods=["POST"])
 def enhance_image():
@@ -2336,94 +2395,16 @@ def enhance_image():
     remove_bg = bool(data.get("remove_bg", False))
     logo_url = data.get("logo_url", "").strip() or None
 
-    if not image_url:
-        return jsonify({"error": "image_url is required"}), 400
-    if not title:
-        return jsonify({"error": "title is required"}), 400
+    if not image_url or not title or not logo_url:
+        return jsonify({"error": "image_url, title, and logo_url are required"}), 400
 
     try:
-        response = requests.get(image_url, timeout=10)
-        response.raise_for_status()
-        if not response.headers.get("content-type", "").startswith("image/"):
-            return jsonify({"error": "Invalid image URL: not an image"}), 400
-        image = Image.open(BytesIO(response.content)).convert("RGBA")
-        if len(response.content) > 10 * 1024 * 1024:
-            return jsonify({"error": "Image file size exceeds 10MB limit"}), 400
+        output_file = process_image_bytes(image_url, logo_url, title, remove_bg)
+        return send_file(output_file, mimetype="image/png")
+    finally:
+        if os.path.exists(output_file):
+            os.remove(output_file)
 
-        if remove_bg:
-            try:
-                image_no_bg = remove_bg_api(image)
-            except Exception as e:
-                return jsonify({"error": f"Background removal failed: {str(e)}"}), 500
-        else:
-            image_no_bg = image
-
-        tilt_angle = random.uniform(-3, 3)
-        image_rotated = image_no_bg.rotate(tilt_angle, expand=True, resample=Image.BICUBIC)
-
-        canvas_width = image_rotated.width
-        canvas_height = image_rotated.height + 200
-        canvas = Image.new("RGBA", (canvas_width, canvas_height), "WHITE")
-
-        image_x = (canvas_width - image_rotated.width) // 2
-        image_y = 120
-        canvas.paste(image_rotated, (image_x, image_y), image_rotated)
-
-        if logo_url:
-            try:
-                logo_response = requests.get(logo_url, timeout=10)
-                logo_response.raise_for_status()
-                if not logo_response.headers.get("content-type", "").startswith("image/"):
-                    return jsonify({"error": "Invalid logo URL: not an image"}), 400
-                logo = Image.open(BytesIO(logo_response.content)).convert("RGBA")
-                if len(logo_response.content) > 10 * 1024 * 1024:
-                    return jsonify({"error": "Logo file size exceeds 10MB limit"}), 400
-                logo_width = canvas_width // 10
-                logo_height = int((logo.height / logo.width) * logo_width)
-                logo = logo.resize((logo_width, logo_height), Image.LANCZOS)
-                logo.putalpha(int(255 * 0.5))
-                logo_x = canvas_width - logo_width - 20
-                logo_y = canvas_height - logo_height - 20
-                canvas.paste(logo, (logo_x, logo_y), logo)
-            except Exception as e:
-                return jsonify({"error": f"Failed to process logo: {str(e)}"}), 500
-
-        draw = ImageDraw.Draw(canvas)
-        try:
-            font = ImageFont.truetype("Roboto-Bold.ttf", 50)
-        except:
-            try:
-                font = ImageFont.truetype("Helvetica.ttf", 50)
-            except:
-                font = ImageFont.load_default()
-        try:
-            bbox = draw.textbbox((0, 0), title, font=font)
-            text_width = bbox[2] - bbox[0]
-            text_height = bbox[3] - bbox[1]
-        except:
-            text_width, text_height = draw.textsize(title, font=font)
-
-        text_x = (canvas_width - text_width) // 2
-        yellow_height = text_height + 30
-        text_y = (yellow_height - text_height) // 2
-
-        draw.rectangle((0, 0, canvas_width, yellow_height), fill="yellow")
-        draw.text((text_x, text_y), title, fill="black", font=font)
-
-        with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_file:
-            output_file = temp_file.name
-            canvas.save(output_file, "PNG")
-
-        try:
-            return send_file(output_file, mimetype="image/png")
-        finally:
-            if os.path.exists(output_file):
-                os.remove(output_file)
-
-    except requests.exceptions.RequestException as e:
-        return jsonify({"error": f"Failed to download image or logo: {str(e)}"}), 500
-    except Exception as e:
-        return jsonify({"error": f"Processing error: {str(e)}"}), 500
 
 if __name__ == "__main__":
     if not all([CLIENT_ID, CLIENT_SECRET, RU_NAME, DB_URL]):
