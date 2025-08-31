@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,17 +7,14 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
         body {
             font-family: 'Inter', sans-serif;
         }
-
         .hero-gradient {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
             background-size: 200% 200%;
             animation: gradientShift 8s ease-in-out infinite;
         }
-
         @keyframes gradientShift {
             0%, 100% {
                 background-position: 0% 50%;
@@ -27,60 +23,47 @@
                 background-position: 100% 50%;
             }
         }
-
         .hover-lift {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-
         .hover-lift:hover {
             transform: translateY(-4px);
             box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
         }
-
         .image-enhance-gradient {
             background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
         }
-
         .nav-gradient {
             background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
         }
-
         .hamburger div {
             transition: all 0.3s ease;
         }
-
         .hamburger.active .top {
             transform: translateY(8px) rotate(45deg);
         }
-
         .hamburger.active .middle {
             opacity: 0;
         }
-
         .hamburger.active .bottom {
             transform: translateY(-8px) rotate(-45deg);
         }
-
         .mobile-menu {
             transition: all 0.3s ease-in-out;
             transform: translateY(-100%);
         }
-
         .mobile-menu.active {
             transform: translateY(0);
         }
-
         .card {
             background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
             border: 2px solid transparent;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
         .card:hover {
             border: 2px solid #a855f7;
             background: linear-gradient(135deg, #ffffff 0%, #f3e8ff 100%);
         }
-
         .preview img {
             max-width: 100%;
             height: auto;
@@ -88,19 +71,16 @@
             border: 2px solid #e5e7eb;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
-
         .upload-btn {
             background: #ffffff;
             border: 2px solid #a855f7;
             color: #a855f7;
             transition: all 0.3s ease;
         }
-
         .upload-btn:hover {
             background: #a855f7;
             color: #ffffff;
         }
-
         /* Popup styles */
         .popup {
             display: none;
@@ -114,7 +94,6 @@
             justify-content: center;
             align-items: center;
         }
-
         .popup-content {
             background: white;
             padding: 20px;
@@ -124,7 +103,6 @@
             overflow: auto;
             position: relative;
         }
-
         .popup-close {
             position: absolute;
             top: 10px;
@@ -133,7 +111,6 @@
             font-size: 24px;
             color: #666;
         }
-
         .error-message {
             display: none;
             background-color: #fee2e2;
@@ -143,7 +120,6 @@
             margin-bottom: 16px;
             border: 1px solid #fecaca;
         }
-
         .success-message {
             display: none;
             background-color: #dcfce7;
@@ -153,20 +129,17 @@
             margin-bottom: 16px;
             border: 1px solid #bbf7d0;
         }
-
         .ai-status {
             background-color: #e0f2fe;
             border: 2px solid #bae6fd;
             border-radius: 16px;
             padding: 24px;
         }
-
         .ai-progress {
             background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
         }
     </style>
 </head>
-
 <body class="min-h-screen bg-gray-50">
     <!-- Navigation -->
     <nav class="nav-gradient border-b border-gray-200 fixed w-full top-0 z-50">
@@ -211,7 +184,6 @@
             </div>
         </div>
     </nav>
-
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-6 lg:px-12 py-16 pt-24">
         <div class="text-center mb-12">
@@ -222,7 +194,9 @@
                 Transform your product images with professional editing. Add banners, remove backgrounds, and integrate logos to make your listings stand out.
             </p>
         </div>
-
+        <!-- Messages -->
+        <div id="error-message" class="hidden bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-xl mb-8 font-medium"></div>
+        <div id="success-message" class="hidden bg-green-50 border border-green-200 text-green-800 px-6 py-4 rounded-xl mb-8 font-medium"></div>
         <!-- AI Status Indicator -->
         <div id="ai-status" class="hidden ai-status mt-8">
             <div class="flex items-center">
@@ -238,63 +212,101 @@
                 </div>
             </div>
         </div>
-
-        <!-- Messages -->
-        <div id="error-message" class="error-message mb-8"></div>
-        <div id="success-message" class="success-message mb-8"></div>
-
-        <!-- Image Enhancement Form -->
-        <div class="card rounded-2xl shadow-lg p-8 max-w-3xl mx-auto hover-lift">
-            <div class="mb-6">
-                <h3 class="text-2xl font-bold text-gray-900 mb-2">Enhance Your Image</h3>
-                <p class="text-sm text-gray-500">
-                    Upload an image or paste an image URL, add a banner title, optionally remove the background, and add a logo. The image will be tilted by a random angle between -3° and 3°.
-                </p>
+        <!-- Main Grid -->
+        <div class="grid lg:grid-cols-3 gap-12">
+            <div class="lg:col-span-2">
+                <!-- Image Enhancement Form -->
+                <div class="card rounded-2xl shadow-lg p-8 hover-lift">
+                    <div class="mb-6">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Enhance Your Image</h3>
+                        <p class="text-sm text-gray-500">
+                            Upload an image or paste an image URL, add a banner title, optionally remove the background, and add a logo. The image will be tilted by a random angle between -3° and 3°.
+                        </p>
+                    </div>
+                    <div class="space-y-6">
+                        <div>
+                            <label for="image_url" class="block text-sm font-semibold text-gray-700 mb-2">Image URL</label>
+                            <div class="flex items-center space-x-4">
+                                <input id="image_url" type="text" placeholder="https://example.com/image.jpg" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900">
+                                <label class="upload-btn px-4 py-2 rounded-lg font-semibold cursor-pointer hover-lift">
+                                    Upload Image
+                                    <input id="image-upload" type="file" accept="image/*" class="hidden">
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="title" class="block text-sm font-semibold text-gray-700 mb-2">Banner Title</label>
+                            <input id="title" type="text" placeholder="e.g., Super Saver 6-Pack" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900">
+                        </div>
+                        <div>
+                            <label for="logo_url" class="block text-sm font-semibold text-gray-700 mb-2">Logo URL (optional)</label>
+                            <div class="flex items-center space-x-4">
+                                <input id="logo_url" type="text" placeholder="https://example.com/logo.png" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900">
+                                <label class="upload-btn px-4 py-2 rounded-lg font-semibold cursor-pointer hover-lift">
+                                    Upload Logo
+                                    <input id="logo-upload" type="file" accept="image/*" class="hidden">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <input id="remove_bg" type="checkbox" class="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
+                            <label for="remove_bg" class="text-sm font-semibold text-gray-700">Remove background</label>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <button id="go" class="image-enhance-gradient text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed hover-lift">Enhance</button>
+                            <span id="msg" class="text-sm text-gray-500"></span>
+                        </div>
+                        <div class="preview" id="preview"></div>
+                    </div>
+                </div>
             </div>
-
+            <!-- Right Side Info Blocks -->
             <div class="space-y-6">
-                <div>
-                    <label for="image_url" class="block text-sm font-semibold text-gray-700 mb-2">Image URL</label>
-                    <div class="flex items-center space-x-4">
-                        <input id="image_url" type="text" placeholder="https://example.com/image.jpg" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900">
-                        <label class="upload-btn px-4 py-2 rounded-lg font-semibold cursor-pointer hover-lift">
-                            Upload Image
-                            <input id="image-upload" type="file" accept="image/*" class="hidden">
-                        </label>
-                    </div>
+                <div class="card p-6 rounded-2xl shadow-lg hover-lift">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">✨ Image Enhancement Features</h3>
+                    <ul class="space-y-3 text-sm text-gray-600">
+                        <li class="flex items-start">
+                            <div class="w-2 h-2 bg-purple-500 rounded-full mt-2 mr-2"></div>
+                            Add custom banners
+                        </li>
+                        <li class="flex items-start">
+                            <div class="w-2 h-2 bg-purple-500 rounded-full mt-2 mr-2"></div>
+                            Remove backgrounds
+                        </li>
+                        <li class="flex items-start">
+                            <div class="w-2 h-2 bg-purple-500 rounded-full mt-2 mr-2"></div>
+                            Integrate logos
+                        </li>
+                        <li class="flex items-start">
+                            <div class="w-2 h-2 bg-purple-500 rounded-full mt-2 mr-2"></div>
+                            Auto-tilt for dynamic look
+                        </li>
+                    </ul>
                 </div>
-
-                <div>
-                    <label for="title" class="block text-sm font-semibold text-gray-700 mb-2">Banner Title</label>
-                    <input id="title" type="text" placeholder="e.g., Super Saver 6-Pack" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900">
+                <div class="card p-6 rounded-2xl shadow-lg hover-lift">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">📈 Tips for Better Images</h3>
+                    <ul class="space-y-3 text-sm text-gray-600">
+                        <li class="flex items-start">
+                            <div class="w-2 h-2 bg-purple-500 rounded-full mt-2 mr-2"></div>
+                            Use high-resolution images
+                        </li>
+                        <li class="flex items-start">
+                            <div class="w-2 h-2 bg-purple-500 rounded-full mt-2 mr-2"></div>
+                            Ensure good lighting
+                        </li>
+                        <li class="flex items-start">
+                            <div class="w-2 h-2 bg-purple-500 rounded-full mt-2 mr-2"></div>
+                            Keep the background clean
+                        </li>
+                        <li class="flex items-start">
+                            <div class="w-2 h-2 bg-purple-500 rounded-full mt-2 mr-2"></div>
+                            Highlight key features
+                        </li>
+                    </ul>
                 </div>
-
-                <div>
-                    <label for="logo_url" class="block text-sm font-semibold text-gray-700 mb-2">Logo URL (optional)</label>
-                    <div class="flex items-center space-x-4">
-                        <input id="logo_url" type="text" placeholder="https://example.com/logo.png" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900">
-                        <label class="upload-btn px-4 py-2 rounded-lg font-semibold cursor-pointer hover-lift">
-                            Upload Logo
-                            <input id="logo-upload" type="file" accept="image/*" class="hidden">
-                        </label>
-                    </div>
-                </div>
-
-                <div class="flex items-center space-x-3">
-                    <input id="remove_bg" type="checkbox" class="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
-                    <label for="remove_bg" class="text-sm font-semibold text-gray-700">Remove background</label>
-                </div>
-
-                <div class="flex items-center justify-between">
-                    <button id="go" class="image-enhance-gradient text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed hover-lift">Enhance</button>
-                    <span id="msg" class="text-sm text-gray-500"></span>
-                </div>
-
-                <div class="preview" id="preview"></div>
             </div>
         </div>
     </div>
-
     <!-- Popup for Image Preview -->
     <div id="image-popup" class="popup">
         <div class="popup-content">
@@ -302,7 +314,6 @@
             <div id="popup-preview"></div>
         </div>
     </div>
-
     <!-- Footer -->
     <footer class="bg-gray-900 text-white">
         <div class="max-w-7xl mx-auto px-6 lg:px-12 py-12">
@@ -354,7 +365,7 @@
                     </a>
                     <a href="#" class="text-gray-400 hover:text-white transition-colors hover-lift">
                         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2.163c3.204 0 3.584.013 4.85.07 1.366.061 2.347.306 2.982.608a4.84 4.84 0 011.772 1.153 4.84 4.84 0 011.153 1.772c.302.635.547 1.616.608 2.982.058 1.266.07 1.646.07 4.85s-.013 3.584-.07 4.85c-.061 1.366-.306 2.347-.608 2.982a4.84 4.84 0 01-1.153 1.772 4.84 4.84 0 01-1.772 1.153c-.635.302-1.616.547-2.982.608-1.266.058-1.646.07-4.85.07s-3.584-.058-4.85-.07c-1.366-.061-2.347-.306-2.982-.608a4.84 4.84 0 01-1.772-1.153 4.84 4.84 0 01-1.153-1.772c-.302-.635-.547-1.616-.608-2.982-.058-1.266-.07-1.646-.07-4.85s.013-3.584.07-4.85c.061 1.366.306-2.347.608-2.982a4.84 4.84 0 011.153-1.772 4.84 4.84 0 011.772-1.153c.635-.302 1.616-.547 2.982-.608 1.266-.058 1.646-.07 4.85-.07zm0-2.163c-3.259 0-3.668.014-4.947.072-1.358.062-2.626.335-3.517.934a7.045 7.045 0 00-2.55 2.55c-.599.891-.872 2.159-.934 3.517-.058 1.279-.072 1.688-.072 4.947s.014 3.668.072 4.947c.062 1.358.335 2.626.934 3.517a7.045 7.045 0 002.55 2.55c.891.599 2.159.872 3.517.934 1.279.058 1.688.072 4.947.072s3.668-.014 4.947-.072c1.358-.062 2.626-.335 3.517-.934a7.045 7.045 0 00-2.55-2.55c-.891-.599-2.159-.872-3.517-.934-1.279-.058-1.688-.072-4.947-.072z"></path>
+                            <path d="M12 2.163c3.204 0 3.584.013 4.85.07 1.366.061 2.347.306 2.982.608a4.84 4.84 0 011.772 1.153 4.84 4.84 0 011.153 1.772c.302.635.547 1.616.608 2.982.058 1.266.07 1.646.07 4.85s-.013 3.584-.07 4.85c-.061 1.366-.306 2.347-.608 2.982a4.84 4.84 0 01-1.153 1.772 4.84 4.84 0 01-1.772 1.153c-.635.302-1.616.547-2.982.608-1.266.058-1.646.07-4.85.07s-3.584-.058-4.85-.07c-1.366-.061-2.347-.306-2.982-.608a4.84 4.84 0 01-1.772-1.153 4.84 4.84 0 01-1.153-1.772c-.302-.635-.547-1.616-.608-2.982-.058-1.266-.07-1.646-.07-4.85s.013-3.584.07-4.85c.061-1.366.306-2.347.608-2.982a4.84 4.84 0 011.153-1.772 4.84 4.84 0 011.772-1.153c.635-.302 1.616-.547 2.982-.608 1.266-.058 1.646-.07 4.85-.07zm0-2.163c-3.259 0-3.668.014-4.947.072-1.358.062-2.626.335-3.517.934a7.045 7.045 0 00-2.55 2.55c-.599.891-.872 2.159-.934 3.517-.058 1.279-.072 1.688-.072 4.947s.014 3.668.072 4.947c.062 1.358.335 2.626.934 3.517a7.045 7.045 0 002.55 2.55c.891.599 2.159.872 3.517.934 1.279.058 1.688.072 4.947.072s3.668-.014 4.947-.072c1.358-.062 2.626-.335 3.517-.934a7.045 7.045 0 00-2.55-2.55c-.891-.599-2.159-.872-3.517-.934-1.279-.058-1.688-.072-4.947-.072z"></path>
                         </svg>
                     </a>
                 </div>
@@ -364,444 +375,217 @@
             </div>
         </div>
     </footer>
-
     <script>
         // AI Status Functions
- technology, and will be available soon!</p>
-                </div>
-            </div>
-        </div>
-
-        <script>
-            // AI Status Functions
-            const aiStatusEl = document.getElementById('ai-status');
-            const aiStatusTextEl = document.getElementById('ai-status-text');
-            const aiProgressEl = document.getElementById('ai-progress');
-
-            function showAIStatus(message, progress = 0) {
-                aiStatusEl.classList.remove('hidden');
-                aiStatusTextEl.textContent = message;
-                aiProgressEl.style.width = `${progress}%`;
-            }
-
-            function hideAIStatus() {
-                aiStatusEl.classList.add('hidden');
-                aiProgressEl.style.width = '0%';
-            }
-
-            function updateAIProgress(message, progress) {
-                aiStatusTextEl.textContent = message;
-                aiProgressEl.style.width = `${progress}%`;
-            }
-
-            // Authentication check and user info display
-            window.addEventListener('load', async () => {
-                try {
-                    const response = await fetch('/auth-status');
-                    const data = await response.json();
-
-                    if (!data.is_logged_in) {
-                        window.location.href = 'login.html';
-                        return;
-                    }
-
-                    document.getElementById('user-email').textContent = data.email;
-                    document.getElementById('mobile-user-email').textContent = data.email;
-
-                    try {
-                        const profileResponse = await fetch('/profile');
-                        const profileData = await profileResponse.json();
-                        if (profileResponse.ok && profileData.profile && profileData.profile.profile_pic_url) {
-                            document.getElementById('user-profile-pic').src = profileData.profile.profile_pic_url;
-                            document.getElementById('mobile-user-profile-pic').src = profileData.profile.profile_pic_url;
-                        }
-                    } catch (error) {
-                        console.error('Error loading profile image:', error);
-                    }
-
-                    // Prefill fields from query parameters
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const imageUrl = urlParams.get('image_url');
-                    const logoUrl = urlParams.get('logo_url');
-                    if (imageUrl) document.getElementById('image_url').value = imageUrl;
-                    if (logoUrl) document.getElementById('logo_url').value = logoUrl;
-                } catch (error) {
+        const aiStatusEl = document.getElementById('ai-status');
+        const aiStatusTextEl = document.getElementById('ai-status-text');
+        const aiProgressEl = document.getElementById('ai-progress');
+        function showAIStatus(message, progress = 0) {
+            aiStatusEl.classList.remove('hidden');
+            aiStatusTextEl.textContent = message;
+            aiProgressEl.style.width = `${progress}%`;
+        }
+        function hideAIStatus() {
+            aiStatusEl.classList.add('hidden');
+            aiProgressEl.style.width = '0%';
+        }
+        function updateAIProgress(message, progress) {
+            aiStatusTextEl.textContent = message;
+            aiProgressEl.style.width = `${progress}%`;
+        }
+        // Authentication check and user info display
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch('/auth-status');
+                const data = await response.json();
+                if (!data.is_logged_in) {
                     window.location.href = 'login.html';
-                }
-            });
-
-            // Hamburger menu toggle
-            const hamburgerBtn = document.getElementById('hamburger-btn');
-            const mobileMenu = document.getElementById('mobile-menu');
-            hamburgerBtn.addEventListener('click', () => {
-                mobileMenu.classList.toggle('active');
-                hamburgerBtn.classList.toggle('active');
-                mobileMenu.classList.toggle('hidden');
-            });
-
-            // Logout functionality
-            document.getElementById('logout-btn').addEventListener('click', async () => {
-                try {
-                    await fetch('/logout', { method: 'POST' });
-                    window.location.href = 'index.html';
-                } catch (error) {
-                    console.error('Logout failed:', error);
-                }
-            });
-
-            document.getElementById('mobile-logout-btn').addEventListener('click', async () => {
-                try {
-                    await fetch('/logout', { method: 'POST' });
-                    window.location.href = 'index.html';
-                } catch (error) {
-                    console.error('Logout failed:', error);
-                }
-            });
-
-            // Message Display Functions
-            const errorMessage = document.getElementById('error-message');
-            const successMessage = document.getElementById('success-message');
-
-            function showError(message) {
-                errorMessage.textContent = message;
-                errorMessage.classList.remove('hidden');
-                successMessage.classList.add('hidden');
-                setTimeout(() => {
-                    errorMessage.classList.add('hidden');
-                    errorMessage.textContent = '';
-                }, 5000);
-            }
-
-            function showSuccess(message) {
-                successMessage.textContent = message;
-                successMessage.classList.remove('hidden');
-                errorMessage.classList.add('hidden');
-                setTimeout(() => {
-                    successMessage.classList.add('hidden');
-                    successMessage.textContent = '';
-                }, 5000);
-            }
-
-            // Image and Logo Upload functionality
-            const imageUploadInput = document.getElementById('image-upload');
-            const logoUploadInput = document.getElementById('logo-upload');
-
-            async function uploadFile(fileInput, type, targetInputId) {
-                if (!fileInput.files || fileInput.files.length === 0) {
-                    showError(`No ${type} file selected`);
                     return;
                 }
-
-                const file = fileInput.files[0];
-                const formData = new FormData();
-                formData.append('image', file);
-
-                const uploadBtn = fileInput.previousElementSibling;
-                uploadBtn.disabled = true;
-                uploadBtn.textContent = `Uploading ${type}...`;
-
+                document.getElementById('user-email').textContent = data.email;
+                document.getElementById('mobile-user-email').textContent = data.email;
                 try {
-                    const response = await fetch('/upload-profile-image', {
-                        method: 'POST',
-                        body: formData
-                    });
-                    const data = await response.json();
-
-                    if (response.ok && data.status === 'success') {
-                        document.getElementById(targetInputId).value = data.image_url;
-                        showSuccess(`${type} uploaded successfully`);
-                    } else {
-                        throw new Error(data.error || 'Upload failed');
+                    const profileResponse = await fetch('/profile');
+                    const profileData = await profileResponse.json();
+                    if (profileResponse.ok && profileData.profile && profileData.profile.profile_pic_url) {
+                        document.getElementById('user-profile-pic').src = profileData.profile.profile_pic_url;
+                        document.getElementById('mobile-user-profile-pic').src = profileData.profile.profile_pic_url;
                     }
                 } catch (error) {
-                    showError(`Error uploading ${type}: ${error.message}`);
-                } finally {
-                    uploadBtn.disabled = false;
-                    uploadBtn.textContent = `Upload ${type}`;
-                    fileInput.value = '';
+                    console.error('Error loading profile image:', error);
                 }
-            }
-
-            imageUploadInput.addEventListener('change', () => uploadFile(imageUploadInput, 'Image', 'image_url'));
-            logoUploadInput.addEventListener('change', () => uploadFile(logoUploadInput, 'Logo', 'logo_url'));
-
-            // Remove Background Coming Soon
-            const removeBgCheckbox = document.getElementById('remove_bg');
-            removeBgCheckbox.addEventListener('change', () => {
-                if (removeBgCheckbox.checked) {
-                    showError('Background removal feature is coming soon!');
-                    removeBgCheckbox.checked = false;
-                }
-            });
-
-            // Image Enhancement functionality
-            const goBtn = document.getElementById('go');
-            const preview = document.getElementById('preview');
-            const popup = document.getElementById('image-popup');
-            const popupPreview = document.getElementById('popup-preview');
-            const popupClose = document.querySelector('.popup-close');
-
-            function showPopup() {
-                popup.style.display = 'flex';
-            }
-
-            function hidePopup() {
-                popup.style.display = 'none';
-streets of vibrant cities to the serene landscapes of countryside retreats. Whether you're planning a weekend getaway or a month-long adventure, our expert tips and insider knowledge ensure you experience the best each destination has to offer. From hidden gems to iconic landmarks, we’ve got you covered with itineraries, travel hacks, and local insights to make your journey unforgettable.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    // AI Status Functions
-    const aiStatusEl = document.getElementById('ai-status');
-    const aiStatusTextEl = document.getElementById('ai-status-text');
-    const aiProgressEl = document.getElementById('ai-progress');
-
-    function showAIStatus(message, progress = 0) {
-        aiStatusEl.classList.remove('hidden');
-        aiStatusTextEl.textContent = message;
-        aiProgressEl.style.width = `${progress}%`;
-    }
-
-    function hideAIStatus() {
-        aiStatusEl.classList.add('hidden');
-        aiProgressEl.style.width = '0%';
-    }
-
-    function updateAIProgress(message, progress) {
-        aiStatusTextEl.textContent = message;
-        aiProgressEl.style.width = `${progress}%`;
-    }
-
-    // Authentication check and user info display
-    window.addEventListener('load', async () => {
-        try {
-            const response = await fetch('/auth-status');
-            const data = await response.json();
-
-            if (!data.is_logged_in) {
+                // Prefill fields from query parameters
+                const urlParams = new URLSearchParams(window.location.search);
+                const imageUrl = urlParams.get('image_url');
+                const logoUrl = urlParams.get('logo_url');
+                if (imageUrl) document.getElementById('image_url').value = imageUrl;
+                if (logoUrl) document.getElementById('logo_url').value = logoUrl;
+            } catch (error) {
                 window.location.href = 'login.html';
+            }
+        });
+        // Hamburger menu toggle
+        const hamburgerBtn = document.getElementById('hamburger-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        hamburgerBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+            hamburgerBtn.classList.toggle('active');
+            mobileMenu.classList.toggle('hidden');
+        });
+        // Logout functionality
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            try {
+                await fetch('/logout', { method: 'POST' });
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('Logout failed:', error);
+            }
+        });
+        document.getElementById('mobile-logout-btn').addEventListener('click', async () => {
+            try {
+                await fetch('/logout', { method: 'POST' });
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('Logout failed:', error);
+            }
+        });
+        // Message Display Functions
+        const errorMessage = document.getElementById('error-message');
+        const successMessage = document.getElementById('success-message');
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.remove('hidden');
+            successMessage.classList.add('hidden');
+            setTimeout(() => {
+                errorMessage.classList.add('hidden');
+                errorMessage.textContent = '';
+            }, 5000);
+        }
+        function showSuccess(message) {
+            successMessage.textContent = message;
+            successMessage.classList.remove('hidden');
+            errorMessage.classList.add('hidden');
+            setTimeout(() => {
+                successMessage.classList.add('hidden');
+                successMessage.textContent = '';
+            }, 5000);
+        }
+        // Image and Logo Upload functionality
+        const imageUploadInput = document.getElementById('image-upload');
+        const logoUploadInput = document.getElementById('logo-upload');
+        async function uploadFile(fileInput, type, targetInputId) {
+            if (!fileInput.files || fileInput.files.length === 0) {
+                showError(`No ${type} file selected`);
                 return;
             }
-
-            document.getElementById('user-email').textContent = data.email;
-            document.getElementById('mobile-user-email').textContent = data.email;
-
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('image', file);
+            const uploadBtn = fileInput.previousElementSibling;
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = `Uploading ${type}...`;
             try {
-                const profileResponse = await fetch('/profile');
-                const profileData = await profileResponse.json();
-                if (profileResponse.ok && profileData.profile && profileData.profile.profile_pic_url) {
-                    document.getElementById('user-profile-pic').src = profileData.profile.profile_pic_url;
-                    document.getElementById('mobile-user-profile-pic').src = profileData.profile.profile_pic_url;
+                const response = await fetch('/upload-profile-image', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                if (response.ok && data.status === 'success') {
+                    document.getElementById(targetInputId).value = data.image_url;
+                    showSuccess(`${type} uploaded successfully`);
+                } else {
+                    throw new Error(data.error || 'Upload failed');
                 }
             } catch (error) {
-                console.error('Error loading profile image:', error);
+                showError(`Error uploading ${type}: ${error.message}`);
+            } finally {
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = `Upload ${type}`;
+                fileInput.value = '';
             }
-
-            // Prefill fields from query parameters
-            const urlParams = new URLSearchParams(window.location.search);
-            const imageUrl = urlParams.get('image_url');
-            const logoUrl = urlParams.get('logo_url');
-            if (imageUrl) document.getElementById('image_url').value = imageUrl;
-            if (logoUrl) document.getElementById('logo_url').value = logoUrl;
-        } catch (error) {
-            window.location.href = 'login.html';
         }
-    });
-
-    // Hamburger menu toggle
-    const hamburgerBtn = document.getElementById('hamburger-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-    hamburgerBtn.addEventListener('click', () => {
-        mobileMenu.classList.toggle('active');
-        hamburgerBtn.classList.toggle('active');
-        mobileMenu.classList.toggle('hidden');
-    });
-
-    // Logout functionality
-    document.getElementById('logout-btn').addEventListener('click', async () => {
-        try {
-            await fetch('/logout', { method: 'POST' });
-            window.location.href = 'index.html';
-        } catch (error) {
-            console.error('Logout failed:', error);
-        }
-    });
-
-    document.getElementById('mobile-logout-btn').addEventListener('click', async () => {
-        try {
-            await fetch('/logout', { method: 'POST' });
-            window.location.href = 'index.html';
-        } catch (error) {
-            console.error('Logout failed:', error);
-        }
-    });
-
-    // Message Display Functions
-    const errorMessage = document.getElementById('error-message');
-    const successMessage = document.getElementById('success-message');
-
-    function showError(message) {
-        errorMessage.textContent = message;
-        errorMessage.classList.remove('hidden');
-        successMessage.classList.add('hidden');
-        setTimeout(() => {
-            errorMessage.classList.add('hidden');
-            errorMessage.textContent = '';
-        }, 5000);
-    }
-
-    function showSuccess(message) {
-        successMessage.textContent = message;
-        successMessage.classList.remove('hidden');
-        errorMessage.classList.add('hidden');
-        setTimeout(() => {
-            successMessage.classList.add('hidden');
-            successMessage.textContent = '';
-        }, 5000);
-    }
-
-    // Image and Logo Upload functionality
-    const imageUploadInput = document.getElementById('image-upload');
-    const logoUploadInput = document.getElementById('logo-upload');
-
-    async function uploadFile(fileInput, type, targetInputId) {
-        if (!fileInput.files || fileInput.files.length === 0) {
-            showError(`No ${type} file selected`);
-            return;
-        }
-
-        const file = fileInput.files[0];
-        const formData = new FormData();
-        formData.append('image', file);
-
-        const uploadBtn = fileInput.previousElementSibling;
-        uploadBtn.disabled = true;
-        uploadBtn.textContent = `Uploading ${type}...`;
-
-        try {
-            const response = await fetch('/upload-profile-image', {
-                method: 'POST',
-                body: formData
-            });
-            const data = await response.json();
-
-            if (response.ok && data.status === 'success') {
-                document.getElementById(targetInputId).value = data.image_url;
-                showSuccess(`${type} uploaded successfully`);
-            } else {
-                throw new Error(data.error || 'Upload failed');
+        imageUploadInput.addEventListener('change', () => uploadFile(imageUploadInput, 'Image', 'image_url'));
+        logoUploadInput.addEventListener('change', () => uploadFile(logoUploadInput, 'Logo', 'logo_url'));
+        // Remove Background Coming Soon
+        const removeBgCheckbox = document.getElementById('remove_bg');
+        removeBgCheckbox.addEventListener('change', () => {
+            if (removeBgCheckbox.checked) {
+                showError('Background removal feature is coming soon!');
+                removeBgCheckbox.checked = false;
             }
-        } catch (error) {
-            showError(`Error uploading ${type}: ${error.message}`);
-        } finally {
-            uploadBtn.disabled = false;
-            uploadBtn.textContent = `Upload ${type}`;
-            fileInput.value = '';
+        });
+        // Image Enhancement functionality
+        const goBtn = document.getElementById('go');
+        const preview = document.getElementById('preview');
+        const popup = document.getElementById('image-popup');
+        const popupPreview = document.getElementById('popup-preview');
+        const popupClose = document.querySelector('.popup-close');
+        function showPopup() {
+            popup.style.display = 'flex';
         }
-    }
-
-    imageUploadInput.addEventListener('change', () => uploadFile(imageUploadInput, 'Image', 'image_url'));
-    logoUploadInput.addEventListener('change', () => uploadFile(logoUploadInput, 'Logo', 'logo_url'));
-
-    // Remove Background Coming Soon
-    const removeBgCheckbox = document.getElementById('remove_bg');
-    removeBgCheckbox.addEventListener('change', () => {
-        if (removeBgCheckbox.checked) {
-            showError('Background removal feature is coming soon!');
-            removeBgCheckbox.checked = false;
+        function hidePopup() {
+            popup.style.display = 'none';
+            popupPreview.innerHTML = '';
         }
-    });
-
-    // Image Enhancement functionality
-    const goBtn = document.getElementById('go');
-    const preview = document.getElementById('preview');
-    const popup = document.getElementById('image-popup');
-    const popupPreview = document.getElementById('popup-preview');
-    const popupClose = document.querySelector('.popup-close');
-
-    function showPopup() {
-        popup.style.display = 'flex';
-    }
-
-    function hidePopup() {
-        popup.style.display = 'none';
-        popupPreview.innerHTML = '';
-    }
-
-    popupClose.addEventListener('click', hidePopup);
-    popup.addEventListener('click', (e) => {
-        if (e.target === popup) hidePopup();
-    });
-
-    goBtn.addEventListener('click', async () => {
-        const image_url = document.getElementById('image_url').value.trim();
-        const title = document.getElementById('title').value.trim();
-        const logo_url = document.getElementById('logo_url').value.trim();
-        const remove_bg = document.getElementById('remove_bg').checked;
-
-        if (!image_url) {
-            showError('Please provide an image URL or upload an image');
-            return;
-        }
-
-        goBtn.disabled = true;
-        goBtn.textContent = 'Enhancing...';
-        preview.innerHTML = '';
-        showAIStatus('🤖 Analyzing image...', 10);
-        setTimeout(() => updateAIProgress('🔍 Processing enhancements...', 25), 500);
-        setTimeout(() => updateAIProgress('🖼️ Applying banner and logo...', 50), 1500);
-        setTimeout(() => updateAIProgress('🎨 Finalizing image...', 75), 2500);
-
-        try {
-            const payload = { image_url, title, remove_bg };
-            if (logo_url) payload.logo_url = logo_url;
-
-            const res = await fetch('/enhance-image', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            if (!res.ok) {
-                const err = await res.json().catch(() => ({ error: 'Unknown error' }));
-                throw new Error(err.error || res.statusText);
+        popupClose.addEventListener('click', hidePopup);
+        popup.addEventListener('click', (e) => {
+            if (e.target === popup) hidePopup();
+        });
+        goBtn.addEventListener('click', async () => {
+            const image_url = document.getElementById('image_url').value.trim();
+            const title = document.getElementById('title').value.trim();
+            const logo_url = document.getElementById('logo_url').value.trim();
+            const remove_bg = document.getElementById('remove_bg').checked;
+            if (!image_url) {
+                showError('Please provide an image URL or upload an image');
+                return;
             }
-
-            const blob = await res.blob();
-            const url = URL.createObjectURL(blob);
-
-            // Create image for preview
-            const img = document.createElement('img');
-            img.src = url;
-            popupPreview.appendChild(img);
-
-            // Create download button
-            const downloadBtn = document.createElement('a');
-            downloadBtn.href = url;
-            downloadBtn.download = 'enhanced.png';
-            downloadBtn.textContent = 'Download Enhanced Image';
-            downloadBtn.className = 'mt-4 inline-block px-6 py-3 image-enhance-gradient text-white rounded-lg font-semibold hover:opacity-90 transition-opacity hover-lift';
-            popupPreview.appendChild(downloadBtn);
-
-            updateAIProgress('✅ Image enhanced successfully!', 100);
-            setTimeout(() => {
+            goBtn.disabled = true;
+            goBtn.textContent = 'Enhancing...';
+            preview.innerHTML = '';
+            showAIStatus('🤖 Analyzing image...', 10);
+            setTimeout(() => updateAIProgress('🔍 Processing enhancements...', 25), 500);
+            setTimeout(() => updateAIProgress('🖼️ Applying banner and logo...', 50), 1500);
+            setTimeout(() => updateAIProgress('🎨 Finalizing image...', 75), 2500);
+            try {
+                const payload = { image_url, title, remove_bg };
+                if (logo_url) payload.logo_url = logo_url;
+                const res = await fetch('/enhance-image', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({ error: 'Unknown error' }));
+                    throw new Error(err.error || res.statusText);
+                }
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+                // Create image for preview
+                const img = document.createElement('img');
+                img.src = url;
+                popupPreview.appendChild(img);
+                // Create download button
+                const downloadBtn = document.createElement('a');
+                downloadBtn.href = url;
+                downloadBtn.download = 'enhanced.png';
+                downloadBtn.textContent = 'Download Enhanced Image';
+                downloadBtn.className = 'mt-4 inline-block px-6 py-3 image-enhance-gradient text-white rounded-lg font-semibold hover:opacity-90 transition-opacity hover-lift';
+                popupPreview.appendChild(downloadBtn);
+                updateAIProgress('✅ Image enhanced successfully!', 100);
+                setTimeout(() => {
+                    hideAIStatus();
+                    showPopup();
+                    showSuccess('Image enhanced successfully');
+                }, 1000);
+            } catch (e) {
+                showError('Error: ' + e.message);
                 hideAIStatus();
-                showPopup();
-                showSuccess('Image enhanced successfully');
-            }, 1000);
-
-        } catch (e) {
-            showError('Error: ' + e.message);
-            hideAIStatus();
-        } finally {
-            goBtn.disabled = false;
-            goBtn.textContent = 'Enhance';
-        }
-    });
-</script>
+            } finally {
+                goBtn.disabled = false;
+                goBtn.textContent = 'Enhance';
+            }
+        });
+    </script>
 </body>
 </html>
