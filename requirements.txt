@@ -7,3 +7,5 @@ jsonschema
 openai
 gunicorn
 pillow
+rembg
+onnxruntime
