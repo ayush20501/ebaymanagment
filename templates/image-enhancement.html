@@ -65,11 +65,12 @@
             background: linear-gradient(135deg, #ffffff 0%, #f3e8ff 100%);
         }
         .preview img {
-            max-width: 100%;
+            max-width: 200px;
             height: auto;
             border-radius: 10px;
             border: 2px solid #e5e7eb;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin: 16px 0;
         }
         .upload-btn {
             background: #ffffff;
@@ -113,30 +114,50 @@
         }
         .error-message {
             display: none;
-            background-color: #fee2e2;
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
             color: #dc2626;
             padding: 12px;
-            border-radius: 8px;
+            border-radius: 12px;
             margin-bottom: 16px;
-            border: 1px solid #fecaca;
+            border: 2px solid #fecaca;
+            font-medium: 500;
         }
         .success-message {
             display: none;
-            background-color: #dcfce7;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
             color: #15803d;
             padding: 12px;
-            border-radius: 8px;
+            border-radius: 12px;
             margin-bottom: 16px;
-            border: 1px solid #bbf7d0;
+            border: 2px solid #bbf7d0;
+            font-weight: 500;
         }
         .ai-status {
-            background-color: #e0f2fe;
-            border: 2px solid #bae6fd;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 2px solid #e2e8f0;
             border-radius: 16px;
             padding: 24px;
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: 400px;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
         }
         .ai-progress {
             background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+        }
+        .ai-progress-bg {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+        }
+        @media (max-width: 640px) {
+            .ai-status {
+                min-width: 320px;
+                left: 16px;
+                right: 16px;
+                transform: none;
+            }
         }
     </style>
 </head>
@@ -195,23 +216,8 @@
             </p>
         </div>
         <!-- Messages -->
-        <div id="error-message" class="hidden bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-xl mb-8 font-medium"></div>
-        <div id="success-message" class="hidden bg-green-50 border border-green-200 text-green-800 px-6 py-4 rounded-xl mb-8 font-medium"></div>
-        <!-- AI Status Indicator -->
-        <div id="ai-status" class="hidden ai-status mt-8">
-            <div class="flex items-center">
-                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-4"></div>
-                <div>
-                    <h3 class="text-lg font-semibold text-blue-900">Processing Image Enhancement</h3>
-                    <p id="ai-status-text" class="text-blue-700 mt-1">Analyzing image...</p>
-                </div>
-            </div>
-            <div class="mt-6">
-                <div class="bg-white rounded-full h-3">
-                    <div id="ai-progress" class="ai-progress h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
-                </div>
-            </div>
-        </div>
+        <div id="error-message" class="hidden error-message"></div>
+        <div id="success-message" class="hidden success-message"></div>
         <!-- Main Grid -->
         <div class="grid lg:grid-cols-3 gap-12">
             <div class="lg:col-span-2">
@@ -304,6 +310,21 @@
                         </li>
                     </ul>
                 </div>
+            </div>
+        </div>
+    </div>
+    <!-- AI Status Indicator (Bottom Progress Bar) -->
+    <div id="ai-status" class="hidden ai-status">
+        <div class="flex items-center mb-4">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mr-4"></div>
+            <div>
+                <h3 class="text-lg font-semibold text-gray-900">Processing Image Enhancement</h3>
+                <p id="ai-status-text" class="text-gray-700 mt-1">Analyzing image...</p>
+            </div>
+        </div>
+        <div>
+            <div class="ai-progress-bg rounded-full h-3">
+                <div id="ai-progress" class="ai-progress h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
             </div>
         </div>
     </div>
@@ -478,133 +499,3 @@
         document.getElementById('upload-image-btn').addEventListener('click', () => {
             imageUploadInput.click();
         });
-
-        // Handle file selection for image
-        imageUploadInput.addEventListener('change', () => {
-            uploadFile(imageUploadInput, 'Image', 'image_url');
-        });
-
-        // Trigger file input when the upload button is clicked
-        document.getElementById('upload-logo-btn').addEventListener('click', () => {
-            logoUploadInput.click();
-        });
-
-        // Handle file selection for logo
-        logoUploadInput.addEventListener('change', () => {
-            uploadFile(logoUploadInput, 'Logo', 'logo_url');
-        });
-
-        async function uploadFile(fileInput, type, targetInputId) {
-            if (!fileInput.files || fileInput.files.length === 0) {
-                showError(`No ${type} file selected`);
-                return;
-            }
-            const file = fileInput.files[0];
-            const formData = new FormData();
-            formData.append('image', file);
-            const uploadBtn = document.getElementById(type === 'Image' ? 'upload-image-btn' : 'upload-logo-btn');
-            uploadBtn.disabled = true;
-            uploadBtn.textContent = `Uploading ${type}...`;
-            try {
-                const response = await fetch('/upload-profile-image', {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await response.json();
-                if (response.ok && data.status === 'success') {
-                    document.getElementById(targetInputId).value = data.image_url;
-                    showSuccess(`${type} uploaded successfully`);
-                } else {
-                    throw new Error(data.error || 'Upload failed');
-                }
-            } catch (error) {
-                showError(`Error uploading ${type}: ${error.message}`);
-            } finally {
-                uploadBtn.disabled = false;
-                uploadBtn.textContent = `Upload ${type}`;
-                fileInput.value = '';
-            }
-        }
-        // Remove Background Coming Soon
-        const removeBgCheckbox = document.getElementById('remove_bg');
-        removeBgCheckbox.addEventListener('change', () => {
-            if (removeBgCheckbox.checked) {
-                showError('Background removal feature is coming soon!');
-                removeBgCheckbox.checked = false;
-            }
-        });
-        // Image Enhancement functionality
-        const goBtn = document.getElementById('go');
-        const preview = document.getElementById('preview');
-        const popup = document.getElementById('image-popup');
-        const popupPreview = document.getElementById('popup-preview');
-        const popupClose = document.querySelector('.popup-close');
-        function showPopup() {
-            popup.style.display = 'flex';
-        }
-        function hidePopup() {
-            popup.style.display = 'none';
-            popupPreview.innerHTML = '';
-        }
-        popupClose.addEventListener('click', hidePopup);
-        popup.addEventListener('click', (e) => {
-            if (e.target === popup) hidePopup();
-        });
-        goBtn.addEventListener('click', async () => {
-            const image_url = document.getElementById('image_url').value.trim();
-            const title = document.getElementById('title').value.trim();
-            const logo_url = document.getElementById('logo_url').value.trim();
-            const remove_bg = document.getElementById('remove_bg').checked;
-            if (!image_url) {
-                showError('Please provide an image URL or upload an image');
-                return;
-            }
-            goBtn.disabled = true;
-            goBtn.textContent = 'Enhancing...';
-            preview.innerHTML = '';
-            showAIStatus('🤖 Analyzing image...', 10);
-            setTimeout(() => updateAIProgress('🔍 Processing enhancements...', 25), 500);
-            setTimeout(() => updateAIProgress('🖼️ Applying banner and logo...', 50), 1500);
-            setTimeout(() => updateAIProgress('🎨 Finalizing image...', 75), 2500);
-            try {
-                const payload = { image_url, title, remove_bg };
-                if (logo_url) payload.logo_url = logo_url;
-                const res = await fetch('/enhance-image', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if (!res.ok) {
-                    const err = await res.json().catch(() => ({ error: 'Unknown error' }));
-                    throw new Error(err.error || res.statusText);
-                }
-                const blob = await res.blob();
-                const url = URL.createObjectURL(blob);
-                // Create image for preview
-                const img = document.createElement('img');
-                img.src = url;
-                popupPreview.appendChild(img);
-                // Create download button
-                const downloadBtn = document.createElement('a');
-                downloadBtn.href = url;
-                downloadBtn.download = 'enhanced.png';
-                downloadBtn.textContent = 'Download Enhanced Image';
-                downloadBtn.className = 'mt-4 inline-block px-6 py-3 image-enhance-gradient text-white rounded-lg font-semibold hover:opacity-90 transition-opacity hover-lift';
-                popupPreview.appendChild(downloadBtn);
-                updateAIProgress('✅ Image enhanced successfully!', 100);
-                setTimeout(() => {
-                    hideAIStatus();
-                    showPopup();
-                    showSuccess('Image enhanced successfully');
-                }, 1000);
-            } catch (e) {
-                showError('Error: ' + e.message);
-                hideAIStatus();
-            } finally {
-                goBtn.disabled = false;
-                goBtn.textContent = 'Enhance';
-            }
-        });
-    </script>
-</body>
-</html>
