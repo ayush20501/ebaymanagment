@@ -33,6 +33,9 @@
         .image-enhance-gradient {
             background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
         }
+        .single-listing-gradient {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        }
         .nav-gradient {
             background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
         }
@@ -55,31 +58,14 @@
         .mobile-menu.active {
             transform: translateY(0);
         }
-        .card {
+        .service-card {
             background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
             border: 2px solid transparent;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .card:hover {
-            border: 2px solid #a855f7;
-            background: linear-gradient(135deg, #ffffff 0%, #f3e8ff 100%);
-        }
-        .preview img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 10px;
-            border: 2px solid #e5e7eb;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        .upload-btn {
-            background: #ffffff;
-            border: 2px solid #a855f7;
-            color: #a855f7;
-            transition: all 0.3s ease;
-        }
-        .upload-btn:hover {
-            background: #a855f7;
-            color: #ffffff;
+        .service-card:hover {
+            border: 2px solid #3b82f6;
+            background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%);
         }
         .input-field {
             transition: all 0.3s ease;
@@ -87,8 +73,8 @@
         }
         .input-field:focus {
             outline: none;
-            border-color: #a855f7;
-            box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.1);
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
         }
         .pulse-animation {
             animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
@@ -126,6 +112,16 @@
         .image-input {
             border-radius: 8px;
         }
+        .upload-btn {
+            background: #ffffff;
+            border: 2px solid #3b82f6;
+            color: #3b82f6;
+            transition: all 0.3s ease;
+        }
+        .upload-btn:hover {
+            background: #3b82f6;
+            color: #ffffff;
+        }
     </style>
 </head>
 <body class="min-h-screen bg-gray-50">
@@ -139,23 +135,18 @@
                     </a>
                 </div>
                 <div class="hidden lg:flex items-center space-x-8">
-                    <a href="services.html"
-                        class="text-gray-600 hover:text-gray-900 font-medium px-4 py-2 rounded-lg transition-colors hover-lift">
+                    <a href="services.html" class="text-gray-600 hover:text-gray-900 font-medium px-4 py-2 rounded-lg transition-colors hover-lift">
                         Services
                     </a>
-                    <a href="dashboard.html"
-                        class="text-gray-600 hover:text-gray-900 font-medium px-4 py-2 rounded-lg transition-colors hover-lift">
+                    <a href="dashboard.html" class="text-gray-600 hover:text-gray-900 font-medium px-4 py-2 rounded-lg transition-colors hover-lift">
                         Dashboard
                     </a>
-                    <a href="display-profile.html" id="profile-btn"
-                        class="flex items-center space-x-2 text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg transition-colors hover-lift">
-                        <img id="user-profile-pic" src="https://via.placeholder.com/32" alt="Profile"
-                            class="w-8 h-8 rounded-full border-2 border-gray-200 object-cover">
+                    <a href="display-profile.html" id="profile-btn" class="flex items-center space-x-2 text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg transition-colors hover-lift">
+                        <img id="user-profile-pic" src="https://via.placeholder.com/32" alt="Profile" class="w-8 h-8 rounded-full border-2 border-gray-200 object-cover">
                         <span class="font-medium">Profile</span>
                     </a>
                     <span id="user-email" class="text-gray-600 text-sm"></span>
-                    <button id="logout-btn"
-                        class="hero-gradient text-white px-4 py-2 rounded-lg font-semibold hover:opacity-90 transition-opacity hover-lift">
+                    <button id="logout-btn" class="hero-gradient text-white px-4 py-2 rounded-lg font-semibold hover:opacity-90 transition-opacity hover-lift">
                         Logout
                     </button>
                 </div>
@@ -169,26 +160,20 @@
                     </button>
                 </div>
             </div>
-            <div id="mobile-menu"
-                class="lg:hidden mobile-menu absolute top-16 left-0 w-full bg-white shadow-lg border-b border-gray-200 hidden">
+            <div id="mobile-menu" class="lg:hidden mobile-menu absolute top-16 left-0 w-full bg-white shadow-lg border-b border-gray-200 hidden">
                 <div class="flex flex-col space-y-4 px-6 py-4">
-                    <a href="services.html"
-                        class="text-gray-600 hover:text-gray-900 font-medium py-2 transition-colors hover-lift">
+                    <a href="services.html" class="text-gray-600 hover:text-gray-900 font-medium py-2 transition-colors hover-lift">
                         Services
                     </a>
-                    <a href="dashboard.html"
-                        class="text-gray-600 hover:text-gray-900 font-medium py-2 transition-colors hover-lift">
+                    <a href="dashboard.html" class="text-gray-600 hover:text-gray-900 font-medium py-2 transition-colors hover-lift">
                         Dashboard
                     </a>
-                    <a href="display-profile.html"
-                        class="flex items-center space-x-2 text-gray-600 hover:text-gray-900 font-medium py-2 transition-colors hover-lift">
-                        <img id="mobile-user-profile-pic" src="https://via.placeholder.com/32" alt="Profile"
-                            class="w-8 h-8 rounded-full border-2 border-gray-200 object-cover">
+                    <a href="display-profile.html" class="flex items-center space-x-2 text-gray-600 hover:text-gray-900 font-medium py-2 transition-colors hover-lift">
+                        <img id="mobile-user-profile-pic" src="https://via.placeholder.com/32" alt="Profile" class="w-8 h-8 rounded-full border-2 border-gray-200 object-cover">
                         <span>Profile</span>
                     </a>
                     <span id="mobile-user-email" class="text-gray-600 text-sm py-2"></span>
-                    <button id="mobile-logout-btn"
-                        class="hero-gradient text-white px-4 py-2 rounded-lg font-semibold hover:opacity-90 transition-opacity hover-lift text-left">
+                    <button id="mobile-logout-btn" class="hero-gradient text-white px-4 py-2 rounded-lg font-semibold hover:opacity-90 transition-opacity hover-lift text-left">
                         Logout
                     </button>
                 </div>
@@ -214,40 +199,40 @@
                     </div>
                     <form id="preview-form" class="space-y-6">
                         <div>
-                            <label class="block text-lg font-semibold text-gray-900 mb-3">Title</label>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Title</label>
                             <input type="text" id="preview-title" maxlength="80" class="input-field w-full px-4 py-4 rounded-xl text-base">
                             <p class="text-sm text-gray-500 mt-2">Max 80 characters</p>
                         </div>
                         <div>
-                            <label class="block text-lg font-semibold text-gray-900 mb-3">Description</label>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Description</label>
                             <textarea id="preview-description" rows="6" class="input-field w-full px-4 py-4 rounded-xl text-base resize-none" placeholder="Enter description text here..."></textarea>
                             <p class="text-sm text-gray-500 mt-2">Edit the generated description if needed. HTML tags will be preserved in the final listing.</p>
                         </div>
                         <div>
-                            <label class="block text-lg font-semibold text-gray-900 mb-3">Item Aspects</label>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Item Aspects</label>
                             <div id="preview-aspects" class="space-y-3">
                             </div>
                             <p class="text-sm text-gray-500 mt-2">Edit or add aspect values as needed (comma-separated)</p>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-lg font-semibold text-gray-900 mb-3">Price</label>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Price</label>
                                 <p id="preview-price-currency" class="text-base text-gray-900"></p>
                                 <p class="text-sm text-gray-500 mt-2">Price and currency (non-editable)</p>
                             </div>
                             <div>
-                                <label class="block text-lg font-semibold text-gray-900 mb-3">Quantity</label>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Quantity</label>
                                 <p id="preview-quantity" class="text-base text-gray-900"></p>
                                 <p class="text-sm text-gray-500 mt-2">Number of items available (non-editable)</p>
                             </div>
                         </div>
                         <div>
-                            <label class="block text-lg font-semibold text-gray-900 mb-3">Condition</label>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Condition</label>
                             <p id="preview-condition" class="text-base text-gray-900"></p>
                             <p class="text-sm text-gray-500 mt-2">Item condition (non-editable)</p>
                         </div>
                         <div>
-                            <label class="block text-lg font-semibold text-gray-900 mb-3">Images</label>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Images</label>
                             <div id="preview-images" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
                             </div>
                         </div>
@@ -256,7 +241,7 @@
                         <div id="preview-success" class="hidden bg-green-50 border border-green-200 text-green-800 px-6 py-4 rounded-xl font-medium">
                         </div>
                         <div class="flex space-x-3 pt-2">
-                            <button type="submit" class="image-enhance-gradient text-white px-6 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity disabled:bg-gray-400 hover-lift">
+                            <button type="submit" class="single-listing-gradient text-white px-6 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity disabled:bg-gray-400 hover-lift">
                                 Publish to eBay
                             </button>
                             <button type="button" id="cancel-preview" class="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-300 hover-lift">
@@ -277,15 +262,15 @@
                 </button>
             </div>
         </div>
-        <div class="mb-12">
-            <div class="max-w-4xl text-center">
-                <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+        <div class="mb-16">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 class="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
                     Create New
                     <span class="hero-gradient bg-clip-text text-transparent">
                         Listing
                     </span>
                 </h2>
-                <p class="text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto">
+                <p class="text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto">
                     Describe your product and let our AI create the perfect eBay listing with optimized titles,
                     descriptions, and categories.
                 </p>
@@ -297,9 +282,9 @@
         </div>
         <div class="grid lg:grid-cols-3 gap-12">
             <div class="lg:col-span-2">
-                <form id="listing-form" class="card rounded-2xl shadow-lg p-8 hover-lift">
+                <form id="listing-form" class="service-card rounded-2xl shadow-lg p-8 hover-lift">
                     <div class="mb-8 flex justify-between items-center p-4 bg-green-50 border border-green-200 rounded-xl">
-                        <button type="button" id="autofill-btn" class="image-enhance-gradient text-white px-6 py-3 rounded-lg hover:opacity-90 transition-opacity font-medium flex items-center hover-lift">
+                        <button type="button" id="autofill-btn" class="single-listing-gradient text-white px-6 py-3 rounded-lg hover:opacity-90 transition-opacity font-medium flex items-center hover-lift">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                             </svg>
@@ -340,13 +325,9 @@
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Product Images *</label>
                             <div class="space-y-4">
                                 <div class="flex gap-2">
-                                    <label class="upload-btn px-4 py-2 rounded-lg font-semibold cursor-pointer hover-lift">
+                                    <label class="upload-btn px-6 py-3 rounded-lg font-semibold cursor-pointer hover-lift">
                                         Upload Image
                                         <input type="file" id="upload-image-input" accept="image/*" class="hidden">
-                                    </label>
-                                    <label class="upload-btn px-4 py-2 rounded-lg font-semibold cursor-pointer hover-lift">
-                                        Upload Logo
-                                        <input type="file" id="upload-logo-input" accept="image/*" class="hidden">
                                     </label>
                                 </div>
                                 <div id="images-container" class="space-y-2">
@@ -356,20 +337,16 @@
                                             +
                                         </button>
                                     </div>
-                                    <div class="flex items-center gap-2">
-                                        <input type="text" name="logo_url" placeholder="Paste a logo URL or upload above" class="image-input input-field flex-1 px-4 py-3 rounded-lg text-base">
-                                        <button type="button" class="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-bold text-lg hover-lift" onclick="this.parentElement.remove()">−</button>
-                                    </div>
                                 </div>
                             </div>
-                            <p class="text-sm text-gray-500 mt-3">📸 You can upload images or a logo, or paste HTTPS URLs. High-quality images improve sales significantly!</p>
+                            <p class="text-sm text-gray-500 mt-3">📸 You can upload images or paste HTTPS URLs. High-quality images improve sales significantly!</p>
                         </div>
                         <div class="pt-4">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <button type="button" id="preview-btn" class="bg-blue-600 text-white py-4 px-8 rounded-xl text-lg font-semibold hover:bg-blue-700 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed hover-lift order-2 md:order-1">
+                                <button type="button" id="preview-btn" class="bg-blue-600 text-white py-4 px-6 rounded-xl text-lg font-semibold hover:bg-blue-700 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed hover-lift order-2 md:order-1">
                                     Preview, Edit & Publish
                                 </button>
-                                <button type="submit" id="publish-btn" class="image-enhance-gradient text-white py-4 px-8 rounded-xl text-lg font-semibold hover:opacity-90 transition-opacity disabled:bg-gray-400 disabled:cursor-not-allowed hover-lift pulse-animation order-1 md:order-2">
+                                <button type="submit" id="publish-btn" class="single-listing-gradient text-white py-4 px-6 rounded-xl text-lg font-semibold hover:opacity-90 transition-opacity disabled:bg-gray-400 disabled:cursor-not-allowed hover-lift pulse-animation order-1 md:order-2">
                                     Publish to eBay
                                 </button>
                             </div>
@@ -381,48 +358,48 @@
                 </form>
             </div>
             <div class="space-y-6">
-                <div class="card p-6 rounded-2xl shadow-lg hover-lift">
+                <div class="service-card p-6 rounded-2xl shadow-lg hover-lift">
                     <h3 class="text-lg font-bold text-gray-900 mb-4">✨ AI-Powered Listing</h3>
                     <ul class="space-y-3 text-sm text-gray-600">
                         <li class="flex items-start">
-                            <span class="text-purple-500 mr-2">✓</span>
+                            <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-2"></div>
                             Automatic keyword extraction
                         </li>
                         <li class="flex items-start">
-                            <span class="text-purple-500 mr-2">✓</span>
+                            <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-2"></div>
                             SEO-optimized titles
                         </li>
                         <li class="flex items-start">
-                            <span class="text-purple-500 mr-2">✓</span>
+                            <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-2"></div>
                             Perfect category detection
                         </li>
                         <li class="flex items-start">
-                            <span class="text-purple-500 mr-2">✓</span>
+                            <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-2"></div>
                             Professional descriptions
                         </li>
                         <li class="flex items-start">
-                            <span class="text-purple-500 mr-2">✓</span>
+                            <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-2"></div>
                             eBay best practices
                         </li>
                     </ul>
                 </div>
-                <div class="card p-6 rounded-2xl shadow-lg hover-lift">
+                <div class="service-card p-6 rounded-2xl shadow-lg hover-lift">
                     <h3 class="text-lg font-bold text-gray-900 mb-4">📈 Tips for Better Sales</h3>
                     <ul class="space-y-3 text-sm text-gray-600">
                         <li class="flex items-start">
-                            <span class="text-purple-500 mr-2">✓</span>
+                            <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-2"></div>
                             Use high-quality, well-lit photos
                         </li>
                         <li class="flex items-start">
-                            <span class="text-purple-500 mr-2">✓</span>
+                            <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-2"></div>
                             Include brand names and model numbers
                         </li>
                         <li class="flex items-start">
-                            <span class="text-purple-500 mr-2">✓</span>
+                            <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-2"></div>
                             Mention any defects or wear honestly
                         </li>
                         <li class="flex items-start">
-                            <span class="text-purple-500 mr-2">✓</span>
+                            <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-2"></div>
                             Research competitive pricing
                         </li>
                     </ul>
@@ -477,10 +454,8 @@
                     <h4 class="text-lg font-semibold mb-4">Stay Updated</h4>
                     <p class="text-gray-400 text-sm mb-4">Subscribe to our newsletter for the latest updates and offers.</p>
                     <form class="flex">
-                        <input type="email" placeholder="Enter your email"
-                            class="w-full px-4 py-2 rounded-l-lg bg-gray-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <button type="submit"
-                            class="hero-gradient px-4 py-2 rounded-r-lg font-semibold hover:opacity-90 transition-opacity">
+                        <input type="email" placeholder="Enter your email" class="w-full px-4 py-2 rounded-l-lg bg-gray-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button type="submit" class="hero-gradient px-4 py-2 rounded-r-lg font-semibold hover:opacity-90 transition-opacity">
                             Subscribe
                         </button>
                     </form>
@@ -615,27 +590,26 @@
             imagesContainer.appendChild(newRow);
         });
         const uploadImageInput = document.getElementById('upload-image-input');
-        const uploadLogoInput = document.getElementById('upload-logo-input');
-        async function uploadFile(fileInput, type, isLogo = false) {
+        async function uploadFile(fileInput) {
             if (!fileInput.files || fileInput.files.length === 0) {
-                document.getElementById('error-message').textContent = `No ${type} file selected`;
+                document.getElementById('error-message').textContent = 'No image file selected';
                 document.getElementById('error-message').classList.remove('hidden');
                 return;
             }
             const file = fileInput.files[0];
             if (!file.type.startsWith('image/')) {
-                document.getElementById('error-message').textContent = `Please select an image file for ${type}`;
+                document.getElementById('error-message').textContent = 'Please select an image file';
                 document.getElementById('error-message').classList.remove('hidden');
                 return;
             }
             if (file.size > 10 * 1024 * 1024) {
-                document.getElementById('error-message').textContent = `${type} file size must be less than 10MB`;
+                document.getElementById('error-message').textContent = 'Image file size must be less than 10MB';
                 document.getElementById('error-message').classList.remove('hidden');
                 return;
             }
-            const uploadBtn = isLogo ? uploadLogoInput.previousElementSibling : uploadImageInput.previousElementSibling;
+            const uploadBtn = uploadImageInput.previousElementSibling;
             uploadBtn.disabled = true;
-            uploadBtn.textContent = `Uploading ${type}...`;
+            uploadBtn.textContent = 'Uploading Image...';
             const formData = new FormData();
             formData.append('image', file);
             try {
@@ -645,7 +619,7 @@
                 });
                 const data = await response.json();
                 if (response.ok && data.status === 'success') {
-                    const inputs = imagesContainer.querySelectorAll(`input[name="${isLogo ? 'logo_url' : 'image_url'}"]`);
+                    const inputs = imagesContainer.querySelectorAll('input[name="image_url"]');
                     let emptyInput = null;
                     for (let input of inputs) {
                         if (!input.value.trim()) {
@@ -655,17 +629,12 @@
                     }
                     if (emptyInput) {
                         emptyInput.value = data.image_url;
-                    } else if (!isLogo) {
+                    } else {
                         addImageBtn.click();
                         const newInputs = imagesContainer.querySelectorAll('input[name="image_url"]');
                         newInputs[newInputs.length - 1].value = data.image_url;
-                    } else {
-                        const logoInput = imagesContainer.querySelector('input[name="logo_url"]');
-                        if (logoInput) {
-                            logoInput.value = data.image_url;
-                        }
                     }
-                    document.getElementById('success-message').textContent = `${type} uploaded successfully!`;
+                    document.getElementById('success-message').textContent = 'Image uploaded successfully!';
                     document.getElementById('success-message').classList.remove('hidden');
                     document.getElementById('error-message').classList.add('hidden');
                 } else {
@@ -673,15 +642,14 @@
                     document.getElementById('error-message').classList.remove('hidden');
                 }
             } catch (err) {
-                document.getElementById('error-message').textContent = `Error uploading ${type}: ${err.message}`;
+                document.getElementById('error-message').textContent = `Error uploading image: ${err.message}`;
                 document.getElementById('error-message').classList.remove('hidden');
             }
             uploadBtn.disabled = false;
-            uploadBtn.textContent = `Upload ${type}`;
+            uploadBtn.textContent = 'Upload Image';
             fileInput.value = '';
         }
-        uploadImageInput.addEventListener('change', () => uploadFile(uploadImageInput, 'Image'));
-        uploadLogoInput.addEventListener('change', () => uploadFile(uploadLogoInput, 'Logo', true));
+        uploadImageInput.addEventListener('change', () => uploadFile(uploadImageInput));
         document.getElementById('autofill-btn').addEventListener('click', () => {
             document.getElementById('raw_text').value = "Sainsbury's Mackerel Fillets in Olive Oil 125g - Premium quality mackerel fillets preserved in olive oil. Perfect for sandwiches, salads, or as a healthy snack. Rich in omega-3 fatty acids and protein. Best before date clearly marked on tin.";
             document.getElementById('price_value').value = "19.99";
@@ -690,10 +658,6 @@
             const firstImageInput = imagesContainer.querySelector('input[name="image_url"]');
             if (firstImageInput) {
                 firstImageInput.value = "https://assets.sainsburys-groceries.co.uk/gol/1261448/1/640x640.jpg";
-            }
-            const logoInput = imagesContainer.querySelector('input[name="logo_url"]');
-            if (logoInput) {
-                logoInput.value = "";
             }
             document.getElementById('error-message').classList.add('hidden');
             document.getElementById('success-message').classList.add('hidden');
@@ -705,7 +669,7 @@
             }, 200);
         });
         function collectImages() {
-            const inputs = imagesContainer.querySelectorAll('input[name="image_url"], input[name="logo_url"]');
+            const inputs = imagesContainer.querySelectorAll('input[name="image_url"]');
             const images = [];
             inputs.forEach(input => {
                 const val = input.value.trim();
@@ -820,7 +784,7 @@
                 imgDiv.className = 'relative group';
                 imgDiv.innerHTML = `
                     <img src="${url}" alt="Listing Image ${index + 1}"
-                         class="w-full h-32 object-cover rounded-lg border-2 border-gray-200 hover:border-purple-400 transition-colors cursor-pointer"
+                         class="w-full h-32 object-cover rounded-lg border-2 border-gray-200 hover:border-blue-400 transition-colors cursor-pointer"
                          onclick="openImageModal('${url}')"
                          onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xMiA5VjEzTTEyIDE3SDE2TTggMTdIMTJNOCAxM0gxMk04IDlIMTZNNCAxN1Y3QTIgMiAwIDAgMSA2IDVIMThBMiAyIDAgMCExIDIwIDdWMTdBMiAyIDAgMCExIDE4IDE5SDZBMiAyIDAgMCExIDQgMTdaIiBzdHJva2U9IiM2QjczODAiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjwvc3ZnPgo='; this.className += ' opacity-50'">
                     <div class="absolute top-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
