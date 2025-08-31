@@ -143,6 +143,27 @@
             margin-bottom: 16px;
             border: 1px solid #fecaca;
         }
+
+        .success-message {
+            display: none;
+            background-color: #dcfce7;
+            color: #15803d;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            border: 1px solid #bbf7d0;
+        }
+
+        .ai-status {
+            background-color: #e0f2fe;
+            border: 2px solid #bae6fd;
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .ai-progress {
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+        }
     </style>
 </head>
 
@@ -202,9 +223,28 @@
             </p>
         </div>
 
+        <!-- AI Status Indicator -->
+        <div id="ai-status" class="hidden ai-status mt-8">
+            <div class="flex items-center">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-4"></div>
+                <div>
+                    <h3 class="text-lg font-semibold text-blue-900">Processing Image Enhancement</h3>
+                    <p id="ai-status-text" class="text-blue-700 mt-1">Analyzing image...</p>
+                </div>
+            </div>
+            <div class="mt-6">
+                <div class="bg-white rounded-full h-3">
+                    <div id="ai-progress" class="ai-progress h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        <div id="error-message" class="error-message mb-8"></div>
+        <div id="success-message" class="success-message mb-8"></div>
+
         <!-- Image Enhancement Form -->
         <div class="card rounded-2xl shadow-lg p-8 max-w-3xl mx-auto hover-lift">
-            <div id="error-message" class="error-message"></div>
             <div class="mb-6">
                 <h3 class="text-2xl font-bold text-gray-900 mb-2">Enhance Your Image</h3>
                 <p class="text-sm text-gray-500">
@@ -246,7 +286,7 @@
                 </div>
 
                 <div class="flex items-center justify-between">
-                    <button id="go" class="image-enhance-gradient text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity hover-lift disabled:opacity-50 disabled:cursor-not-allowed">Enhance</button>
+                    <button id="go" class="image-enhance-gradient text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed hover-lift">Enhance</button>
                     <span id="msg" class="text-sm text-gray-500"></span>
                 </div>
 
@@ -314,7 +354,7 @@
                     </a>
                     <a href="#" class="text-gray-400 hover:text-white transition-colors hover-lift">
                         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2.163c3.204 0 3.584.013 4.85.07 1.366.061 2.347.306 2.982.608a4.84 4.84 0 011.772 1.153 4.84 4.84 0 011.153 1.772c.302.635.547 1.616.608 2.982.058 1.266.07 1.646.07 4.85s-.013 3.584-.07 4.85c-.061 1.366-.306 2.347-.608 2.982a4.84 4.84 0 01-1.153 1.772 4.84 4.84 0 01-1.772 1.153c-.635.302-1.616.547-2.982.608-1.266.058-1.646.07-4.85.07s-3.584-.058-4.85-.07c-1.366-.061-2.347-.306-2.982-.608a4.84 4.84 0 01-1.772-1.153 4.84 4.84 0 01-1.153-1.772c-.302-.635-.547-1.616-.608-2.982-.058-1.266-.07-1.646-.07-4.85s.013-3.584.07-4.85c.061 1.366.306-2.347.608-2.982a4.84 4.84 0 011.153-1.772 4.84 4.84 0 011.772-1.153c.635-.302 1.616-.547 2.982-.608 1.266-.058 1.646-.07 4.85.07zm0-2.163c-3.259 0-3.668.014-4.947.072-1.358.062-2.626.335-3.517.934a7.045 7.045 0 00-2.55 2.55c-.599.891-.872 2.159-.934 3.517-.058 1.279-.072 1.688-.072 4.947s.014 3.668.072 4.947c.062 1.358.335 2.626.934 3.517a7.045 7.045 0 002.55 2.55c.891.599 2.159.872 3.517.934 1.279.058 1.688.072 4.947.072s3.668-.014 4.947-.072c1.358-.062 2.626-.335 3.517-.934a7.045 7.045 0 00-2.55-2.55c-.891-.599-2.159-.872-3.517-.934-1.279-.058-1.688-.072-4.947-.072z"></path>
+                            <path d="M12 2.163c3.204 0 3.584.013 4.85.07 1.366.061 2.347.306 2.982.608a4.84 4.84 0 011.772 1.153 4.84 4.84 0 011.153 1.772c.302.635.547 1.616.608 2.982.058 1.266.07 1.646.07 4.85s-.013 3.584-.07 4.85c-.061 1.366-.306 2.347-.608 2.982a4.84 4.84 0 01-1.153 1.772 4.84 4.84 0 01-1.772 1.153c-.635.302-1.616.547-2.982.608-1.266.058-1.646.07-4.85.07s-3.584-.058-4.85-.07c-1.366-.061-2.347-.306-2.982-.608a4.84 4.84 0 01-1.772-1.153 4.84 4.84 0 01-1.153-1.772c-.302-.635-.547-1.616-.608-2.982-.058-1.266-.07-1.646-.07-4.85s.013-3.584.07-4.85c.061 1.366.306-2.347.608-2.982a4.84 4.84 0 011.153-1.772 4.84 4.84 0 011.772-1.153c.635-.302 1.616-.547 2.982-.608 1.266-.058 1.646-.07 4.85-.07zm0-2.163c-3.259 0-3.668.014-4.947.072-1.358.062-2.626.335-3.517.934a7.045 7.045 0 00-2.55 2.55c-.599.891-.872 2.159-.934 3.517-.058 1.279-.072 1.688-.072 4.947s.014 3.668.072 4.947c.062 1.358.335 2.626.934 3.517a7.045 7.045 0 002.55 2.55c.891.599 2.159.872 3.517.934 1.279.058 1.688.072 4.947.072s3.668-.014 4.947-.072c1.358-.062 2.626-.335 3.517-.934a7.045 7.045 0 00-2.55-2.55c-.891-.599-2.159-.872-3.517-.934-1.279-.058-1.688-.072-4.947-.072z"></path>
                         </svg>
                     </a>
                 </div>
@@ -326,193 +366,442 @@
     </footer>
 
     <script>
-        // Authentication check and user info display
-        window.addEventListener('load', async () => {
-            try {
-                const response = await fetch('/auth-status');
-                const data = await response.json();
+        // AI Status Functions
+ technology, and will be available soon!</p>
+                </div>
+            </div>
+        </div>
 
-                if (!data.is_logged_in) {
+        <script>
+            // AI Status Functions
+            const aiStatusEl = document.getElementById('ai-status');
+            const aiStatusTextEl = document.getElementById('ai-status-text');
+            const aiProgressEl = document.getElementById('ai-progress');
+
+            function showAIStatus(message, progress = 0) {
+                aiStatusEl.classList.remove('hidden');
+                aiStatusTextEl.textContent = message;
+                aiProgressEl.style.width = `${progress}%`;
+            }
+
+            function hideAIStatus() {
+                aiStatusEl.classList.add('hidden');
+                aiProgressEl.style.width = '0%';
+            }
+
+            function updateAIProgress(message, progress) {
+                aiStatusTextEl.textContent = message;
+                aiProgressEl.style.width = `${progress}%`;
+            }
+
+            // Authentication check and user info display
+            window.addEventListener('load', async () => {
+                try {
+                    const response = await fetch('/auth-status');
+                    const data = await response.json();
+
+                    if (!data.is_logged_in) {
+                        window.location.href = 'login.html';
+                        return;
+                    }
+
+                    document.getElementById('user-email').textContent = data.email;
+                    document.getElementById('mobile-user-email').textContent = data.email;
+
+                    try {
+                        const profileResponse = await fetch('/profile');
+                        const profileData = await profileResponse.json();
+                        if (profileResponse.ok && profileData.profile && profileData.profile.profile_pic_url) {
+                            document.getElementById('user-profile-pic').src = profileData.profile.profile_pic_url;
+                            document.getElementById('mobile-user-profile-pic').src = profileData.profile.profile_pic_url;
+                        }
+                    } catch (error) {
+                        console.error('Error loading profile image:', error);
+                    }
+
+                    // Prefill fields from query parameters
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const imageUrl = urlParams.get('image_url');
+                    const logoUrl = urlParams.get('logo_url');
+                    if (imageUrl) document.getElementById('image_url').value = imageUrl;
+                    if (logoUrl) document.getElementById('logo_url').value = logoUrl;
+                } catch (error) {
                     window.location.href = 'login.html';
+                }
+            });
+
+            // Hamburger menu toggle
+            const hamburgerBtn = document.getElementById('hamburger-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            hamburgerBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('active');
+                hamburgerBtn.classList.toggle('active');
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // Logout functionality
+            document.getElementById('logout-btn').addEventListener('click', async () => {
+                try {
+                    await fetch('/logout', { method: 'POST' });
+                    window.location.href = 'index.html';
+                } catch (error) {
+                    console.error('Logout failed:', error);
+                }
+            });
+
+            document.getElementById('mobile-logout-btn').addEventListener('click', async () => {
+                try {
+                    await fetch('/logout', { method: 'POST' });
+                    window.location.href = 'index.html';
+                } catch (error) {
+                    console.error('Logout failed:', error);
+                }
+            });
+
+            // Message Display Functions
+            const errorMessage = document.getElementById('error-message');
+            const successMessage = document.getElementById('success-message');
+
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.classList.remove('hidden');
+                successMessage.classList.add('hidden');
+                setTimeout(() => {
+                    errorMessage.classList.add('hidden');
+                    errorMessage.textContent = '';
+                }, 5000);
+            }
+
+            function showSuccess(message) {
+                successMessage.textContent = message;
+                successMessage.classList.remove('hidden');
+                errorMessage.classList.add('hidden');
+                setTimeout(() => {
+                    successMessage.classList.add('hidden');
+                    successMessage.textContent = '';
+                }, 5000);
+            }
+
+            // Image and Logo Upload functionality
+            const imageUploadInput = document.getElementById('image-upload');
+            const logoUploadInput = document.getElementById('logo-upload');
+
+            async function uploadFile(fileInput, type, targetInputId) {
+                if (!fileInput.files || fileInput.files.length === 0) {
+                    showError(`No ${type} file selected`);
                     return;
                 }
 
-                document.getElementById('user-email').textContent = data.email;
-                document.getElementById('mobile-user-email').textContent = data.email;
+                const file = fileInput.files[0];
+                const formData = new FormData();
+                formData.append('image', file);
+
+                const uploadBtn = fileInput.previousElementSibling;
+                uploadBtn.disabled = true;
+                uploadBtn.textContent = `Uploading ${type}...`;
 
                 try {
-                    const profileResponse = await fetch('/profile');
-                    const profileData = await profileResponse.json();
-                    if (profileResponse.ok && profileData.profile && profileData.profile.profile_pic_url) {
-                        document.getElementById('user-profile-pic').src = profileData.profile.profile_pic_url;
-                        document.getElementById('mobile-user-profile-pic').src = profileData.profile.profile_pic_url;
+                    const response = await fetch('/upload-profile-image', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await response.json();
+
+                    if (response.ok && data.status === 'success') {
+                        document.getElementById(targetInputId).value = data.image_url;
+                        showSuccess(`${type} uploaded successfully`);
+                    } else {
+                        throw new Error(data.error || 'Upload failed');
                     }
                 } catch (error) {
-                    console.error('Error loading profile image:', error);
+                    showError(`Error uploading ${type}: ${error.message}`);
+                } finally {
+                    uploadBtn.disabled = false;
+                    uploadBtn.textContent = `Upload ${type}`;
+                    fileInput.value = '';
                 }
+            }
 
-                // Prefill fields from query parameters
-                const urlParams = new URLSearchParams(window.location.search);
-                const imageUrl = urlParams.get('image_url');
-                const logoUrl = urlParams.get('logo_url');
-                if (imageUrl) document.getElementById('image_url').value = imageUrl;
-                if (logoUrl) document.getElementById('logo_url').value = logoUrl;
-            } catch (error) {
+            imageUploadInput.addEventListener('change', () => uploadFile(imageUploadInput, 'Image', 'image_url'));
+            logoUploadInput.addEventListener('change', () => uploadFile(logoUploadInput, 'Logo', 'logo_url'));
+
+            // Remove Background Coming Soon
+            const removeBgCheckbox = document.getElementById('remove_bg');
+            removeBgCheckbox.addEventListener('change', () => {
+                if (removeBgCheckbox.checked) {
+                    showError('Background removal feature is coming soon!');
+                    removeBgCheckbox.checked = false;
+                }
+            });
+
+            // Image Enhancement functionality
+            const goBtn = document.getElementById('go');
+            const preview = document.getElementById('preview');
+            const popup = document.getElementById('image-popup');
+            const popupPreview = document.getElementById('popup-preview');
+            const popupClose = document.querySelector('.popup-close');
+
+            function showPopup() {
+                popup.style.display = 'flex';
+            }
+
+            function hidePopup() {
+                popup.style.display = 'none';
+streets of vibrant cities to the serene landscapes of countryside retreats. Whether you're planning a weekend getaway or a month-long adventure, our expert tips and insider knowledge ensure you experience the best each destination has to offer. From hidden gems to iconic landmarks, we’ve got you covered with itineraries, travel hacks, and local insights to make your journey unforgettable.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // AI Status Functions
+    const aiStatusEl = document.getElementById('ai-status');
+    const aiStatusTextEl = document.getElementById('ai-status-text');
+    const aiProgressEl = document.getElementById('ai-progress');
+
+    function showAIStatus(message, progress = 0) {
+        aiStatusEl.classList.remove('hidden');
+        aiStatusTextEl.textContent = message;
+        aiProgressEl.style.width = `${progress}%`;
+    }
+
+    function hideAIStatus() {
+        aiStatusEl.classList.add('hidden');
+        aiProgressEl.style.width = '0%';
+    }
+
+    function updateAIProgress(message, progress) {
+        aiStatusTextEl.textContent = message;
+        aiProgressEl.style.width = `${progress}%`;
+    }
+
+    // Authentication check and user info display
+    window.addEventListener('load', async () => {
+        try {
+            const response = await fetch('/auth-status');
+            const data = await response.json();
+
+            if (!data.is_logged_in) {
                 window.location.href = 'login.html';
-            }
-        });
-
-        // Hamburger menu toggle
-        const hamburgerBtn = document.getElementById('hamburger-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
-        hamburgerBtn.addEventListener('click', () => {
-            mobileMenu.classList.toggle('active');
-            hamburgerBtn.classList.toggle('active');
-            mobileMenu.classList.toggle('hidden');
-        });
-
-        // Logout functionality
-        document.getElementById('logout-btn').addEventListener('click', async () => {
-            try {
-                await fetch('/logout', { method: 'POST' });
-                window.location.href = 'index.html';
-            } catch (error) {
-                console.error('Logout failed:', error);
-            }
-        });
-
-        document.getElementById('mobile-logout-btn').addEventListener('click', async () => {
-            try {
-                await fetch('/logout', { method: 'POST' });
-                window.location.href = 'index.html';
-            } catch (error) {
-                console.error('Logout failed:', error);
-            }
-        });
-
-        // Image and Logo Upload functionality
-        const imageUploadInput = document.getElementById('image-upload');
-        const logoUploadInput = document.getElementById('logo-upload');
-        const errorMessage = document.getElementById('error-message');
-        const msg = document.getElementById('msg');
-
-        function showError(message) {
-            errorMessage.textContent = message;
-            errorMessage.style.display = 'block';
-            setTimeout(() => {
-                errorMessage.style.display = 'none';
-                errorMessage.textContent = '';
-            }, 5000); // Hide after 5 seconds
-        }
-
-        async function uploadFile(fileInput, type, targetInputId) {
-            if (!fileInput.files || fileInput.files.length === 0) {
-                showError(`No ${type} file selected`);
                 return;
             }
 
-            const file = fileInput.files[0];
-            const formData = new FormData();
-            formData.append('image', file);
+            document.getElementById('user-email').textContent = data.email;
+            document.getElementById('mobile-user-email').textContent = data.email;
 
-            msg.textContent = `Uploading ${type}...`;
             try {
-                const response = await fetch('/upload-profile-image', {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await response.json();
-
-                if (!response.ok || !data.status === 'success') {
-                    throw new Error(data.error || 'Upload failed');
+                const profileResponse = await fetch('/profile');
+                const profileData = await profileResponse.json();
+                if (profileResponse.ok && profileData.profile && profileData.profile.profile_pic_url) {
+                    document.getElementById('user-profile-pic').src = profileData.profile.profile_pic_url;
+                    document.getElementById('mobile-user-profile-pic').src = profileData.profile.profile_pic_url;
                 }
+            } catch (error) {
+                console.error('Error loading profile image:', error);
+            }
 
-                msg.textContent = `${type} uploaded successfully`;
+            // Prefill fields from query parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const imageUrl = urlParams.get('image_url');
+            const logoUrl = urlParams.get('logo_url');
+            if (imageUrl) document.getElementById('image_url').value = imageUrl;
+            if (logoUrl) document.getElementById('logo_url').value = logoUrl;
+        } catch (error) {
+            window.location.href = 'login.html';
+        }
+    });
+
+    // Hamburger menu toggle
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    hamburgerBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('active');
+        hamburgerBtn.classList.toggle('active');
+        mobileMenu.classList.toggle('hidden');
+    });
+
+    // Logout functionality
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+        try {
+            await fetch('/logout', { method: 'POST' });
+            window.location.href = 'index.html';
+        } catch (error) {
+            console.error('Logout failed:', error);
+        }
+    });
+
+    document.getElementById('mobile-logout-btn').addEventListener('click', async () => {
+        try {
+            await fetch('/logout', { method: 'POST' });
+            window.location.href = 'index.html';
+        } catch (error) {
+            console.error('Logout failed:', error);
+        }
+    });
+
+    // Message Display Functions
+    const errorMessage = document.getElementById('error-message');
+    const successMessage = document.getElementById('success-message');
+
+    function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.classList.remove('hidden');
+        successMessage.classList.add('hidden');
+        setTimeout(() => {
+            errorMessage.classList.add('hidden');
+            errorMessage.textContent = '';
+        }, 5000);
+    }
+
+    function showSuccess(message) {
+        successMessage.textContent = message;
+        successMessage.classList.remove('hidden');
+        errorMessage.classList.add('hidden');
+        setTimeout(() => {
+            successMessage.classList.add('hidden');
+            successMessage.textContent = '';
+        }, 5000);
+    }
+
+    // Image and Logo Upload functionality
+    const imageUploadInput = document.getElementById('image-upload');
+    const logoUploadInput = document.getElementById('logo-upload');
+
+    async function uploadFile(fileInput, type, targetInputId) {
+        if (!fileInput.files || fileInput.files.length === 0) {
+            showError(`No ${type} file selected`);
+            return;
+        }
+
+        const file = fileInput.files[0];
+        const formData = new FormData();
+        formData.append('image', file);
+
+        const uploadBtn = fileInput.previousElementSibling;
+        uploadBtn.disabled = true;
+        uploadBtn.textContent = `Uploading ${type}...`;
+
+        try {
+            const response = await fetch('/upload-profile-image', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+
+            if (response.ok && data.status === 'success') {
                 document.getElementById(targetInputId).value = data.image_url;
-            } catch (error) {
-                showError(`Error uploading ${type}: ${error.message}`);
+                showSuccess(`${type} uploaded successfully`);
+            } else {
+                throw new Error(data.error || 'Upload failed');
             }
+        } catch (error) {
+            showError(`Error uploading ${type}: ${error.message}`);
+        } finally {
+            uploadBtn.disabled = false;
+            uploadBtn.textContent = `Upload ${type}`;
+            fileInput.value = '';
+        }
+    }
+
+    imageUploadInput.addEventListener('change', () => uploadFile(imageUploadInput, 'Image', 'image_url'));
+    logoUploadInput.addEventListener('change', () => uploadFile(logoUploadInput, 'Logo', 'logo_url'));
+
+    // Remove Background Coming Soon
+    const removeBgCheckbox = document.getElementById('remove_bg');
+    removeBgCheckbox.addEventListener('change', () => {
+        if (removeBgCheckbox.checked) {
+            showError('Background removal feature is coming soon!');
+            removeBgCheckbox.checked = false;
+        }
+    });
+
+    // Image Enhancement functionality
+    const goBtn = document.getElementById('go');
+    const preview = document.getElementById('preview');
+    const popup = document.getElementById('image-popup');
+    const popupPreview = document.getElementById('popup-preview');
+    const popupClose = document.querySelector('.popup-close');
+
+    function showPopup() {
+        popup.style.display = 'flex';
+    }
+
+    function hidePopup() {
+        popup.style.display = 'none';
+        popupPreview.innerHTML = '';
+    }
+
+    popupClose.addEventListener('click', hidePopup);
+    popup.addEventListener('click', (e) => {
+        if (e.target === popup) hidePopup();
+    });
+
+    goBtn.addEventListener('click', async () => {
+        const image_url = document.getElementById('image_url').value.trim();
+        const title = document.getElementById('title').value.trim();
+        const logo_url = document.getElementById('logo_url').value.trim();
+        const remove_bg = document.getElementById('remove_bg').checked;
+
+        if (!image_url) {
+            showError('Please provide an image URL or upload an image');
+            return;
         }
 
-        imageUploadInput.addEventListener('change', () => uploadFile(imageUploadInput, 'image', 'image_url'));
-        logoUploadInput.addEventListener('change', () => uploadFile(logoUploadInput, 'logo', 'logo_url'));
+        goBtn.disabled = true;
+        goBtn.textContent = 'Enhancing...';
+        preview.innerHTML = '';
+        showAIStatus('🤖 Analyzing image...', 10);
+        setTimeout(() => updateAIProgress('🔍 Processing enhancements...', 25), 500);
+        setTimeout(() => updateAIProgress('🖼️ Applying banner and logo...', 50), 1500);
+        setTimeout(() => updateAIProgress('🎨 Finalizing image...', 75), 2500);
 
-        // Image Enhancement functionality
-        const goBtn = document.getElementById('go');
-        const preview = document.getElementById('preview');
-        const popup = document.getElementById('image-popup');
-        const popupPreview = document.getElementById('popup-preview');
-        const popupClose = document.querySelector('.popup-close');
+        try {
+            const payload = { image_url, title, remove_bg };
+            if (logo_url) payload.logo_url = logo_url;
 
-        function showPopup() {
-            popup.style.display = 'flex';
-        }
+            const res = await fetch('/enhance-image', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
 
-        function hidePopup() {
-            popup.style.display = 'none';
-            popupPreview.innerHTML = '';
-        }
-
-        popupClose.addEventListener('click', hidePopup);
-        popup.addEventListener('click', (e) => {
-            if (e.target === popup) hidePopup();
-        });
-
-        goBtn.addEventListener('click', async () => {
-            const image_url = document.getElementById('image_url').value.trim();
-            const title = document.getElementById('title').value.trim();
-            const logo_url = document.getElementById('logo_url').value.trim();
-            const remove_bg = document.getElementById('remove_bg').checked;
-
-            if (!image_url) {
-                showError('Please provide an image URL or upload an image');
-                return;
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({ error: 'Unknown error' }));
+                throw new Error(err.error || res.statusText);
             }
 
-            msg.textContent = 'Processing...';
-            goBtn.disabled = true;
-            preview.innerHTML = '';
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
 
-            try {
-                const payload = { image_url, title, remove_bg };
-                if (logo_url) payload.logo_url = logo_url;
+            // Create image for preview
+            const img = document.createElement('img');
+            img.src = url;
+            popupPreview.appendChild(img);
 
-                const res = await fetch('/enhance-image', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+            // Create download button
+            const downloadBtn = document.createElement('a');
+            downloadBtn.href = url;
+            downloadBtn.download = 'enhanced.png';
+            downloadBtn.textContent = 'Download Enhanced Image';
+            downloadBtn.className = 'mt-4 inline-block px-6 py-3 image-enhance-gradient text-white rounded-lg font-semibold hover:opacity-90 transition-opacity hover-lift';
+            popupPreview.appendChild(downloadBtn);
 
-                if (!res.ok) {
-                    const err = await res.json().catch(() => ({ error: 'Unknown error' }));
-                    showError('Error: ' + (err.error || res.statusText));
-                } else {
-                    const blob = await res.blob();
-                    const url = URL.createObjectURL(blob);
+            updateAIProgress('✅ Image enhanced successfully!', 100);
+            setTimeout(() => {
+                hideAIStatus();
+                showPopup();
+                showSuccess('Image enhanced successfully');
+            }, 1000);
 
-                    // Create image for preview
-                    const img = document.createElement('img');
-                    img.src = url;
-                    popupPreview.appendChild(img);
-
-                    // Create download button
-                    const downloadBtn = document.createElement('a');
-                    downloadBtn.href = url;
-                    downloadBtn.download = 'enhanced.png';
-                    downloadBtn.textContent = 'Download Enhanced Image';
-                    downloadBtn.className = 'mt-4 inline-block px-6 py-3 image-enhance-gradient text-white rounded-lg font-semibold hover:opacity-90 transition-opacity hover-lift';
-                    popupPreview.appendChild(downloadBtn);
-
-                    showPopup();
-                    msg.textContent = 'Image enhanced successfully';
-                }
-            } catch (e) {
-                showError('Error: ' + e.message);
-            } finally {
-                goBtn.disabled = false;
-            }
-        });
-    </script>
+        } catch (e) {
+            showError('Error: ' + e.message);
+            hideAIStatus();
+        } finally {
+            goBtn.disabled = false;
+            goBtn.textContent = 'Enhance';
+        }
+    });
+</script>
 </body>
-
 </html>
