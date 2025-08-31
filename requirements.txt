@@ -6,3 +6,4 @@ werkzeug
 jsonschema
 openai
 gunicorn
+pillow
