@@ -472,27 +472,22 @@
         // Image and Logo Upload functionality
         const imageUploadInput = document.getElementById('image-upload');
         const logoUploadInput = document.getElementById('logo-upload');
-
         // Trigger file input when the upload button is clicked
         document.getElementById('upload-image-btn').addEventListener('click', () => {
             imageUploadInput.click();
         });
-
         // Handle file selection for image
         imageUploadInput.addEventListener('change', () => {
             uploadFile(imageUploadInput, 'Image', 'image_url');
         });
-
         // Trigger file input when the upload button is clicked
         document.getElementById('upload-logo-btn').addEventListener('click', () => {
             logoUploadInput.click();
         });
-
         // Handle file selection for logo
         logoUploadInput.addEventListener('change', () => {
             uploadFile(logoUploadInput, 'Logo', 'logo_url');
         });
-
         async function uploadFile(fileInput, type, targetInputId) {
             if (!fileInput.files || fileInput.files.length === 0) {
                 showError(`No ${type} file selected`);
