@@ -196,21 +196,6 @@
         <!-- Messages -->
         <div id="error-message" class="hidden bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-xl mb-8 font-medium"></div>
         <div id="success-message" class="hidden bg-green-50 border border-green-200 text-green-800 px-6 py-4 rounded-xl mb-8 font-medium"></div>
-        <!-- AI Status Indicator -->
-        <div id="ai-status" class="hidden ai-status mt-8">
-            <div class="flex items-center">
-                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-4"></div>
-                <div>
-                    <h3 class="text-lg font-semibold text-blue-900">Processing Image Enhancement</h3>
-                    <p id="ai-status-text" class="text-blue-700 mt-1">Analyzing image...</p>
-                </div>
-            </div>
-            <div class="mt-6">
-                <div class="bg-white rounded-full h-3">
-                    <div id="ai-progress" class="ai-progress h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
-                </div>
-            </div>
-        </div>
         <!-- Main Grid -->
         <div class="grid lg:grid-cols-3 gap-12">
             <div class="lg:col-span-2">
@@ -306,6 +291,23 @@
             </div>
         </div>
     </div>
+
+    <!-- AI Status Indicator - Moved below the main content, above the footer -->
+    <div id="ai-status" class="hidden ai-status max-w-7xl mx-auto px-6 lg:px-12 mb-16">
+        <div class="flex items-center">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-4"></div>
+            <div>
+                <h3 class="text-lg font-semibold text-blue-900">Processing Image Enhancement</h3>
+                <p id="ai-status-text" class="text-blue-700 mt-1">Analyzing image...</p>
+            </div>
+        </div>
+        <div class="mt-6">
+            <div class="bg-white rounded-full h-3">
+                <div id="ai-progress" class="ai-progress h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- Popup for Image Preview -->
     <div id="image-popup" class="popup">
         <div class="popup-content">
