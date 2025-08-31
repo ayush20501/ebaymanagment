@@ -81,7 +81,6 @@
             background: #a855f7;
             color: #ffffff;
         }
-        /* Popup styles */
         .popup {
             display: none;
             position: fixed;
@@ -525,14 +524,6 @@
                 fileInput.value = '';
             }
         }
-        // Remove Background Coming Soon
-        const removeBgCheckbox = document.getElementById('remove_bg');
-        removeBgCheckbox.addEventListener('change', () => {
-            if (removeBgCheckbox.checked) {
-                showError('Background removal feature is coming soon!');
-                removeBgCheckbox.checked = false;
-            }
-        });
         // Image Enhancement functionality
         const goBtn = document.getElementById('go');
         const preview = document.getElementById('preview');
