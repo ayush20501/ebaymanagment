@@ -2311,7 +2311,7 @@ def format_description():
 def remove_background_api(image_bytes):
     api_url = "https://api.remove.bg/v1.0/removebg"
     files = {'image_file': image_bytes}
-    headers = {'X-Api-Key': 'NKaRQJXaoGpt247sVBqzL5yX'}
+    headers = {'X-Api-Key': REMOVE_BG_API_KEY}
     response = requests.post(api_url, files=files, headers=headers)
     if response.status_code == 200:
         return response.content
