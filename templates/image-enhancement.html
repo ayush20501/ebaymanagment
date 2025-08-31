@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -100,9 +99,18 @@
             background: #a855f7;
             color: #ffffff;
         }
+
+        .ai-status {
+            transition: opacity 0.3s ease;
+        }
+
+        .ai-status.hidden {
+            opacity: 0;
+            height: 0;
+            overflow: hidden;
+        }
     </style>
 </head>
-
 <body class="min-h-screen bg-gray-50">
     <!-- Navigation -->
     <nav class="nav-gradient border-b border-gray-200 fixed w-full top-0 z-50">
@@ -159,8 +167,265 @@
             </p>
         </div>
 
+        <!-- AI Status Loader -->
+        <div id="ai-status" class="hidden bg-blue-50 border-2 border-blue-200 rounded-2xl p-6 mb-8 ai-status">
+            <div class="flex items-center">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-4"></div>
+                <div>
+                    <h3 class="text-lg font-semibold text-blue-900">Processing Your Image</h3>
+                    <p id="ai-status-text" class="text-blue-700 mt-1">Starting image enhancement...</p>
+                </div>
+            </div>
+            <div class="mt-6">
+                <div class="bg-white rounded-full h-3">
+                    <div id="ai-progress" class="image-enhance-gradient h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
         <!-- Image Enhancement Form -->
         <div class="card rounded-2xl shadow-lg p-8 max-w-3xl mx-auto hover-lift">
+            <!-- Error Message Container -->
+            <div id="error-container" class="hidden mb-6 p-4 bg-red-50 border border-red-200 text-red-800 rounded-xl text-center text-sm font-semibold">
+                <span id="msg"></span>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-2xl font-bold text-gray-900 mb-2">Enhance Your Image</h3>
+                <p class="text-sm text-gray-500">
+                    Upload an image or paste an image URL, add a banner title, optionally remove the background, and add a logo. The image will be tilted by a random angle between -3° and 3°.
+                </p>
+            </div>
+
+            <div class="space-y-6">
+                <div>
+                    <label for="image_url" class="block text-sm font-semibold text-gray-700 mb-2">Image URL</label>
+                    <div class="flex items-center space-x-4">
+                        <input id="image_url" type="text" placeholder="https://example.com/image.jpg" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900">
+                        <label class="upload-btn px-4 py-2 rounded-lg font-semibold cursor-pointer hover-lift">
+                            Upload Image
+                            <input id="image-upload" type="file" accept="image/*" class="hidden">
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="title" class="block text-sm font-semibold text-gray-700 mb-2">Banner Title</label>
+                    <input id="title" type="text" placeholder="e.g., Super Saver 6-Pack" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900">
+                </div>
+
+                <div>
+                    <label for="logo_url" class="block text-sm font-semibold text-gray-700 mb-2">Logo URL (optional)</label>
+                    <div class="flex items-center space-x-4">
+                        <input id="logo_url" type="text" placeholder="https://example.com/logo.png" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900">
+                        <label class="upload-btn px-4 py-2 rounded-lg font-semibold cursor-pointer hover-lift">
+                            Upload Logo
+                            <input id="logo-upload" type="file
+
+System: I notice that the provided HTML code for the image enhancement page appears to be cut off at the end of the `<input id="logo-upload" type="file` line. To provide a complete and functional solution, I'll complete the HTML by closing the input tag, adding the remaining form elements, and integrating the loader functionality based on the single item listing page's approach. I'll ensure the loader mimics the style and behavior of the single item listing page (spinning animation, progress bar, and status messages), keep the "Enhance" button disabled during processing, and display errors prominently at the top with a timeout.
+
+### Assumptions for Completion
+- The remaining HTML structure follows the original image enhancement page, including the "Remove background" checkbox, "Enhance" button, and preview section.
+- The loader will use the same progress messages and timing as the single item listing page, adapted for image enhancement (e.g., "Downloading image...", "Applying enhancements...").
+- Errors will be displayed in the `#error-container` with a 5-second timeout, matching the single item listing's error handling style.
+- The JavaScript will include all necessary functionality for authentication, hamburger menu, logout, image/logo uploads, and image enhancement, with the new loader logic integrated.
+
+### Complete Image Enhancement HTML Code
+Below is the complete HTML code for the image enhancement page, incorporating the loader, error handling, and all existing functionality, styled to match the single item listing page.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Enhancement - ListFast.ai</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .hero-gradient {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 8s ease-in-out infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .hover-lift {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
+        }
+
+        .image-enhance-gradient {
+            background: linear-gradient(135deg, #azki55f7 0%, #ec4899 100%);
+        }
+
+        .nav-gradient {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        }
+
+        .hamburger div {
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.active .top {
+            transform: translateY(8px) rotate(45deg);
+        }
+
+        .hamburger.active .middle {
+            opacity: 0;
+        }
+
+        .hamburger.active .bottom {
+            transform: translateY(-8px) rotate(-45deg);
+        }
+
+        .mobile-menu {
+            transition: all 0.3s ease-in-out;
+            transform: translateY(-100%);
+        }
+
+        .mobile-menu.active {
+            transform: translateY(0);
+        }
+
+        .card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 2px solid transparent;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card:hover {
+            border: 2px solid #a855f7;
+            background: linear-gradient(135deg, #ffffff 0%, #f3e8ff 100%);
+        }
+
+        .preview img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            border: 2px solid #e5e7eb;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .upload-btn {
+            background: #ffffff;
+            border: 2px solid #a855f7;
+            color: #a855f7;
+            transition: all 0.3s ease;
+        }
+
+        .upload-btn:hover {
+            background: #a855f7;
+            color: #ffffff;
+        }
+
+        .ai-status {
+            transition: opacity 0.3s ease;
+        }
+
+        .ai-status.hidden {
+            opacity: 0;
+            height: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Navigation -->
+    <nav class="nav-gradient border-b border-gray-200 fixed w-full top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="flex items-center space-x-2">
+                        <span class="text-2xl font-bold text-gray-900 hover-lift">ListFast.ai</span>
+                    </a>
+                </div>
+                <div class="hidden lg:flex items-center space-x-8">
+                    <a href="services.html" class="text-gray-600 hover:text-gray-900 font-medium px-4 py-2 rounded-lg transition-colors hover-lift">Services</a>
+                    <a href="dashboard.html" class="text-gray-600 hover:text-gray-900 font-medium px-4 py-2 rounded-lg transition-colors hover-lift">Dashboard</a>
+                    <a href="display-profile.html" id="profile-btn" class="flex items-center space-x-2 text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg transition-colors hover-lift">
+                        <img id="user-profile-pic" src="https://via.placeholder.com/32" alt="Profile" class="w-8 h-8 rounded-full border-2 border-gray-200 object-cover">
+                        <span class="font-medium">Profile</span>
+                    </a>
+                    <span id="user-email" class="text-gray-600 text-sm"></span>
+                    <button id="logout-btn" class="hero-gradient text-white px-4 py-2 rounded-lg font-semibold hover:opacity-90 transition-opacity hover-lift">Logout</button>
+                </div>
+                <div class="lg:hidden flex items-center">
+                    <button id="hamburger-btn" class="p-2 focus:outline-none">
+                        <div class="hamburger space-y-1.5">
+                            <div class="top w-6 h-0.5 bg-gray-900"></div>
+                            <div class="middle w-6 h-0.5 bg-gray-900"></div>
+                            <div class="bottom w-6 h-0.5 bg-gray-900"></div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+            <div id="mobile-menu" class="lg:hidden mobile-menu absolute top-16 left-0 w-full bg-white shadow-lg border-b border-gray-200 hidden">
+                <div class="flex flex-col space-y-4 px-6 py-4">
+                    <a href="services.html" class="text-gray-600 hover:text-gray-900 font-medium py-2 transition-colors hover-lift">Services</a>
+                    <a href="dashboard.html" class="text-gray-600 hover:text-gray-900 font-medium py-2 transition-colors hover-lift">Dashboard</a>
+                    <a href="display-profile.html" class="flex items-center space-x-2 text-gray-600 hover:text-gray-900 font-medium py-2 transition-colors hover-lift">
+                        <img id="mobile-user-profile-pic" src="https://via.placeholder.com/32" alt="Profile" class="w-8 h-8 rounded-full border-2 border-gray-200 object-cover">
+                        <span>Profile</span>
+                    </a>
+                    <span id="mobile-user-email" class="text-gray-600 text-sm py-2"></span>
+                    <button id="mobile-logout-btn" class="hero-gradient text-white px-4 py-2 rounded-lg font-semibold hover:opacity-90 transition-opacity hover-lift text-left">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-6 lg:px-12 py-16 pt-24">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                Image <span class="image-enhance-gradient bg-clip-text text-transparent">Enhancement</span>
+            </h2>
+            <p class="text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto">
+                Transform your product images with professional editing. Add banners, remove backgrounds, and integrate logos to make your listings stand out.
+            </p>
+        </div>
+
+        <!-- AI Status Loader -->
+        <div id="ai-status" class="hidden bg-blue-50 border-2 border-blue-200 rounded-2xl p-6 mb-8 ai-status">
+            <div class="flex items-center">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-4"></div>
+                <div>
+                    <h3 class="text-lg font-semibold text-blue-900">Processing Your Image</h3>
+                    <p id="ai-status-text" class="text-blue-700 mt-1">Starting image enhancement...</p>
+                </div>
+            </div>
+            <div class="mt-6">
+                <div class="bg-white rounded-full h-3">
+                    <div id="ai-progress" class="image-enhance-gradient h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Image Enhancement Form -->
+        <div class="card rounded-2xl shadow-lg p-8 max-w-3xl mx-auto hover-lift">
+            <!-- Error Message Container -->
+            <div id="error-container" class="hidden mb-6 p-4 bg-red-50 border border-red-200 text-red-800 rounded-xl text-center text-sm font-semibold">
+                <span id="msg"></span>
+            </div>
+
             <div class="mb-6">
                 <h3 class="text-2xl font-bold text-gray-900 mb-2">Enhance Your Image</h3>
                 <p class="text-sm text-gray-500">
@@ -197,13 +462,13 @@
                 </div>
 
                 <div class="flex items-center space-x-3">
-                    <input id="remove_bg" type="checkbox" class="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
+                    <input id="remove_bg" type="checkbox" class="w- обстановка h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
                     <label for="remove_bg" class="text-sm font-semibold text-gray-700">Remove background</label>
                 </div>
 
                 <div class="flex items-center justify-between">
                     <button id="go" class="image-enhance-gradient text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity hover-lift">Enhance</button>
-                    <span id="msg" class="text-sm text-gray-500"></span>
+                    <span class="text-sm text-gray-500"></span>
                 </div>
 
                 <div class="preview" id="preview"></div>
@@ -234,7 +499,7 @@
                     <h4 class="text-lg font-semibold mb-4">Support</h4>
                     <ul class="space-y-2 text-gray-400 text-sm">
                         <li><a href="#" class="hover:text-white transition-colors hover-lift">Help Center</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors hover-lift">Contact Us</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors hover-lift">Recent Us</a></li>
                         <li><a href="#" class="hover:text-white transition-colors hover-lift">FAQ</a></li>
                         <li><a href="#" class="hover:text-white transition-colors hover-lift">Terms & Conditions</a></li>
                     </ul>
@@ -262,7 +527,7 @@
                     </a>
                     <a href="#" class="text-gray-400 hover:text-white transition-colors hover-lift">
                         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2.163c3.204 0 3.584.013 4.85.07 1.366.061 2.347.306 2.982.608a4.84 4.84 0 011.772 1.153 4.84 4.84 0 011.153 1.772c.302.635.547 1.616.608 2.982.058 1.266.07 1.646.07 4.85s-.013 3.584-.07 4.85c-.061 1.366-.306 2.347-.608 2.982a4.84 4.84 0 01-1.153 1.772 4.84 4.84 0 01-1.772 1.153c-.635.302-1.616.547-2.982.608-1.266.058-1.646.07-4.85.07s-3.584-.058-4.85-.07c-1.366-.061-2.347-.306-2.982-.608a4.84 4.84 0 01-1.772-1.153 4.84 4.84 0 01-1.153-1.772c-.302-.635-.547-1.616-.608-2.982-.058-1.266-.07-1.646-.07-4.85s.013-3.584.07-4.85c.061 1.366.306-2.347.608-2.982a4.84 4.84 0 011.153-1.772 4.84 4.84 0 011.772-1.153c.635-.302 1.616-.547 2.982-.608 1.266-.058 1.646-.07 4.85-.07zm0-2.163c-3.259 0-3.668.014-4.947.072-1.358.062-2.626.335-3.517.934a7.045 7.045 0 00-2.55 2.55c-.599.891-.872 2.159-.934 3.517-.058 1.279-.072 1.688-.072 4.947s.014 3.668.072 4.947c.062 1.358.335 2.626.934 3.517a7.045 7.045 0 002.55 2.55c.891.599 2.159.872 3.517.934 1.279.058 1.688.072 4.947.072s3.668-.014 4.947-.072c1.358-.062 2.626-.335 3.517-.934a7.045 7.045 0 00-2.55-2.55c-.891-.599-2.159-.872-3.517-.934-1.279-.058-1.688-.072-4.947-.072z"></path>
+                            <path d="M12 2.163c3.204 0 3.584.013 4.85.07 1.366.061 2.347.306 2.982.608a4.84 4.84 0 011.772 1.153 4.84 4.84 0 011.153 1.772c.302.635.547 1.616.608 2.982.058 1.266.07 1.646.07 4.85s-.013 3.584-.07 4.85c-.061 1.366-.306 2.347-.608 2.982a4.84 4.84 0 01-1.153 1.772 4.84 4.84 0 01-1.772 1.153c-.635.302-1.616.547-2.982.608-1.266.058-1.646.07-4.85.07s-3.584-.058-4.85-.07c-1.366-.061-2.347-.306-2.982-.608a4.84 4.84 0 01-1.772-1.153 4.84 4.84 0 01-1.153-1.772c-.302-.635-.547-1.616-.608-2.982-.058-1.266-.07-1.646-.07-4.85s.013-3.584.07-4.85c.061-1.366.306-2.347.608-2.982a4.84 4.84 0 011.153-1.772 4.84 4.84 0 011.772-1.153c.635-.302 1.616-.547 2.982-.608 1.266-.058 1.646-.07 4.85-.07zm0-2.163c-3.259 0-3.668.014-4.947.072-1.358.062-2.626.335-3.517.934a7.045 7.045 0 00-2.55 2.55c-.599.891-.872 2.159-.934 3.517-.058 1.279-.072 1.688-.072 4.947s.014 3.668.072 4.947c.062 1.358.335 2.626.934 3.517a7.045 7.045 0 002.55 2.55c.891.599 2.159.872 3.517.934 1.279.058 1.688.072 4.947.072s3.668-.014 4.947-.072c1.358-.062 2.626-.335 3.517-.934a7.045 7.045 0 00-2.55-2.55c-.891-.599-2.159-.872-3.517-.934-1.279-.058-1.688-.072-4.947-.072z"></path>
                         </svg>
                     </a>
                 </div>
@@ -274,6 +539,27 @@
     </footer>
 
     <script>
+        // AI Status Loader Functions
+        const aiStatusEl = document.getElementById('ai-status');
+        const aiStatusTextEl = document.getElementById('ai-status-text');
+        const aiProgressEl = document.getElementById('ai-progress');
+
+        function showAIStatus(message, progress = 0) {
+            aiStatusEl.classList.remove('hidden');
+            aiStatusTextEl.textContent = message;
+            aiProgressEl.style.width = `${progress}%`;
+        }
+
+        function updateAIProgress(message, progress) {
+            aiStatusTextEl.textContent = message;
+            aiProgressEl.style.width = `${progress}%`;
+        }
+
+        function hideAIStatus() {
+            aiStatusEl.classList.add('hidden');
+            aiProgressEl.style.width = '0%';
+        }
+
         // Authentication check and user info display
         window.addEventListener('load', async () => {
             try {
@@ -342,10 +628,16 @@
         const imageUploadInput = document.getElementById('image-upload');
         const logoUploadInput = document.getElementById('logo-upload');
         const msg = document.getElementById('msg');
+        const errorContainer = document.getElementById('error-container');
 
         async function uploadFile(fileInput, type, targetInputId) {
             if (!fileInput.files || fileInput.files.length === 0) {
                 msg.textContent = `No ${type} file selected`;
+                errorContainer.classList.remove('hidden');
+                setTimeout(() => {
+                    errorContainer.classList.add('hidden');
+                    msg.textContent = '';
+                }, 5000);
                 return;
             }
 
@@ -353,27 +645,40 @@
             const formData = new FormData();
             formData.append('image', file);
 
-            msg.textContent = `Uploading ${type}...`;
+            const uploadBtn = fileInput.previousElementSibling;
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = `Uploading ${type}...`;
+
             try {
-                const response = await fetch('/upload-profile-image', {
+                constwiper response = await fetch('/upload-profile-image', {
                     method: 'POST',
                     body: formData
                 });
                 const data = await response.json();
 
-                if (!response.ok || !data.status === 'success') {
+                if (!response.ok || data.status !== 'success') {
                     throw new Error(data.error || 'Upload failed');
                 }
 
-                msg.textContent = `${type} uploaded successfully`;
                 document.getElementById(targetInputId).value = data.image_url;
+                msg.textContent = `${type} uploaded successfully`;
+                errorContainer.classList.add('hidden');
             } catch (error) {
                 msg.textContent = `Error uploading ${type}: ${error.message}`;
+                errorContainer.classList.remove('hidden');
+                setTimeout(() => {
+                    errorContainer.classList.add('hidden');
+                    msg.textContent = '';
+                }, 5000);
+            } finally {
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = `Upload ${type}`;
+                fileInput.value = '';
             }
         }
 
-        imageUploadInput.addEventListener('change', () => uploadFile(imageUploadInput, 'image', 'image_url'));
-        logoUploadInput.addEventListener('change', () => uploadFile(logoUploadInput, 'logo', 'logo_url'));
+        imageUploadInput.addEventListener('change', () => uploadFile(imageUploadInput, 'Image', 'image_url'));
+        logoUploadInput.addEventListener('change', () => uploadFile(logoUploadInput, 'Logo', 'logo_url'));
 
         // Image Enhancement functionality
         const goBtn = document.getElementById('go');
@@ -385,9 +690,26 @@
             const logo_url = document.getElementById('logo_url').value.trim();
             const remove_bg = document.getElementById('remove_bg').checked;
 
-            msg.textContent = '';
-            preview.innerHTML = '';
+            if (!image_url || !title) {
+                msg.textContent = 'Image URL and title are required';
+                errorContainer.classList.remove('hidden');
+                setTimeout(() => {
+                    errorContainer.classList.add('hidden');
+                    msg.textContent = '';
+                }, 5000);
+                return;
+            }
+
             goBtn.disabled = true;
+            goBtn.textContent = 'Enhancing...';
+            preview.innerHTML = '';
+            errorContainer.classList.add('hidden');
+            msg.textContent = '';
+
+            showAIStatus('🤖 Starting image enhancement...', 10);
+            setTimeout(() => updateAIProgress('📥 Downloading image...', 25), 500);
+            setTimeout(() => updateAIProgress('🖌️ Applying enhancements...', 50), 1500);
+            setTimeout(() => updateAIProgress('🖼️ Finalizing image...', 75), 2500);
 
             try {
                 const payload = { image_url, title, remove_bg };
@@ -402,7 +724,13 @@
                 if (!res.ok) {
                     const err = await res.json().catch(() => ({ error: 'Unknown error' }));
                     msg.textContent = 'Error: ' + (err.error || res.statusText);
+                    errorContainer.classList.remove('hidden');
+                    setTimeout(() => {
+                        errorContainer.classList.add('hidden');
+                        msg.textContent = '';
+                    }, 5000);
                 } else {
+                    updateAIProgress('✅ Image Enhanced!', 100);
                     const blob = await res.blob();
                     const url = URL.createObjectURL(blob);
 
@@ -421,11 +749,17 @@
                 }
             } catch (e) {
                 msg.textContent = 'Error: ' + e.message;
+                errorContainer.classList.remove('hidden');
+                setTimeout(() => {
+                    errorContainer.classList.add('hidden');
+                    msg.textContent = '';
+                }, 5000);
             } finally {
                 goBtn.disabled = false;
+                goBtn.textContent = 'Enhance';
+                setTimeout(hideAIStatus, 1000);
             }
         });
     </script>
 </body>
-
 </html>
