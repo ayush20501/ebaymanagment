@@ -836,6 +836,11 @@ def index():
 @app.route("/profile.html")
 def profile_page():
     return send_from_directory(app.template_folder, 'profile.html')
+
+@app.route("/image-enhancement.html")
+def image_enhancement_page():
+    return send_from_directory(app.template_folder, 'image-enhancement.html')
+	
 @app.route("/display-profile.html")
 def display_profile_page():
     return send_from_directory(app.template_folder, 'display-profile.html')
