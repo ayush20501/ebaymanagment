@@ -2342,14 +2342,34 @@ def process_image_bytes(image_url, logo_url, title, remove_bg=True, output_file=
         fillcolor=(0, 0, 0, 0)
     )
     
-    canvas_width = image_tilted.width
-    canvas_height = image_tilted.height + 200
-    canvas = Image.new("RGBA", (canvas_width, canvas_height), "WHITE")
-    canvas.paste(image_tilted, (0, 120), image_tilted)
+    # Calculate square canvas size - use the larger dimension plus space for banner
+    banner_height = 200
+    max_dimension = max(image_tilted.width, image_tilted.height)
+    canvas_size = max_dimension + banner_height
     
+    # Create square canvas
+    canvas = Image.new("RGBA", (canvas_size, canvas_size), "WHITE")
+    
+    # Calculate position to center the image and maximize it
+    # Leave space for banner at the top
+    available_height = canvas_size - banner_height
+    scale_factor = min(canvas_size / image_tilted.width, available_height / image_tilted.height)
+    
+    new_width = int(image_tilted.width * scale_factor)
+    new_height = int(image_tilted.height * scale_factor)
+    
+    # Resize image to maximize it in the available space
+    image_resized = image_tilted.resize((new_width, new_height), Image.LANCZOS)
+    
+    # Center the image horizontally and position it below the banner
+    x_offset = (canvas_size - new_width) // 2
+    y_offset = banner_height + (available_height - new_height) // 2
+    canvas.paste(image_resized, (x_offset, y_offset), image_resized)
+    
+    # Handle logo
     logo_response = requests.get(logo_url)
     logo = Image.open(BytesIO(logo_response.content)).convert("RGBA")
-    logo_width = canvas_width // 10
+    logo_width = canvas_size // 10
     logo_height = int((logo.height / logo.width) * logo_width)
     logo = logo.resize((logo_width, logo_height), Image.LANCZOS)
     
@@ -2357,27 +2377,42 @@ def process_image_bytes(image_url, logo_url, title, remove_bg=True, output_file=
     new_logo_data = [(item[0], item[1], item[2], int(item[3] * 0.5)) for item in logo_data]
     logo.putdata(new_logo_data)
     
-    logo_x = canvas_width - logo_width - 20
-    logo_y = canvas_height - logo_height - 20
+    logo_x = canvas_size - logo_width - 20
+    logo_y = canvas_size - logo_height - 20
     canvas.paste(logo, (logo_x, logo_y), logo)
     
+    # Handle dynamic font sizing for title
     draw = ImageDraw.Draw(canvas)
-    try:
-        font = ImageFont.truetype("Roboto-Bold.ttf", 50)
-    except:
-        try:
-            font = ImageFont.truetype("Helvetica.ttf", 50)
-        except:
-            font = ImageFont.load_default(size=40)
     
+    # Start with a base font size and reduce if needed
+    font_size = 50
+    max_text_width = canvas_size - 40  # Leave some padding
+    
+    while font_size > 10:  # Minimum font size
+        try:
+            font = ImageFont.truetype("Roboto-Bold.ttf", font_size)
+        except:
+            try:
+                font = ImageFont.truetype("Helvetica.ttf", font_size)
+            except:
+                font = ImageFont.load_default(size=font_size)
+        
+        bbox = draw.textbbox((0, 0), title, font=font)
+        text_width = bbox[2] - bbox[0]
+        
+        if text_width <= max_text_width:
+            break
+        font_size -= 2
+    
+    # Draw the banner with the title
     bbox = draw.textbbox((0, 0), title, font=font)
     text_width = bbox[2] - bbox[0]
     text_height = bbox[3] - bbox[1]
-    text_x = (canvas_width - text_width) // 2
+    text_x = (canvas_size - text_width) // 2
     yellow_height = text_height + 30
     text_y = (yellow_height - text_height) // 2
     
-    draw.rectangle((0, 0, canvas_width, yellow_height), fill="yellow")
+    draw.rectangle((0, 0, canvas_size, yellow_height), fill="yellow")
     draw.text((text_x, text_y), title, fill="black", font=font)
     
     canvas.save(output_file, "PNG")
