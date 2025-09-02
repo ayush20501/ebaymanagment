@@ -2434,11 +2434,12 @@ def enhance_image():
     if not image_url:
         return jsonify({"error": "image_url is required"}), 400
 
+    output_file = None
     try:
         output_file = process_image_bytes(image_url, logo_url, title, remove_bg)
         return send_file(output_file, mimetype="image/png")
     finally:
-        if os.path.exists(output_file):
+        if output_file and os.path.exists(output_file):
             os.remove(output_file)
 
 
