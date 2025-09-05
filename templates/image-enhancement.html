@@ -220,7 +220,13 @@
                         </div>
                         <div>
                             <label for="title" class="block text-sm font-semibold text-gray-700 mb-2">Banner Title (optional)</label>
-                            <input id="title" type="text" placeholder="e.g., Super Saver 6-Pack" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900">
+                            <input id="title" type="text" maxlength="80" placeholder="e.g., Super Saver 6-Pack (80 characters max)" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900">
+                            <div>
+                                <label for="title" class="block text-sm font-semibold text-gray-700 mb-2">Banner Title (optional)</label>
+                                <input id="title" type="text" maxlength="80" placeholder="e.g., Super Saver 6-Pack (80 characters max)" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900">
+                                <div id="title-char-count" class="text-right text-sm text-gray-500 mt-1">0 / 80</div>
+                            </div>
+
                         </div>
                         <div>
                             <label for="logo_url" class="block text-sm font-semibold text-gray-700 mb-2">Logo URL (optional)</label>
@@ -521,6 +527,19 @@
                 fileInput.value = '';
             }
         }
+        const titleInput = document.getElementById('title');
+        const titleCharCount = document.getElementById('title-char-count');
+        
+        titleInput.addEventListener('input', () => {
+            const currentLength = titleInput.value.length;
+            titleCharCount.textContent = `${currentLength} / 80`;
+            
+            if (currentLength > 70) {
+                titleCharCount.classList.add('text-red-500');
+            } else {
+                titleCharCount.classList.remove('text-red-500');
+            }
+        });
         // Image Enhancement functionality
         const goBtn = document.getElementById('go');
         const preview = document.getElementById('preview');
