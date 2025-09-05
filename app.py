@@ -2352,7 +2352,7 @@ def process_image_bytes(image_url, title=None, logo_url=None, remove_bg=False, o
     draw = ImageDraw.Draw(canvas)
 
     if title:
-        font_size = 100
+        font_size = 150
         padding = 40
         
         try:
@@ -2365,7 +2365,7 @@ def process_image_bytes(image_url, title=None, logo_url=None, remove_bg=False, o
             text_width = bbox[2] - bbox[0]
             if text_width <= canvas_size - padding:
                 break
-            font_size -= 5
+            font_size -= 10
             font = font.font_variant(size=font_size)
 
         bbox = draw.textbbox((0, 0), title, font=font)
