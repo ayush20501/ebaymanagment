@@ -2352,8 +2352,9 @@ def process_image_bytes(image_url, title=None, logo_url=None, remove_bg=False, o
     draw = ImageDraw.Draw(canvas)
 
     if title:
-        font_size = 80
+        font_size = 100
         padding = 40
+        
         try:
             font = ImageFont.truetype("Roboto-Bold.ttf", font_size)
         except IOError:
@@ -2361,14 +2362,17 @@ def process_image_bytes(image_url, title=None, logo_url=None, remove_bg=False, o
 
         while font_size > 10:
             bbox = draw.textbbox((0, 0), title, font=font)
-            if (bbox[2] - bbox[0]) <= canvas_size - padding:
+            text_width = bbox[2] - bbox[0]
+            if text_width <= canvas_size - padding:
                 break
-            font_size -= 2
+            font_size -= 5
             font = font.font_variant(size=font_size)
 
         bbox = draw.textbbox((0, 0), title, font=font)
-        text_x = (canvas_size - (bbox[2] - bbox[0])) // 2
-        text_y = (banner_height - (bbox[3] - bbox[1])) // 2
+        text_width = bbox[2] - bbox[0]
+        text_height = bbox[3] - bbox[1]
+        text_x = (canvas_size - text_width) // 2
+        text_y = (banner_height - text_height) // 2
         
         draw.rectangle((0, 0, canvas_size, banner_height), fill="yellow")
         draw.text((text_x, text_y), title, fill="black", font=font)
@@ -2378,9 +2382,11 @@ def process_image_bytes(image_url, title=None, logo_url=None, remove_bg=False, o
             logo_response = requests.get(logo_url)
             logo_response.raise_for_status()
             logo = Image.open(BytesIO(logo_response.content)).convert("RGBA")
+            
             logo_width = canvas_size // 10
             logo_height = int((logo.height / logo.width) * logo_width)
             logo = logo.resize((logo_width, logo_height), Image.LANCZOS)
+            
             logo_x = canvas_size - logo_width - 20
             logo_y = canvas_size - logo_height - 20
             canvas.paste(logo, (logo_x, logo_y), logo)
@@ -2389,6 +2395,7 @@ def process_image_bytes(image_url, title=None, logo_url=None, remove_bg=False, o
 
     canvas.save(output_file, "PNG")
     return output_file
+
 
 
 @app.route("/enhance-image", methods=["POST"])
