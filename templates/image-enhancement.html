@@ -137,10 +137,12 @@
         .ai-progress {
             background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
         }
+        .text-red-500 {
+            color: #dc2626;
+        }
     </style>
 </head>
 <body class="min-h-screen bg-gray-50">
-    <!-- Navigation -->
     <nav class="nav-gradient border-b border-gray-200 fixed w-full top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 lg:px-12">
             <div class="flex justify-between items-center h-16">
@@ -183,7 +185,6 @@
             </div>
         </div>
     </nav>
-    <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-6 lg:px-12 py-16 pt-24">
         <div class="text-center mb-12">
             <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
@@ -193,13 +194,10 @@
                 Transform your product images with professional editing. Add banners, remove backgrounds, and integrate logos to make your listings stand out.
             </p>
         </div>
-        <!-- Messages -->
         <div id="error-message" class="hidden bg-red-50 border border-red-200 text-red-800 px-6 py-4 rounded-xl mb-8 font-medium"></div>
         <div id="success-message" class="hidden bg-green-50 border border-green-200 text-green-800 px-6 py-4 rounded-xl mb-8 font-medium"></div>
-        <!-- Main Grid -->
         <div class="grid lg:grid-cols-3 gap-12">
             <div class="lg:col-span-2">
-                <!-- Image Enhancement Form -->
                 <div class="card rounded-2xl shadow-lg p-8 hover-lift">
                     <div class="mb-6">
                         <h3 class="text-2xl font-bold text-gray-900 mb-2">Enhance Your Image</h3>
@@ -220,13 +218,8 @@
                         </div>
                         <div>
                             <label for="title" class="block text-sm font-semibold text-gray-700 mb-2">Banner Title (optional)</label>
-                            <input id="title" type="text" maxlength="80" placeholder="e.g., Super Saver 6-Pack (80 characters max)" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900">
-                            <div>
-                                <label for="title" class="block text-sm font-semibold text-gray-700 mb-2">Banner Title (optional)</label>
-                                <input id="title" type="text" maxlength="80" placeholder="e.g., Super Saver 6-Pack (80 characters max)" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900">
-                                <div id="title-char-count" class="text-right text-sm text-gray-500 mt-1">0 / 80</div>
-                            </div>
-
+                            <input id="title" type="text" maxlength="80" placeholder="e.g., Super Saver 6-Pack" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900">
+                            <span id="title-char-count" class="text-sm text-gray-500 mt-1 block">0/80 characters</span>
                         </div>
                         <div>
                             <label for="logo_url" class="block text-sm font-semibold text-gray-700 mb-2">Logo URL (optional)</label>
@@ -250,7 +243,6 @@
                     </div>
                 </div>
             </div>
-            <!-- Right Side Info Blocks -->
             <div class="space-y-6">
                 <div class="card p-6 rounded-2xl shadow-lg hover-lift">
                     <h3 class="text-lg font-bold text-gray-900 mb-4">✨ Image Enhancement Features</h3>
@@ -297,8 +289,6 @@
             </div>
         </div>
     </div>
-
-    <!-- AI Status Indicator - Moved below the main content, above the footer -->
     <div id="ai-status" class="hidden ai-status max-w-7xl mx-auto px-6 lg:px-12 mb-16">
         <div class="flex items-center">
             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-4"></div>
@@ -313,15 +303,12 @@
             </div>
         </div>
     </div>
-
-    <!-- Popup for Image Preview -->
     <div id="image-popup" class="popup">
         <div class="popup-content">
             <span class="popup-close">&times;</span>
             <div id="popup-preview"></div>
         </div>
     </div>
-    <!-- Footer -->
     <footer class="bg-gray-900 text-white">
         <div class="max-w-7xl mx-auto px-6 lg:px-12 py-12">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -383,7 +370,6 @@
         </div>
     </footer>
     <script>
-        // AI Status Functions
         const aiStatusEl = document.getElementById('ai-status');
         const aiStatusTextEl = document.getElementById('ai-status-text');
         const aiProgressEl = document.getElementById('ai-progress');
@@ -400,7 +386,6 @@
             aiStatusTextEl.textContent = message;
             aiProgressEl.style.width = `${progress}%`;
         }
-        // Authentication check and user info display
         window.addEventListener('load', async () => {
             try {
                 const response = await fetch('/auth-status');
@@ -421,7 +406,6 @@
                 } catch (error) {
                     console.error('Error loading profile image:', error);
                 }
-                // Prefill fields from query parameters
                 const urlParams = new URLSearchParams(window.location.search);
                 const imageUrl = urlParams.get('image_url');
                 const logoUrl = urlParams.get('logo_url');
@@ -431,7 +415,6 @@
                 window.location.href = 'login.html';
             }
         });
-        // Hamburger menu toggle
         const hamburgerBtn = document.getElementById('hamburger-btn');
         const mobileMenu = document.getElementById('mobile-menu');
         hamburgerBtn.addEventListener('click', () => {
@@ -439,7 +422,6 @@
             hamburgerBtn.classList.toggle('active');
             mobileMenu.classList.toggle('hidden');
         });
-        // Logout functionality
         document.getElementById('logout-btn').addEventListener('click', async () => {
             try {
                 await fetch('/logout', { method: 'POST' });
@@ -456,7 +438,6 @@
                 console.error('Logout failed:', error);
             }
         });
-        // Message Display Functions
         const errorMessage = document.getElementById('error-message');
         const successMessage = document.getElementById('success-message');
         function showError(message) {
@@ -477,22 +458,17 @@
                 successMessage.textContent = '';
             }, 5000);
         }
-        // Image and Logo Upload functionality
         const imageUploadInput = document.getElementById('image-upload');
         const logoUploadInput = document.getElementById('logo-upload');
-        // Trigger file input when the upload button is clicked
         document.getElementById('upload-image-btn').addEventListener('click', () => {
             imageUploadInput.click();
         });
-        // Handle file selection for image
         imageUploadInput.addEventListener('change', () => {
             uploadFile(imageUploadInput, 'Image', 'image_url');
         });
-        // Trigger file input when the upload button is clicked
         document.getElementById('upload-logo-btn').addEventListener('click', () => {
             logoUploadInput.click();
         });
-        // Handle file selection for logo
         logoUploadInput.addEventListener('change', () => {
             uploadFile(logoUploadInput, 'Logo', 'logo_url');
         });
@@ -527,20 +503,6 @@
                 fileInput.value = '';
             }
         }
-        const titleInput = document.getElementById('title');
-        const titleCharCount = document.getElementById('title-char-count');
-        
-        titleInput.addEventListener('input', () => {
-            const currentLength = titleInput.value.length;
-            titleCharCount.textContent = `${currentLength} / 80`;
-            
-            if (currentLength > 70) {
-                titleCharCount.classList.add('text-red-500');
-            } else {
-                titleCharCount.classList.remove('text-red-500');
-            }
-        });
-        // Image Enhancement functionality
         const goBtn = document.getElementById('go');
         const preview = document.getElementById('preview');
         const popup = document.getElementById('image-popup');
@@ -562,6 +524,10 @@
             const title = document.getElementById('title').value.trim();
             const logo_url = document.getElementById('logo_url').value.trim();
             const remove_bg = document.getElementById('remove_bg').checked;
+            if (title.length > 80) {
+                showError('Banner title must not exceed 80 characters');
+                return;
+            }
             if (!image_url) {
                 showError('Please provide an image URL or upload an image');
                 return;
@@ -587,11 +553,9 @@
                 }
                 const blob = await res.blob();
                 const url = URL.createObjectURL(blob);
-                // Create image for preview
                 const img = document.createElement('img');
                 img.src = url;
                 popupPreview.appendChild(img);
-                // Create download button
                 const downloadBtn = document.createElement('a');
                 downloadBtn.href = url;
                 downloadBtn.download = 'enhanced.png';
@@ -610,6 +574,17 @@
             } finally {
                 goBtn.disabled = false;
                 goBtn.textContent = 'Enhance';
+            }
+        });
+        const titleInput = document.getElementById('title');
+        const titleCharCount = document.getElementById('title-char-count');
+        titleInput.addEventListener('input', () => {
+            const charCount = titleInput.value.length;
+            titleCharCount.textContent = `${charCount}/80 characters`;
+            if (charCount > 80) {
+                titleCharCount.classList.add('text-red-500');
+            } else {
+                titleCharCount.classList.remove('text-red-500');
             }
         });
     </script>
